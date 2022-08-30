@@ -18,7 +18,7 @@ void main() {
     setWindowMaxSize(const Size(3840, 2160));
     setWindowMinSize(const Size(1280, 720));
   }
-  DartVLC.initialize(useFlutterNativeView: false);
+  DartVLC.initialize(useFlutterNativeView: true);
   BrnInitializer.register(
       allThemeConfig: BrnAllThemeConfig(
     // 全局配置

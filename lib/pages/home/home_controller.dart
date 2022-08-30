@@ -9,7 +9,8 @@ class HomeController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    player = Player(id: 69420, commandlineArguments: [], registerTexture: true);
+    player =
+        Player(id: 69420, commandlineArguments: [], registerTexture: false);
   }
 
   @override
