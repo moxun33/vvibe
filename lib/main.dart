@@ -15,7 +15,7 @@ import 'package:bruno/bruno.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    // setWindowMaxSize(const Size(1920, 1080));
+    setWindowMaxSize(const Size(3840, 2160));
     setWindowMinSize(const Size(1280, 720));
   }
   DartVLC.initialize(useFlutterNativeView: false);
