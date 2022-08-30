@@ -10,23 +10,13 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScaffold(
-      appBar: MyAppBar(
-        centerTitle: true,
-        title: MyTitle('首页'),
-        leadingType: AppBarBackType.None,
-      ),
+    return Scaffold(
       body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(() => Center(child: Text(controller.count.toString()))),
-            TextButton(onPressed: () => controller.increment(), child: Text('count++')),
-            GetBuilder<HomeController>(builder: (_) {
-              return Text(controller.userName);
-            }),
-            TextButton(onPressed: () => controller.changeUserName(), child: Text('changeName')),
-          ],
+        child: Center(
+          child: SizedBox(
+            width: 500,
+            child: Image.asset('assets/logo.png'),
+          ),
         ),
       ),
     );

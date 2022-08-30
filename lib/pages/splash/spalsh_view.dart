@@ -8,7 +8,10 @@ class SplashPage extends StatelessWidget {
     return Scaffold(
       body: Container(
         child: Center(
-          child: Text('这是欢迎页👏'),
+          child: SizedBox(
+            width: 500,
+            child: Image.asset('assets/logo.png'),
+          ),
         ),
       ),
     );

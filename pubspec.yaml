@@ -71,7 +71,12 @@ dependencies:
       ref: master
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5  
-
+  #window-size
+  window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding
+      path: plugins/window_size
+      
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -103,8 +108,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
