@@ -1,5 +1,5 @@
 name: vvibe
-description: have a good video vibe.
+description: have a good video watching vibe.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -24,6 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  #替换图标
+  flutter_launcher_icons: ^0.10.0
 
   # ios 图标库
   cupertino_icons: ^1.0.2
@@ -73,6 +75,21 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "public/logo.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "public/logo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "public/logo.png"
+    icon_size: 64 # min:48, max:256, default: 48
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
