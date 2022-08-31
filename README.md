@@ -14,3 +14,22 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Flutter Rust Bridge
+
+### Requirements
+
+- ``dart pub global activate ffigen``
+- ``cargo install flutter_rust_bridge_codegen``  
+- See [flutter_rust_bridge](https://github.com/fzyzcjy/flutter_rust_bridge)
+- See [ffigen](https://pub.dev/packages/ffigen)
+
+### FFI Code Gen
+
+go to
+
+`packages/ip2region_ffi`
+
+and run
+
+``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart --skip-deps-check`` in ``packages/ip2region_ffi``  

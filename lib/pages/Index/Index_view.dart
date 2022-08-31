@@ -14,7 +14,7 @@ class IndexPage extends GetView<IndexController> {
     return Obx(() => Scaffold(
           body: controller.isloadWelcomePage.isTrue
               ? SplashPage()
-              : Global.isOfflineLogin
+              : !Global.isOfflineLogin
                   ? HomePage()
                   : LoginPage(),
         ));
