@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:vvibe/global.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
 import 'package:get/get.dart';
@@ -11,8 +14,9 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final nativeVideo =
-        NativeVideo(player: controller.player!, showControls: false);
+    final nativeVideo = Global.isRelease && Platform.isWindows
+        ? NativeVideo(player: controller.player!, showControls: false)
+        : Video(player: controller.player!, showControls: false);
     final videoFrame =
         LiveVideoFrame(videoWidget: nativeVideo, player: controller.player!);
     return Scaffold(
