@@ -1,5 +1,5 @@
 [package]
-name = "ip2region_ffi"
+name = "native"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,3 +10,4 @@ crate-type = ["staticlib","cdylib",]
 
 [dependencies]
 ip2region = "0.1.0"
+flutter_rust_bridge = "1.41.3"

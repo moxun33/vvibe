@@ -32,4 +32,4 @@ go to
 
 and run
 
-``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart --skip-deps-check`` in ``packages/ip2region_ffi``  
+``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart --skip-deps-check``
