@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:vvibe/global.dart';
 
 class HomeController extends GetxController {
   Player? player;
@@ -9,7 +12,10 @@ class HomeController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    player = Player(id: 69420, commandlineArguments: [], registerTexture: true);
+    player = Player(
+        id: 69420,
+        commandlineArguments: [],
+        registerTexture: !(Global.isRelease && Platform.isWindows));
   }
 
   @override

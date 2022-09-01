@@ -10,7 +10,7 @@ class LiveVideoFrame extends StatefulWidget {
     //required this.isFullscreen,
   }) : super(key: key);
 
-  final Video videoWidget;
+  final Widget videoWidget;
   final Player player;
   //final bool isFullscreen;
 
