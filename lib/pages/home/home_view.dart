@@ -11,8 +11,7 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final nativeVideo =
-        NativeVideo(player: controller.player!, showControls: false);
+    final nativeVideo = Video(player: controller.player!, showControls: false);
     final videoFrame =
         LiveVideoFrame(videoWidget: nativeVideo, player: controller.player!);
     return Scaffold(

@@ -31,10 +31,9 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   # ui kit
-  bruno: ^2.2.0
-
+  getwidget: ^2.0.4
   # getx
-  get: ^4.1.4
+  get: 4.6.4
 
   # 日期格式
   intl: ^0.17.0
@@ -69,6 +68,7 @@ dependencies:
     git:
       url: https://github.com/iiijam/dart_vlc.git
       ref: master
+
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5  
   #window-size
@@ -78,13 +78,6 @@ dependencies:
       path: plugins/window_size
   ffi: ^2.0.0
   flutter_rust_bridge: ^1.41.3
-  ip2region_ffi:
-    # When depending on this package from a real application you should use:
-    #   ip2region_ffi: ^x.y.z
-    # See https://dart.dev/tools/pub/dependencies#version-constraints
-    # The example app is bundled with the plugin so we use a path dependency on
-    # the parent directory to use the current plugin's version.
-    path: ./packages/ip2region_ffi
 
 dev_dependencies:
   flutter_test:

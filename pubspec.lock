@@ -43,13 +43,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.10.0"
-  badges:
-    dependency: transitive
-    description:
-      name: badges
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -57,13 +50,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.0"
-  bruno:
-    dependency: "direct main"
-    description:
-      name: bruno
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.2.0"
   build:
     dependency: transitive
     description:
@@ -274,13 +260,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.5"
-  flutter_easyrefresh:
-    dependency: transitive
-    description:
-      name: flutter_easyrefresh
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.2.2"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -346,7 +325,14 @@ packages:
       name: get
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.6.5"
+    version: "4.6.4"
+  getwidget:
+    dependency: "direct main"
+    description:
+      name: getwidget
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.1"
   glob:
     dependency: transitive
     description:
@@ -417,13 +403,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.17.0"
-  ip2region_ffi:
-    dependency: "direct main"
-    description:
-      path: "packages/ip2region_ffi"
-      relative: true
-    source: path
-    version: "0.0.1"
   js:
     dependency: transitive
     description:
@@ -445,13 +424,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.2"
-  lpinyin:
-    dependency: transitive
-    description:
-      name: lpinyin
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.3"
   matcher:
     dependency: transitive
     description:
@@ -473,13 +445,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.7.0"
-  nested:
-    dependency: transitive
-    description:
-      name: nested
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.0"
   octo_image:
     dependency: transitive
     description:
@@ -501,20 +466,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.1"
-  path_drawing:
-    dependency: transitive
-    description:
-      name: path_drawing
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.1"
-  path_parsing:
-    dependency: transitive
-    description:
-      name: path_parsing
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.1"
   path_provider:
     dependency: transitive
     description:
@@ -620,13 +571,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.2.4"
-  provider:
-    dependency: transitive
-    description:
-      name: provider
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "6.0.3"
   pub_semver:
     dependency: transitive
     description:
@@ -964,5 +908,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.17.6 <3.0.0"
+  dart: ">=2.17.0 <3.0.0"
   flutter: ">=3.0.0"
