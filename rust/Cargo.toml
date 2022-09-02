@@ -11,3 +11,5 @@ crate-type = ["staticlib","cdylib",]
 [dependencies]
 ip2region = "0.1.0"
 flutter_rust_bridge = "1.41.3"
+serde = { version = "1.0.119", features = ["derive"] }
+serde_json = "1.0"
