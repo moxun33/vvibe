@@ -31,7 +31,6 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   # ui kit
-  getwidget: ^2.0.4
   # getx
   get: 4.6.4
 
@@ -64,10 +63,7 @@ dependencies:
   flutter_cache_manager: ^3.1.0
 
   html: ^0.15.0
-  dart_vlc:
-    git:
-      url: https://github.com/iiijam/dart_vlc.git
-      ref: master
+  dart_vlc: ^0.2.1
 
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5  

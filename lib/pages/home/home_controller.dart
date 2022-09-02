@@ -1,33 +1,85 @@
 import 'dart:io';
 
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
+import 'package:window_size/window_size.dart';
 
 class HomeController extends GetxController {
   Player? player;
-  dynamic? media;
+  bool playListShowed = false;
   @override
   void onInit() {
     // TODO: implement onInit
     super.onInit();
     player = Player(
-        id: 69420,
+        id: 1,
         commandlineArguments: [],
         registerTexture: !(Global.isRelease && Platform.isWindows));
   }
 
   @override
   void onReady() {
-    media = Media.network(
-        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
-    //media = Media.network('http://27.47.71.53:808/hls/1/index.m3u8');
-    player?.open(media, autoStart: true);
+    //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
+    final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
+    startPlay(url);
+  }
+
+  void startPlay(String url) {
+    if (player == null) EasyLoading.show();
+    MediaSource media = Media.network(url, parse: true);
+    player!.open(media, autoStart: true);
+
+    onCurrentStream();
+    onPlaybackStream();
+    onVideoDemensionStream(url);
+    onPlayError();
+  }
+
+  void onCurrentStream() {
+    player?.currentStream.listen((CurrentState state) {});
+  }
+
+  void onPlaybackStream() {
+    player?.playbackStream.listen((PlaybackState state) {
+      if (state.isPlaying) {
+        EasyLoading.dismiss();
+      }
+    });
+  }
+
+  void onPlayError() {
+    player?.errorStream.listen((e) {
+      EasyLoading.showError(player?.error ?? '加载失败');
+      EasyLoading.dismiss();
+    });
+  }
+
+  void onVideoDemensionStream(String? url) {
+    final name = player?.current.media?.metas['title'] ?? url ?? 'vvibe';
+    player?.videoDimensionsStream.listen((videoDimensions) {
+      final ratio = videoDimensions.width.toString() +
+          'x' +
+          videoDimensions.height.toString();
+      final title = '${name} [${ratio}]';
+      setWindowTitle(title);
+    });
+  }
+
+  void updateWIndowTitle() {}
+  void togglePlayList() {
+    playListShowed = !playListShowed;
+    update();
   }
 
   @override
-  void onClose() {
+  void onClose() {}
+
+  @override
+  void dispose() {
     player?.dispose();
+    super.dispose();
   }
 }
