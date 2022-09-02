@@ -16,7 +16,7 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    PlaylistUtil().getPlayListDir();
+    PlaylistUtil().getPlayListFiles();
     final nativeVideo = Global.isRelease && Platform.isWindows
         ? NativeVideo(
             player: controller.player!,
