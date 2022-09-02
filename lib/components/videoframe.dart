@@ -128,7 +128,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   },
                                 ),
                               ),
-                              IconButton(
+                              /* IconButton(
                                 tooltip: '停止',
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
@@ -136,7 +136,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   player.stop();
                                   player.dispose();
                                 },
-                              ),
+                              ), */
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],

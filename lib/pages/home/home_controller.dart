@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
+import 'package:window_size/window_size.dart';
 
 class HomeController extends GetxController {
   Player? player;
@@ -27,21 +28,25 @@ class HomeController extends GetxController {
   }
 
   void startPlay(String url) {
-    EasyLoading.show();
+    if (player == null) EasyLoading.show();
     MediaSource media = Media.network(url, parse: true);
-    player?.open(media, autoStart: true);
-    onPlayStream();
+    player!.open(media, autoStart: true);
+
+    onCurrentStream();
+    onPlaybackStream();
+    onVideoDemensionStream(url);
+    onPlayError();
+  }
+
+  void onCurrentStream() {
+    player?.currentStream.listen((CurrentState state) {});
+  }
+
+  void onPlaybackStream() {
     player?.playbackStream.listen((PlaybackState state) {
       if (state.isPlaying) {
         EasyLoading.dismiss();
       }
-    });
-    onPlayError();
-  }
-
-  void onPlayStream() {
-    player?.currentStream.listen((CurrentState state) {
-      print(state.media);
     });
   }
 
@@ -52,13 +57,29 @@ class HomeController extends GetxController {
     });
   }
 
+  void onVideoDemensionStream(String? url) {
+    final name = player?.current.media?.metas['title'] ?? url ?? 'vvibe';
+    player?.videoDimensionsStream.listen((videoDimensions) {
+      final ratio = videoDimensions.width.toString() +
+          'x' +
+          videoDimensions.height.toString();
+      final title = '${name} [${ratio}]';
+      setWindowTitle(title);
+    });
+  }
+
+  void updateWIndowTitle() {}
   void togglePlayList() {
     playListShowed = !playListShowed;
     update();
   }
 
   @override
-  void onClose() {
+  void onClose() {}
+
+  @override
+  void dispose() {
     player?.dispose();
+    super.dispose();
   }
 }
