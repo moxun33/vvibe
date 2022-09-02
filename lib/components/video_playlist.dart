@@ -17,7 +17,10 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('df'),
+      child: const Padding(
+        padding: EdgeInsets.all(10),
+        child: Text("dd"),
+      ),
       height: MediaQuery.of(context).size.height,
       decoration: new BoxDecoration(
         color: Colors.black87,

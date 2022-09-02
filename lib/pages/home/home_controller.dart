@@ -8,7 +8,7 @@ import 'package:window_size/window_size.dart';
 
 class HomeController extends GetxController {
   Player? player;
-  bool playListShowed = false;
+  bool playListShowed = true;
   @override
   void onInit() {
     // TODO: implement onInit

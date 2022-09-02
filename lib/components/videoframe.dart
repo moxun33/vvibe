@@ -118,7 +118,6 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                       progress: playPauseController),
                                   onPressed: () {
                                     if (player.playback.isPlaying) {
-                                      print('zt');
                                       player.pause();
                                       playPauseController.reverse();
                                     } else {
@@ -145,6 +144,14 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                       Positioned(
                         right: 80,
                         bottom: 10,
+                        child: VolumeControl(
+                          player: player,
+                          thumbColor: Colors.white70,
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        bottom: 10,
                         child: IconButton(
                           tooltip: '播放列表',
                           color: Colors.white,
@@ -152,14 +159,6 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                           onPressed: () {
                             widget.togglePlayList();
                           },
-                        ),
-                      ),
-                      Positioned(
-                        right: 10,
-                        bottom: 10,
-                        child: VolumeControl(
-                          player: player,
-                          thumbColor: Colors.white70,
                         ),
                       )
                     ]),
