@@ -8,11 +8,13 @@ class LiveVideoFrame extends StatefulWidget {
     required this.videoWidget,
     required this.player,
     //required this.isFullscreen,
+    required this.togglePlayList,
   }) : super(key: key);
 
   final Widget videoWidget;
   final Player player;
   //final bool isFullscreen;
+  final Function togglePlayList;
 
   @override
   State<LiveVideoFrame> createState() => _LiveVideoFrameState();
@@ -109,6 +111,8 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   color: Colors.white,
                                   splashRadius: 12,
                                   iconSize: 28,
+                                  tooltip:
+                                      player.playback.isPlaying ? '暂停' : '播放',
                                   icon: AnimatedIcon(
                                       icon: AnimatedIcons.play_pause,
                                       progress: playPauseController),
@@ -118,15 +122,37 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                       playPauseController.reverse();
                                     } else {
                                       player.play();
+
                                       playPauseController.forward();
                                     }
                                   },
                                 ),
                               ),
+                              IconButton(
+                                tooltip: '停止',
+                                color: Colors.white,
+                                icon: Icon(Icons.stop_sharp),
+                                onPressed: () {
+                                  player.stop();
+                                  player.dispose();
+                                },
+                              ),
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],
                           )),
+                      Positioned(
+                        right: 80,
+                        bottom: 10,
+                        child: IconButton(
+                          tooltip: '播放列表',
+                          color: Colors.white,
+                          icon: Icon(Icons.menu_sharp),
+                          onPressed: () {
+                            widget.togglePlayList();
+                          },
+                        ),
+                      ),
                       Positioned(
                         right: 10,
                         bottom: 10,
@@ -271,20 +297,3 @@ class _VolumeControlState extends State<VolumeControl> {
     setState(() {});
   }
 }
-
-/* class CdnControl extends StatefulWidget {
-  final Player player;
-  final Map streams;
-  CdnControl({Key? key, required this.player, required this.streams})
-      : super(key: key);
-
-  @override
-  State<CdnControl> createState() => _CdnControlState();
-}
-
-class _CdnControlState extends State<CdnControl> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-} */

@@ -31,7 +31,6 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   # ui kit
-  getwidget: ^2.0.4
   # getx
   get: 4.6.4
 

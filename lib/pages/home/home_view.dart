@@ -17,12 +17,23 @@ class HomePage extends GetView<HomeController> {
     final nativeVideo = Global.isRelease && Platform.isWindows
         ? NativeVideo(player: controller.player!, showControls: false)
         : Video(player: controller.player!, showControls: false);
-    final videoFrame =
-        LiveVideoFrame(videoWidget: nativeVideo, player: controller.player!);
+    final videoFrame = LiveVideoFrame(
+      videoWidget: nativeVideo,
+      player: controller.player!,
+      togglePlayList: controller.togglePlayList,
+    );
     return Scaffold(
-      body: Container(
-        child: videoFrame,
-      ),
+      body: GetBuilder<HomeController>(builder: (_) {
+        return Container(
+            child: controller.playListShowed
+                ? Row(
+                    children: <Widget>[
+                      Expanded(flex: 4, child: videoFrame),
+                      Expanded(flex: 1, child: Container()),
+                    ],
+                  )
+                : videoFrame);
+      }),
     );
   }
 }
