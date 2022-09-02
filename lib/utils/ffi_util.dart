@@ -27,4 +27,12 @@ class FfiUtil {
         await api.getIpInfo(ip: ip, dbPath: File('assets/ip2region.xdb').path);
     return addr.replaceAll('0|', '');
   }
+
+//获取url的媒体元数据
+  Future<String?> getMediaInfo(String url) async {
+    String info =
+        await api.getMediaInfo(url: url, ffprobeDir: Directory('assets/').path);
+    print(info);
+    return info;
+  }
 }

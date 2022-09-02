@@ -37,6 +37,26 @@ pub extern "C" fn wire_get_ip_info(
     )
 }
 
+#[no_mangle]
+pub extern "C" fn wire_get_media_info(
+    port_: i64,
+    url: *mut wire_uint_8_list,
+    ffprobe_dir: *mut wire_uint_8_list,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_media_info",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_url = url.wire2api();
+            let api_ffprobe_dir = ffprobe_dir.wire2api();
+            move |task_callback| Ok(get_media_info(api_url, api_ffprobe_dir))
+        },
+    )
+}
+
 // Section: wire structs
 
 #[repr(C)]

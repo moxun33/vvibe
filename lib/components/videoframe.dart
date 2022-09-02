@@ -118,6 +118,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                       progress: playPauseController),
                                   onPressed: () {
                                     if (player.playback.isPlaying) {
+                                      print('zt');
                                       player.pause();
                                       playPauseController.reverse();
                                     } else {

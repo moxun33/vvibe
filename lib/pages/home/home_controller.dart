@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
 import 'package:window_size/window_size.dart';
 
@@ -24,11 +23,12 @@ class HomeController extends GetxController {
   void onReady() {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
-    startPlay(url);
+    // startPlay(url);
   }
 
   void startPlay(String url) {
-    if (player == null) EasyLoading.show();
+    if (player == null) return;
+    EasyLoading.show(status: "拼命加载中");
     MediaSource media = Media.network(url, parse: true);
     player!.open(media, autoStart: true);
 
@@ -81,5 +81,6 @@ class HomeController extends GetxController {
   void dispose() {
     player?.dispose();
     super.dispose();
+    setWindowTitle('vvibe');
   }
 }

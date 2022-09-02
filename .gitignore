@@ -50,4 +50,3 @@ target/
 
 ./rust/
 flutter_rust_bridge_codegen.exe
-ffprobe.exe

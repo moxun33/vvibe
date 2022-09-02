@@ -16,6 +16,11 @@ abstract class Native {
       {required String ip, required String dbPath, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetIpInfoConstMeta;
+
+  Future<String> getMediaInfo(
+      {required String url, required String ffprobeDir, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetMediaInfoConstMeta;
 }
 
 class NativeImpl extends FlutterRustBridgeBase<NativeWire> implements Native {
@@ -39,6 +44,23 @@ class NativeImpl extends FlutterRustBridgeBase<NativeWire> implements Native {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "get_ip_info",
         argNames: ["ip", "dbPath"],
+      );
+
+  Future<String> getMediaInfo(
+          {required String url, required String ffprobeDir, dynamic hint}) =>
+      executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => inner.wire_get_media_info(
+            port_, _api2wire_String(url), _api2wire_String(ffprobeDir)),
+        parseSuccessData: _wire2api_String,
+        constMeta: kGetMediaInfoConstMeta,
+        argValues: [url, ffprobeDir],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetMediaInfoConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_media_info",
+        argNames: ["url", "ffprobeDir"],
       );
 
   // Section: api2wire
@@ -112,6 +134,26 @@ class NativeWire implements FlutterRustBridgeWireBase {
           ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>,
               ffi.Pointer<wire_uint_8_list>)>>('wire_get_ip_info');
   late final _wire_get_ip_info = _wire_get_ip_infoPtr.asFunction<
+      void Function(
+          int, ffi.Pointer<wire_uint_8_list>, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_media_info(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> url,
+    ffi.Pointer<wire_uint_8_list> ffprobe_dir,
+  ) {
+    return _wire_get_media_info(
+      port_,
+      url,
+      ffprobe_dir,
+    );
+  }
+
+  late final _wire_get_media_infoPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_get_media_info');
+  late final _wire_get_media_info = _wire_get_media_infoPtr.asFunction<
       void Function(
           int, ffi.Pointer<wire_uint_8_list>, ffi.Pointer<wire_uint_8_list>)>();
 

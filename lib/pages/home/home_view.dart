@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/components/videoframe.dart';
+import 'package:vvibe/components/video_playlist.dart';
 
 class HomePage extends GetView<HomeController> {
   HomePage({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class HomePage extends GetView<HomeController> {
                 ? Row(
                     children: <Widget>[
                       Expanded(flex: 4, child: videoFrame),
-                      Expanded(flex: 1, child: Container()),
+                      SizedBox(width: 200, child: VideoPlaylist()),
                     ],
                   )
                 : videoFrame);

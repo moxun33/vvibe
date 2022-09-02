@@ -1,9 +1,10 @@
 [package]
-name = "native"
+name = "rust_native"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
+name = "native"
 crate-type = ["staticlib","cdylib",]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
