@@ -13,7 +13,9 @@ class LoginPage extends GetView<LoginController> {
         onTap: () => Get.offAndToNamed(AppRoutes.Home),
         child: Container(
           child: Center(
-            child: Text('登录页'),
+            child: GetBuilder<LoginController>(builder: (_) {
+              return Text("ip地址: ${controller.ipAddr} ");
+            }),
           ),
         ),
       ),

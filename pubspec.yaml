@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -31,10 +31,9 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   # ui kit
-  bruno: ^2.2.0
-
+  getwidget: ^2.0.4
   # getx
-  get: ^4.1.4
+  get: 4.6.4
 
   # 日期格式
   intl: ^0.17.0
@@ -69,6 +68,7 @@ dependencies:
     git:
       url: https://github.com/iiijam/dart_vlc.git
       ref: master
+
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5  
   #window-size
@@ -76,10 +76,17 @@ dependencies:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
-      
+  ffi: ^2.0.0
+  flutter_rust_bridge: ^1.41.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  ffigen: ^6.0.1
+  freezed: ^2.1.0+1
+
+dependency_overrides: 
+  ffi: ^2.0.0
 
 flutter_icons:
   android: "launcher_icon"

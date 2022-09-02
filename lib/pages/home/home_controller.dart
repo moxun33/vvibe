@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:vvibe/global.dart';
 
 class HomeController extends GetxController {
   Player? player;
@@ -9,13 +12,17 @@ class HomeController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    player =
-        Player(id: 69420, commandlineArguments: [], registerTexture: false);
+    player = Player(
+        id: 69420,
+        commandlineArguments: [],
+        registerTexture: !(Global.isRelease && Platform.isWindows));
   }
 
   @override
   void onReady() {
-    media = Media.network('http://27.47.71.53:808/hls/1/index.m3u8');
+    media = Media.network(
+        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
+    //media = Media.network('http://27.47.71.53:808/hls/1/index.m3u8');
     player?.open(media, autoStart: true);
   }
 
