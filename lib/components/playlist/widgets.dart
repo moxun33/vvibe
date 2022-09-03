@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-03 16:32:43 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-03 19:44:19
+ * @Last Modified time: 2022-09-03 19:48:13
  */
 
 import 'package:flutter/material.dart';
@@ -81,6 +81,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
           .map((e) => Container(
                 height: 30,
                 color: Colors.black12,
+                alignment: Alignment.centerLeft,
                 child: OutlinedButton(
                     onPressed: () {
                       widget.onUrlTap(e);
