@@ -46,9 +46,11 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
             children: keyList.map<ExpansionPanel>((String key) {
               final urlList = groups[key] ?? [];
               return ExpansionPanel(
+                  canTapOnHeader: true,
                   backgroundColor: Colors.white10,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return ListTile(
+                      isThreeLine: false,
                       title: Text(key),
                       textColor: isExpanded ? Colors.white70 : Colors.white,
                     );

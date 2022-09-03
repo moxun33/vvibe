@@ -32,6 +32,22 @@ class LoacalStorage {
     return val == null ? false : val;
   }
 
+  Future<bool> setString(String key, String val) {
+    return _prefs.setString(key, val);
+  }
+
+  String getString(String key) {
+    return _prefs.getString(key) ?? '';
+  }
+
+  Future<bool> setStringList(String key, List<String> val) {
+    return _prefs.setStringList(key, val);
+  }
+
+  List<String> getStringList(String key) {
+    return _prefs.getStringList(key) ?? [];
+  }
+
   Future<bool> remove(String key) {
     return _prefs.remove(key);
   }

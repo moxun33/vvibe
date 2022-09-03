@@ -18,7 +18,7 @@ class Global {
   static bool isOfflineLogin = true;
 
   /// vlc是否使用native window
-  static bool useNativeView = Global.isRelease && Platform.isWindows;
+  static bool useNativeView = false; //Global.isRelease && Platform.isWindows;
 
   /// 是否 release
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");

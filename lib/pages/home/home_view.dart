@@ -15,7 +15,7 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final nativeVideo = Global.isRelease && Platform.isWindows
+    final nativeVideo = Global.useNativeView
         ? NativeVideo(
             player: controller.player!,
             showControls: false,

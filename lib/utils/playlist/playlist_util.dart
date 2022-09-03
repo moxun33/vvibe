@@ -18,13 +18,15 @@ class PlaylistUtil {
   }
 
   //获取本地播放列表文件列表
-  Future<List<String>> getPlayListFiles() async {
+  Future<List<String>> getPlayListFiles({bool basename = false}) async {
     final Directory dir = await getPlayListDir();
     final dirList = await dir.list().toList();
     final List<String> list = [];
     for (var v in dirList) {
-      if (v.path.endsWith(".txt") || v.path.endsWith(".m3u"))
-        list.add(v.path.replaceAll('\\', '/'));
+      if (v.path.endsWith(".txt") || v.path.endsWith(".m3u")) {
+        final path = v.path.replaceAll('\\', '/');
+        list.add(basename ? path.split('/').last : path);
+      }
     }
     return list;
   }
@@ -100,7 +102,8 @@ class PlaylistUtil {
               url = lines[i + 1],
               name = info.split(',').last.trim();
           list.add(PlayListItem(
-              group: getM3uPropItem(info, new RegExp(r'group-title="(.*?)"')),
+              group: getM3uPropItem(info, new RegExp(r'group-title="(.*?)"'),
+                  defVal: '未分组'),
               tvgName: getM3uPropItem(info, new RegExp(r'tvg-name="(.*?)"')),
               tvgLogo: getM3uPropItem(info, new RegExp(r'tvg-logo="(.*?)"')),
               name: name,

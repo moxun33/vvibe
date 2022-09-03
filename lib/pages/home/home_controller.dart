@@ -33,12 +33,10 @@ class HomeController extends GetxController {
     EasyLoading.show(status: "拼命加载中");
     MediaSource media = Media.network(item.url, parse: true);
     player!.open(media, autoStart: true);
-
+    player!.setUserAgent('Windows ZTE');
     onCurrentStream();
     onPlaybackStream();
-
     onPlayError();
-
     onVideoDemensionStream(item.url, item.name);
   }
 
