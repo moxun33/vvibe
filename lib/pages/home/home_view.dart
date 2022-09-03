@@ -8,15 +8,13 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/components/videoframe.dart';
-import 'package:vvibe/components/video_playlist.dart';
-import 'package:vvibe/utils/utils.dart';
+import 'package:vvibe/components/playlist/video_playlist.dart';
 
 class HomePage extends GetView<HomeController> {
   HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    PlaylistUtil().getPlayListFiles();
     final nativeVideo = Global.isRelease && Platform.isWindows
         ? NativeVideo(
             player: controller.player!,
@@ -35,7 +33,11 @@ class HomePage extends GetView<HomeController> {
                 ? Row(
                     children: <Widget>[
                       Expanded(flex: 4, child: videoFrame),
-                      SizedBox(width: 200, child: VideoPlaylist()),
+                      SizedBox(
+                          width: 200,
+                          child: VideoPlaylist(
+                            onUrlTap: controller.onPlayUrlChange,
+                          )),
                     ],
                   )
                 : videoFrame);

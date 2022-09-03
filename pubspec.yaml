@@ -77,6 +77,7 @@ dependencies:
       path: plugins/window_size
   ffi: ^2.0.0
   flutter_rust_bridge: ^1.41.3
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:

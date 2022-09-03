@@ -4,6 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/global.dart';
+import 'package:vvibe/models/playlist_item.dart';
 import 'package:window_size/window_size.dart';
 
 class HomeController extends GetxController {
@@ -26,7 +27,7 @@ class HomeController extends GetxController {
     // startPlay(url);
   }
 
-  void startPlay(String url) {
+  void startPlay(String url, String? title) {
     if (player == null) return;
     EasyLoading.show(status: "拼命加载中");
     MediaSource media = Media.network(url, parse: true);
@@ -34,8 +35,14 @@ class HomeController extends GetxController {
 
     onCurrentStream();
     onPlaybackStream();
-    onVideoDemensionStream(url);
+    onVideoDemensionStream(url, title);
     onPlayError();
+  }
+
+//播放url改变
+  void onPlayUrlChange(PlayListItem item) {
+    if (item.url == null) return;
+    startPlay(item.url!, item.name);
   }
 
   void onCurrentStream() {
@@ -57,8 +64,9 @@ class HomeController extends GetxController {
     });
   }
 
-  void onVideoDemensionStream(String? url) {
-    final name = player?.current.media?.metas['title'] ?? url ?? 'vvibe';
+  void onVideoDemensionStream(String? url, String? title) {
+    final name =
+        player?.current.media?.metas['title'] ?? title ?? url ?? 'vvibe';
     player?.videoDimensionsStream.listen((videoDimensions) {
       final ratio = videoDimensions.width.toString() +
           'x' +
