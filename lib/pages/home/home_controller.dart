@@ -18,7 +18,7 @@ class HomeController extends GetxController {
     player = Player(
         id: 1,
         commandlineArguments: [],
-        registerTexture: !(Global.isRelease && Platform.isWindows));
+        registerTexture: !Global.useNativeView);
   }
 
   @override

@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-02 16:32:03 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-02 17:08:04
+ * @Last Modified time: 2022-09-03 21:01:02
  */
 import 'dart:io';
 
@@ -19,8 +19,7 @@ void init() {
     setWindowMaxSize(const Size(3840, 2160));
     setWindowMinSize(const Size(1280, 720));
   }
-  DartVLC.initialize(
-      useFlutterNativeView: Global.isRelease && Platform.isWindows);
+  DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
 /*   BrnInitializer.register(
       allThemeConfig: BrnAllThemeConfig(
     // 全局配置
