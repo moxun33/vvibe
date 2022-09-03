@@ -5,7 +5,7 @@
  * @Last Modified time: 2022-09-03 19:46:10
  */
 import 'package:flutter/material.dart';
-import 'package:vvibe/components/playlist/widgets.dart';
+import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/models/playlist_item.dart';
 
 import '../../utils/playlist/playlist_util.dart';
