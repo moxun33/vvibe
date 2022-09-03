@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-03 16:32:43 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-03 19:48:13
+ * @Last Modified time: 2022-09-03 20:43:31
  */
 
 import 'package:flutter/material.dart';
@@ -66,11 +66,20 @@ class PlUrlListView extends StatefulWidget {
       : super(key: key);
   final List<PlayListItem> data;
   final void Function(PlayListItem item) onUrlTap;
+
   @override
   _PlUrlListViewState createState() => _PlUrlListViewState();
 }
 
 class _PlUrlListViewState extends State<PlUrlListView> {
+  PlayListItem? selectedItem;
+  void selectUrl(PlayListItem e) {
+    widget.onUrlTap(e);
+    setState(() {
+      selectedItem = e;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -84,10 +93,10 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 alignment: Alignment.centerLeft,
                 child: OutlinedButton(
                     onPressed: () {
-                      widget.onUrlTap(e);
+                      selectUrl(e);
                     },
                     child: Tooltip(
-                        message: e.name ?? e.url ?? '',
+                        message: '${e.name}',
                         child: Text(
                           e.name?.trim() ?? '未知名称',
                           maxLines: 1,
@@ -95,7 +104,9 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: e.url == selectedItem?.url
+                                ? Colors.blue
+                                : Colors.white,
                           ),
                         ))),
               ))

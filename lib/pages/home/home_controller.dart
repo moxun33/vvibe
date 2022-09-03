@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:window_size/window_size.dart';
@@ -27,26 +28,31 @@ class HomeController extends GetxController {
     // startPlay(url);
   }
 
-  void startPlay(String url, String? title) {
+  void startPlay(PlayListItem item, {bool? first}) {
     if (player == null) return;
     EasyLoading.show(status: "拼命加载中");
-    MediaSource media = Media.network(url, parse: true);
+    MediaSource media = Media.network(item.url, parse: true);
     player!.open(media, autoStart: true);
 
     onCurrentStream();
     onPlaybackStream();
-    onVideoDemensionStream(url, title);
+
     onPlayError();
+
+    onVideoDemensionStream(item.url, item.name);
   }
 
 //播放url改变
   void onPlayUrlChange(PlayListItem item) {
     if (item.url == null) return;
-    startPlay(item.url!, item.name);
+    startPlay(item);
   }
 
   void onCurrentStream() {
-    player?.currentStream.listen((CurrentState state) {});
+    player?.currentStream.listen((CurrentState state) {
+      print(state.media);
+      print(' current stream');
+    });
   }
 
   void onPlaybackStream() {
@@ -59,7 +65,7 @@ class HomeController extends GetxController {
 
   void onPlayError() {
     player?.errorStream.listen((e) {
-      EasyLoading.showError(player?.error ?? '加载失败');
+      EasyLoading.showError('加载失败');
       EasyLoading.dismiss();
     });
   }
