@@ -9,12 +9,14 @@ class LiveVideoFrame extends StatefulWidget {
     required this.player,
     //required this.isFullscreen,
     required this.togglePlayList,
+    required this.stopPlayer,
   }) : super(key: key);
 
   final Widget videoWidget;
   final Player player;
   //final bool isFullscreen;
   final Function togglePlayList;
+  final Function stopPlayer;
 
   @override
   State<LiveVideoFrame> createState() => _LiveVideoFrameState();
@@ -54,6 +56,17 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
       playPauseController.reverse();
     }
     setState(() {});
+  }
+
+  void playOrPuase() {
+    if (player.playback.isPlaying) {
+      player.pause();
+      playPauseController.reverse();
+    } else {
+      player.play();
+
+      playPauseController.forward();
+    }
   }
 
   @override
@@ -117,25 +130,20 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                       icon: AnimatedIcons.play_pause,
                                       progress: playPauseController),
                                   onPressed: () {
-                                    if (player.playback.isPlaying) {
-                                      player.pause();
-                                      playPauseController.reverse();
-                                    } else {
-                                      player.play();
-
-                                      playPauseController.forward();
-                                    }
+                                    playOrPuase();
                                   },
                                 ),
                               ),
-
-                              /* IconButton(
+                              /*    IconButton(
                                 tooltip: '停止',
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
                                 onPressed: () {
-                                  player.stop();
-                                  player.dispose();
+                                  if (player.playback.isPlaying) {
+                                    player.pause();
+                                    playPauseController.reverse();
+                                  }
+                                  widget.stopPlayer();
                                 },
                               ), */
                               const Expanded(

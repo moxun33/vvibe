@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
+import 'package:vvibe/init.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:window_size/window_size.dart';
 
@@ -15,10 +16,7 @@ class HomeController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    player = Player(
-        id: 1,
-        commandlineArguments: [],
-        registerTexture: !Global.useNativeView);
+    initPlayer(1);
   }
 
   @override
@@ -28,8 +26,18 @@ class HomeController extends GetxController {
     // startPlay(url);
   }
 
+  void initPlayer(int id) {
+    player = Player(
+        id: id,
+        commandlineArguments: [],
+        registerTexture: !Global.useNativeView);
+  }
+
   void startPlay(PlayListItem item, {bool? first}) {
-    if (player == null) return;
+    if (player == null) {
+      initPlayer(new DateTime.now().millisecondsSinceEpoch);
+    }
+
     EasyLoading.show(status: "拼命加载中");
     MediaSource media = Media.network(item.url, parse: true);
     player!.open(media, autoStart: true);
@@ -38,6 +46,15 @@ class HomeController extends GetxController {
     onPlaybackStream();
     onPlayError();
     onVideoDemensionStream(item.url, item.name);
+    player!.playOrPause();
+  }
+
+  //停止播放器、销毁实例
+  void stopPlayer({bool dispose = false}) {
+    if (player == null) return;
+    player!.stop();
+    player!.dispose();
+    if (dispose) player = null;
   }
 
 //播放url改变
@@ -91,7 +108,7 @@ class HomeController extends GetxController {
 
   @override
   void dispose() {
-    player?.dispose();
+    stopPlayer(dispose: true);
     super.dispose();
     setWindowTitle('vvibe');
   }

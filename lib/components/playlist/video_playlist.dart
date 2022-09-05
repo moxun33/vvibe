@@ -24,7 +24,7 @@ class VideoPlaylist extends StatefulWidget {
 class _VideoPlaylistState extends State<VideoPlaylist> {
   List<PlayListItem> playlist = [];
   List<String> playFiles = [];
-  String? selectedFilename;
+  String? selectedFilename = null;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
   @override
@@ -33,13 +33,19 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     PlaylistUtil().getPlayListFiles(basename: true).then((value) {
       setState(() => playFiles = value);
       final lastFile = LoacalStorage().getString(LAST_LOCAL_PLAYLIST_FILE);
-      if (lastFile != null) {
+      if (lastFile != '') {
         onPlayFileChange(lastFile);
       } else {
         if (value.length > 0) {
           onPlayFileChange(value.first);
         }
       }
+    });
+  }
+
+  void updatePlaylistFiles() {
+    PlaylistUtil().getPlayListFiles(basename: true).then((value) {
+      setState(() => playFiles = value);
     });
   }
 
@@ -109,6 +115,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
               // This is called when the user selects an item.
               onPlayFileChange(value);
             },
+            onTap: updatePlaylistFiles,
             style: const TextStyle(color: Colors.white),
             items: playFiles.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
