@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
 
-final List<Map<String, String>> playerCtxMenus = [
-  {'value': 'openUrl', 'label': '打开链接'},
-  {'value': 'scanUrl', 'label': '扫源工具'},
-  {'value': 'verifyUrl', 'label': '验证有效性'},
-  {'value': 'setting', 'label': '软件设置'},
-  {'value': 'about', 'label': '关于软件'},
-  {'value': 'close', 'label': '关闭菜单'},
-  {'value': 'quitApp', 'label': '退出软件'},
-];
-
 class PlayerContextMenu extends StatefulWidget {
   const PlayerContextMenu({Key? key}) : super(key: key);
 
@@ -18,6 +8,15 @@ class PlayerContextMenu extends StatefulWidget {
 }
 
 class _PlayerContextMenuState extends State<PlayerContextMenu> {
+  final List<Map<String, String>> playerCtxMenus = [
+    {'value': 'openUrl', 'label': '打开链接'},
+    {'value': 'scanUrl', 'label': '扫源工具'},
+    {'value': 'verifyUrl', 'label': '验证有效性'},
+    {'value': 'setting', 'label': '软件设置'},
+    {'value': 'about', 'label': '关于软件'},
+    // {'value': 'close', 'label': '关闭菜单'},
+    // {'value': 'quitApp', 'label': '退出软件'},
+  ];
   IconData _getIcon(String? type) {
     switch (type) {
       case 'openUrl':
@@ -29,7 +28,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
       case 'setting':
         return Icons.settings_applications_outlined;
       case 'about':
-        return Icons.home_outlined;
+        return Icons.info_outline;
       case 'close':
         return Icons.close_sharp;
       case 'quitApp':
