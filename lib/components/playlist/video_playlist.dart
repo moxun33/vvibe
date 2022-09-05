@@ -10,6 +10,7 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 import '../../utils/playlist/playlist_util.dart';
 
@@ -30,14 +31,14 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   @override
   void initState() {
     super.initState();
-    PlaylistUtil().getPlayListFiles(basename: true).then((value) {
-      setState(() => playFiles = value);
+    PlaylistUtil().getPlayListFiles(basename: true).then((list) {
+      setState(() => playFiles = list);
       final lastFile = LoacalStorage().getString(LAST_LOCAL_PLAYLIST_FILE);
-      if (lastFile != '') {
+      if (lastFile != '' && list.contains(lastFile)) {
         onPlayFileChange(lastFile);
       } else {
-        if (value.length > 0) {
-          onPlayFileChange(value.first);
+        if (list.length > 0) {
+          onPlayFileChange(list.first);
         }
       }
     });
@@ -104,30 +105,37 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     return Column(
       children: [
         Container(
-          height: 50,
-          width: 200,
-          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-          color: Colors.black87,
-          child: DropdownButton<String>(
-            value: selectedFilename,
-            icon: const Icon(Icons.arrow_downward),
-            onChanged: (String? value) {
-              // This is called when the user selects an item.
-              onPlayFileChange(value);
-            },
-            onTap: updatePlaylistFiles,
-            style: const TextStyle(color: Colors.white),
-            items: playFiles.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(color: Colors.purple),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
+            height: 30,
+            width: 200,
+            padding: const EdgeInsets.fromLTRB(5, 2, 5, 0),
+            color: Colors.black87,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton2<String>(
+                value: selectedFilename,
+                icon: const Icon(Icons.keyboard_arrow_down),
+                onChanged: (String? value) {
+                  // This is called when the user selects an item.
+                  onPlayFileChange(value);
+                },
+                itemHeight: 30,
+                isDense: true,
+                //on: updatePlaylistFiles,
+                style: const TextStyle(color: Colors.white),
+                items: playFiles.map<DropdownMenuItem<String>>((String v) {
+                  return DropdownMenuItem<String>(
+                    value: v,
+                    child: Text(
+                      v,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )),
         Expanded(
             child: Container(
           child: PlGroupPanel(

@@ -3,7 +3,7 @@ description: have a good video watching vibe.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -49,7 +49,6 @@ dependencies:
   shared_preferences: ^2.0.6
   cached_network_image: ^3.0.0
 
-
   # webview
   webview_flutter: ^2.0.8
 
@@ -62,7 +61,7 @@ dependencies:
       ref: master
 
   web_socket_channel: ^2.2.0
-  url_launcher: ^6.1.5  
+  url_launcher: ^6.1.5
   #window-size
   window_size:
     git:
@@ -72,6 +71,7 @@ dependencies:
   flutter_rust_bridge: ^1.41.3
   collection: ^1.16.0
   context_menus: ^1.0.2
+  dropdown_button2: ^1.7.2
 
 dev_dependencies:
   flutter_test:
@@ -79,7 +79,7 @@ dev_dependencies:
   ffigen: ^6.0.1
   freezed: ^2.1.0+1
 
-dependency_overrides: 
+dependency_overrides:
   ffi: ^2.0.0
 
 flutter_icons:
@@ -102,7 +102,6 @@ flutter_icons:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

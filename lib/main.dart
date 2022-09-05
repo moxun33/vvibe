@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'VVibe',
+      theme: ThemeData(fontFamily: Platform.isWindows ? '微软雅黑' : null),
       home: IndexPage(),
       initialBinding: IndexBinding(),
       debugShowCheckedModeBanner: false,

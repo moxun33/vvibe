@@ -33,18 +33,22 @@ class PlaylistUtil {
 
   //解析【本地】文件的播放列表内容
   Future<List<PlayListItem>> parsePlaylistFile(String filePath) async {
-    if (filePath.endsWith('.m3u')) {
-      final lines = await readFileLines(filePath);
-      return parseM3uContents(lines);
+    try {
+      if (filePath.endsWith('.m3u')) {
+        final lines = await readFileLines(filePath);
+        return parseM3uContents(lines);
+      }
+
+      if (filePath.endsWith('.txt')) {
+        final lines = await readFileLines(filePath);
+
+        return parseTxtContents(lines);
+      }
+
+      return [];
+    } catch (e) {
+      return [];
     }
-
-    if (filePath.endsWith('.txt')) {
-      final lines = await readFileLines(filePath);
-
-      return parseTxtContents(lines);
-    }
-
-    return [];
   }
 
 //根据url解析远程txt或m3u内容

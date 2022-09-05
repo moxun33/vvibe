@@ -108,7 +108,7 @@ class HomeController extends GetxController {
 
   @override
   void dispose() {
-    stopPlayer(dispose: true);
+    stopPlayer(dispose: Global.isRelease);
     super.dispose();
     setWindowTitle('vvibe');
   }

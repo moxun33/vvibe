@@ -93,23 +93,29 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 height: 30,
                 color: Colors.black12,
                 alignment: Alignment.centerLeft,
-                child: OutlinedButton(
+                child: TextButton(
                     onPressed: () {
                       selectUrl(e);
                     },
                     child: Tooltip(
                         message: '${e.name}',
-                        child: Text(
-                          e.name?.trim() ?? '未知名称',
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: e.url == selectedItem?.url
-                                ? Colors.blue
-                                : Colors.white,
+                        child: SizedBox(
+                          child: Text(
+                            e.name?.trim() ?? '未知名称',
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: e.url == selectedItem?.url
+                                  ? FontWeight.bold
+                                  : FontWeight.w300,
+                              color: e.url == selectedItem?.url
+                                  ? Colors.purple
+                                  : Colors.white,
+                            ),
                           ),
+                          width: 200,
                         ))),
               ))
           .toList(),
