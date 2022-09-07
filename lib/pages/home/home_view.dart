@@ -25,22 +25,27 @@ class HomePage extends GetView<HomeController> {
             showControls: false,
           )
         : Video(player: controller.player!, showControls: false);
-    final videoFrame = LiveVideoFrame(
-      videoWidget: nativeVideo,
-      player: controller.player!,
-      togglePlayList: controller.togglePlayList,
-      stopPlayer: controller.stopPlayer,
-    );
-    final videoFrameDanmakuWall = BarrageWall(
-        debug: true,
-        safeBottomHeight:
-            Get.height ~/ 4 * 3, // do not send bullets to the safe area
 
-        speed: 10,
-        speedCorrectionInMilliseconds: 10000,
-        bullets: [],
-        child: videoFrame,
-        controller: controller.barrageWallController);
+    final videoFrame = ContextMenuOverlay(
+      child: ContextMenuRegion(
+        contextMenu: PlayerContextMenu(),
+        child: BarrageWall(
+            debug: true,
+            safeBottomHeight:
+                Get.height ~/ 4 * 3, // do not send bullets to the safe area
+
+            speed: 10,
+            speedCorrectionInMilliseconds: 10000,
+            bullets: [],
+            child: LiveVideoFrame(
+              videoWidget: nativeVideo,
+              player: controller.player!,
+              togglePlayList: controller.togglePlayList,
+              stopPlayer: controller.stopPlayer,
+            ),
+            controller: controller.barrageWallController),
+      ),
+    );
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
         return Container(
@@ -53,7 +58,7 @@ class HomePage extends GetView<HomeController> {
                           child: ContextMenuOverlay(
                             child: ContextMenuRegion(
                               contextMenu: PlayerContextMenu(),
-                              child: videoFrameDanmakuWall,
+                              child: videoFrame,
                             ),
                           )),
                       SizedBox(
@@ -63,7 +68,7 @@ class HomePage extends GetView<HomeController> {
                           )),
                     ],
                   )
-                : videoFrameDanmakuWall);
+                : videoFrame);
       }),
     );
   }
