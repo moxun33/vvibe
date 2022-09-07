@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
@@ -7,7 +5,6 @@ import 'package:vvibe/global.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/components/player/videoframe.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
@@ -30,10 +27,9 @@ class HomePage extends GetView<HomeController> {
       child: ContextMenuRegion(
         contextMenu: PlayerContextMenu(),
         child: BarrageWall(
-            debug: true,
+            debug: !Global.isRelease,
             safeBottomHeight:
                 Get.height ~/ 4 * 3, // do not send bullets to the safe area
-
             speed: 10,
             speedCorrectionInMilliseconds: 10000,
             bullets: [],

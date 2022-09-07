@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class HomeController extends GetxController {
   final playListBarWidth = 200.0;
 
   final barrageWallController = BarrageWallController();
-
+  DouyuDnamakuService? dyDanmakuService;
   @override
   void onInit() {
     super.onInit();
@@ -32,7 +33,6 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
-    startDanmakuSocket();
   }
 
 //发送弹幕道屏幕
@@ -51,13 +51,29 @@ class HomeController extends GetxController {
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
-  void startDanmakuSocket() {
-    final DouyuDnamakuService dyDanmakuService = DouyuDnamakuService(
-        roomId: 4549169,
-        onDanmaku: (LiveDanmakuItem? node) {
-          sendDanmakuBullet(node);
-        });
-    dyDanmakuService.startConnect();
+  void startDanmakuSocket(PlayListItem item) {
+    stopDanmakuSocket();
+    if (item.tvgId == null) return;
+    final String rid = item.tvgId!;
+    switch (item.group) {
+      case '斗鱼':
+      case 'douyu':
+        dyDanmakuService = DouyuDnamakuService(
+            roomId: rid,
+            onDanmaku: (LiveDanmakuItem? node) {
+              sendDanmakuBullet(node);
+            });
+        dyDanmakuService!.startConnect();
+        break;
+      default:
+    }
+  }
+
+//断开所有弹幕连接
+  void stopDanmakuSocket() {
+    //barrageWallController.disable();
+    dyDanmakuService?.dispose();
+    dyDanmakuService = null;
   }
 
   void initPlayer(int id) {
@@ -76,7 +92,7 @@ class HomeController extends GetxController {
     MediaSource media = Media.network(item.url, parse: true);
     player!.open(media, autoStart: true);
     player!.setUserAgent('Windows ZTE');
-    onCurrentStream();
+    onCurrentStream(item);
     onPlaybackStream();
     onPlayError();
     onVideoDemensionStream(item.url, item.name);
@@ -97,10 +113,10 @@ class HomeController extends GetxController {
     startPlay(item);
   }
 
-  void onCurrentStream() {
+  void onCurrentStream(PlayListItem? item) {
     player?.currentStream.listen((CurrentState state) {
-      print(state.media);
-      print(' current stream');
+      debugPrint(' current stream ${jsonEncode(item)}');
+      if (item != null) startDanmakuSocket(item);
     });
   }
 
@@ -150,5 +166,6 @@ class HomeController extends GetxController {
     stopPlayer(dispose: Global.isRelease);
     super.dispose();
     setWindowTitle('vvibe');
+    stopDanmakuSocket();
   }
 }

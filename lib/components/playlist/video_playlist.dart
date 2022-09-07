@@ -51,7 +51,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
   void onPlayFileChange(String? value) {
-    if (playlist.length < 1) EasyLoading.show(status: '解析中');
+    //   if (playlist.length < 1) EasyLoading.show(status: '解析中');
     setState(() {
       playlist = [];
       selectedFilename = value;

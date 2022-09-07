@@ -15,7 +15,7 @@ import 'package:web_socket_channel/io.dart';
 class DouyuDnamakuService {
   DouyuDnamakuService({required this.roomId, required this.onDanmaku});
 
-  final int roomId;
+  final String roomId;
   final void Function(LiveDanmakuItem? danmaku) onDanmaku;
 
   Timer? timer;
@@ -109,7 +109,7 @@ class DouyuDnamakuService {
         var content = byteDatas
             .substring(byteDatas.indexOf("txt@="), byteDatas.indexOf("/cid"))
             .replaceAll("txt@=", "");
-        debugPrint('$nickname: $content');
+        debugPrint('斗鱼弹幕-->$nickname: $content');
         danmaku = LiveDanmakuItem(name: nickname, msg: content);
       }
     }
