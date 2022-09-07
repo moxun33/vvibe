@@ -9,3 +9,6 @@ const String REGISTRATION_ID = 'reegistration_id';
 
 //最后加载本地播放列表文件
 const LAST_LOCAL_PLAYLIST_FILE = 'LAST_LOCAL_PLAYLIST_FILE';
+
+//最后的播放列表
+const LAST_PLAYLIST_DATA = 'LAST_LOCAL_PLAYLIST_DATA';

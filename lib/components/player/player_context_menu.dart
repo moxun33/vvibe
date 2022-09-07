@@ -43,7 +43,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     return SingleChildScrollView(
         child: Container(
             width: 130,
-            height: 300,
+            height: 220,
             color: Colors.white,
             child: ListView.builder(
                 shrinkWrap: true,

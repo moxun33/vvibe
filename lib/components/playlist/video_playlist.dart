@@ -51,7 +51,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
   void onPlayFileChange(String? value) {
-    EasyLoading.show(status: '解析中');
+    if (playlist.length < 1) EasyLoading.show(status: '解析中');
     setState(() {
       playlist = [];
       selectedFilename = value;
@@ -61,6 +61,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       LoacalStorage().setString(LAST_LOCAL_PLAYLIST_FILE, value);
       PlaylistUtil().parsePlaylistFile("playlist/${value}").then((value) {
         setState(() => playlist = value);
+        LoacalStorage().setJSON(LAST_PLAYLIST_DATA, value);
         EasyLoading.dismiss();
       });
     } else {
