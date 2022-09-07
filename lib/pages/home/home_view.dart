@@ -45,26 +45,25 @@ class HomePage extends GetView<HomeController> {
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
         return Container(
-            child: controller.playListShowed
-                ? Row(
-                    children: <Widget>[
-                      //  PlayerContextMenu(),
-                      Expanded(
-                          flex: 4,
-                          child: ContextMenuOverlay(
-                            child: ContextMenuRegion(
-                              contextMenu: PlayerContextMenu(),
-                              child: videoFrame,
-                            ),
-                          )),
-                      SizedBox(
-                          width: controller.playListBarWidth,
-                          child: VideoPlaylist(
-                            onUrlTap: controller.onPlayUrlChange,
-                          )),
-                    ],
-                  )
-                : videoFrame);
+            child: Row(
+          children: <Widget>[
+            //  PlayerContextMenu(),
+            Expanded(
+                flex: 4,
+                child: ContextMenuOverlay(
+                  child: ContextMenuRegion(
+                    contextMenu: PlayerContextMenu(),
+                    child: videoFrame,
+                  ),
+                )),
+            Container(
+                width:
+                    controller.playListShowed ? controller.playListBarWidth : 0,
+                child: VideoPlaylist(
+                  onUrlTap: controller.onPlayUrlChange,
+                )),
+          ],
+        ));
       }),
     );
   }
