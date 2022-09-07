@@ -72,6 +72,7 @@ dependencies:
   collection: ^1.16.0
   context_menus: ^1.0.2
   dropdown_button2: ^1.7.2
+  flutter_barrage: ^0.5.1
 
 dev_dependencies:
   flutter_test:

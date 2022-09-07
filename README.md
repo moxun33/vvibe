@@ -29,3 +29,14 @@ samples, guidance on mobile development, and a full API reference.
 run
 
 ``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart --skip-deps-check``
+
+# 注意
+
+有些包不支持 safety模式。
+
+解决方案：``--no-sound-null-safety``
+
+- run
+``flutter run --no-sound-null-safety``
+- build
+``flutter build apk --no-sound-null-safety``

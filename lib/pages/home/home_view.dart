@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:vvibe/global.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
@@ -30,6 +31,16 @@ class HomePage extends GetView<HomeController> {
       togglePlayList: controller.togglePlayList,
       stopPlayer: controller.stopPlayer,
     );
+    final videoFrameDanmakuWall = BarrageWall(
+        debug: true,
+        safeBottomHeight:
+            Get.height ~/ 4 * 3, // do not send bullets to the safe area
+
+        speed: 10,
+        speedCorrectionInMilliseconds: 10000,
+        bullets: [],
+        child: videoFrame,
+        controller: controller.barrageWallController);
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
         return Container(
@@ -42,17 +53,17 @@ class HomePage extends GetView<HomeController> {
                           child: ContextMenuOverlay(
                             child: ContextMenuRegion(
                               contextMenu: PlayerContextMenu(),
-                              child: videoFrame,
+                              child: videoFrameDanmakuWall,
                             ),
                           )),
                       SizedBox(
-                          width: 200,
+                          width: controller.playListBarWidth,
                           child: VideoPlaylist(
                             onUrlTap: controller.onPlayUrlChange,
                           )),
                     ],
                   )
-                : videoFrame);
+                : videoFrameDanmakuWall);
       }),
     );
   }

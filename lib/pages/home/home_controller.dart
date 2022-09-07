@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/init.dart';
+import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/danmaku/douyu_danmaku_service.dart';
@@ -13,9 +16,13 @@ import 'package:vvibe/services/danmaku/douyu_danmaku_service.dart';
 class HomeController extends GetxController {
   Player? player;
   bool playListShowed = false;
+
+  final playListBarWidth = 200.0;
+
+  final barrageWallController = BarrageWallController();
+
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     initPlayer(1);
   }
@@ -25,8 +32,31 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
-    final DouyuDnamakuService dyDanmakuService =
-        DouyuDnamakuService(roomId: 4549169, onDanmaku: (v) {});
+    startDanmakuSocket();
+  }
+
+//发送弹幕道屏幕
+  void sendDanmakuBullet(LiveDanmakuItem? data) {
+    if (data?.msg != null)
+      barrageWallController.send([
+        new Bullet(
+            child: Tooltip(
+          message: data?.name ?? '',
+          child: Text(
+            data?.msg ?? '',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ))
+      ]);
+  }
+
+//开始连接斗鱼、忽悠、b站的弹幕
+  void startDanmakuSocket() {
+    final DouyuDnamakuService dyDanmakuService = DouyuDnamakuService(
+        roomId: 4549169,
+        onDanmaku: (LiveDanmakuItem? node) {
+          sendDanmakuBullet(node);
+        });
     dyDanmakuService.startConnect();
   }
 
@@ -102,8 +132,13 @@ class HomeController extends GetxController {
   }
 
   void updateWIndowTitle() {}
+
+  //获取当前弹幕区域尺寸
+  Size getDanmakuSize() => Size(
+      playListShowed ? Get.width - playListBarWidth : Get.width, Get.height);
   void togglePlayList() {
     playListShowed = !playListShowed;
+
     update();
   }
 
