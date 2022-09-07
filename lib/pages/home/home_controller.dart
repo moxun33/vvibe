@@ -8,6 +8,7 @@ import 'package:vvibe/global.dart';
 import 'package:vvibe/init.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:window_size/window_size.dart';
+import 'package:vvibe/services/danmaku/douyu_danmaku_service.dart';
 
 class HomeController extends GetxController {
   Player? player;
@@ -24,6 +25,9 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
+    final DouyuDnamakuService dyDanmakuService =
+        DouyuDnamakuService(roomId: 4549169, onDanmaku: (v) {});
+    dyDanmakuService.startConnect();
   }
 
   void initPlayer(int id) {
