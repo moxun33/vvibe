@@ -9,7 +9,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:web_socket_channel/io.dart';
@@ -109,9 +109,15 @@ class BilibiliDanmakuService {
               String msg = jd["info"][1].toString();
               String name = jd["info"][2][1].toString();
               String uid = jd["info"][2][0].toString();
+              final hexColor = int.parse(
+                  int.parse(jd["info"][0][3] ?? 16777215).toRadixString(16));
+              final String extStr = jd["info"][0][15] ?? "{}";
+              Map<String, dynamic> extMap = jsonDecode(extStr);
+              Color color = Color(hexColor);
               // addDanmaku(LiveDanmakuItem(name, msg));
               debugPrint('B站弹幕--> $uid $name: $msg');
-              onDanmaku(LiveDanmakuItem(name: name, msg: msg, uid: uid));
+              onDanmaku(LiveDanmakuItem(
+                  name: name, msg: msg, uid: uid, ext: extMap, color: color));
               break;
             default:
           }

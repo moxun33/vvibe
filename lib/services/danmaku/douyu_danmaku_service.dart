@@ -103,17 +103,23 @@ class DouyuDnamakuService {
       decodedMsgLen += len;
       String byteDatas =
           utf8.decode(singleMsgBuffer.sublist(12, singleMsgBuffer.length - 2));
-      //type@=chatmsg/rid@=99999/ct@=2/uid@=151938256/nn@=99999丶让我中个奖吧/txt@=这应该也就18左右吧/cid@=0a99327c7fbb495bbfd1f10000000000/ic@=avanew@Sface@S201707@S21@S18@Sc8e935d61918b28151e86548b1fad59f/level@=9/sahf@=0/cst@=1591546069188/bnn@=大马猴/bl@=7/brid@=99999/hc@=7094bdb067efbb89706bf894ceb8e67c/el@=/lk@=/fl@=7/urlev@=16/dms@=3/pdg@=65/pdk@=18
+      //type@=chatmsg/rid@=4549169/uid@=115902484/nn@=坐享骑橙/txt@=坑/cid@=486d1c603c494315b011110000000000/ic@=avatar_v3@S202208@S788d2957c66f46529a6ec0b8520c3489/level@=33/sahf@=0/col@=5/rg@=4/cst@=1662646767542/bnn@=橙記/bl@=22/brid@=4549169/hc@=eaccdb9a398c4648d7821dca31d4fb97/diaf@=1/hl@=1/ifs@=1/el@=/lk@=/fl@=22/hb@=1232@S/dms@=5/pdg@=29/pdk@=88/ail@=1446@S/ext@=/
 
       //目前只处理弹幕信息所以简单点
 
       if (byteDatas.contains("type@=chatmsg")) {
-        var nickname = extractChatMsg(byteDatas, 'nn@=', '/txt');
-        var uid = extractChatMsg(byteDatas, 'uid@=', '/nn');
-        var content = extractChatMsg(byteDatas, 'txt@=', '/cid');
-
+        final nickname = extractChatMsg(byteDatas, 'nn@=', '/txt');
+        final uid = extractChatMsg(byteDatas, 'uid@=', '/nn');
+        final content = extractChatMsg(byteDatas, 'txt@=', '/cid');
+        final String colorStr = extractChatMsg(byteDatas, 'col@=', '/rg');
+        final String ic =
+            extractChatMsg(byteDatas, 'ic@=', '/level').replaceAll('@S', '/');
+        final Map<String, dynamic> ext = {
+          'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
+        };
         debugPrint('斗鱼弹幕-->$uid $nickname: $content');
-        danmaku = LiveDanmakuItem(name: nickname, msg: content, uid: uid);
+        danmaku =
+            LiveDanmakuItem(name: nickname, msg: content, uid: uid, ext: ext);
       }
     }
     return danmaku;
