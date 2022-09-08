@@ -127,7 +127,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     value: v,
                     child: Text(
                       v,
-                      overflow: TextOverflow.ellipsis,
+                      //overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: const TextStyle(
                         color: Colors.purple,
