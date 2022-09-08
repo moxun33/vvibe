@@ -14,19 +14,23 @@ class LiveDanmakuItem {
   LiveDanmakuItem({
     required this.name,
     required this.msg,
+    required this.uid,
   });
 
   String name;
   String msg;
+  String uid;
 
   factory LiveDanmakuItem.fromJson(Map<String, dynamic> json) =>
       LiveDanmakuItem(
         name: json["name"],
-        msg: json["msg"],
+        msg: json["uid"],
+        uid: json["msg"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "msg": msg,
+        "uid": uid,
       };
 }

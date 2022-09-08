@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-07 14:10:22 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-07 15:06:05
+ * @Last Modified time: 2022-09-08 09:41:08
  */
 import 'dart:async';
 import 'dart:convert';
@@ -23,7 +23,7 @@ class DouyuDnamakuService {
   int totleTime = 0;
 
   //开始ws连接
-  void startConnect() {
+  void connect() {
     _channel = IOWebSocketChannel.connect("wss://danmuproxy.douyu.com:8506");
     login();
     setListener();
@@ -78,6 +78,13 @@ class DouyuDnamakuService {
     return Uint8List.fromList(data);
   }
 
+//提取弹幕消息的字段值
+  String extractChatMsg(String byteDatas, String start, String end) {
+    return byteDatas
+        .substring(byteDatas.indexOf(start), byteDatas.indexOf(end))
+        .replaceAll(start, "");
+  }
+
   //对消息进行解码
   decode(Uint8List list) {
     //消息总长度
@@ -101,16 +108,12 @@ class DouyuDnamakuService {
       //目前只处理弹幕信息所以简单点
 
       if (byteDatas.contains("type@=chatmsg")) {
-        //截取用户名
-        var nickname = byteDatas
-            .substring(byteDatas.indexOf("nn@="), byteDatas.indexOf("/txt"))
-            .replaceAll("nn@=", "");
-        //截取弹幕信息
-        var content = byteDatas
-            .substring(byteDatas.indexOf("txt@="), byteDatas.indexOf("/cid"))
-            .replaceAll("txt@=", "");
-        debugPrint('斗鱼弹幕-->$nickname: $content');
-        danmaku = LiveDanmakuItem(name: nickname, msg: content);
+        var nickname = extractChatMsg(byteDatas, 'nn@=', '/txt');
+        var uid = extractChatMsg(byteDatas, 'uid@=', '/nn');
+        var content = extractChatMsg(byteDatas, 'txt@=', '/cid');
+
+        debugPrint('斗鱼弹幕-->$uid $nickname: $content');
+        danmaku = LiveDanmakuItem(name: nickname, msg: content, uid: uid);
       }
     }
     return danmaku;

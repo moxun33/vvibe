@@ -11,6 +11,8 @@ import 'package:vvibe/global.dart';
 import 'package:vvibe/init.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/danmaku/bilibili_danmaku_service.dart';
+import 'package:vvibe/services/danmaku/huya_danmaku_service.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/danmaku/douyu_danmaku_service.dart';
 
@@ -33,6 +35,13 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
+
+    BilibiliDanmakuService bws =
+        BilibiliDanmakuService(roomId: "10375360", onDanmaku: (v) {});
+
+    HuyaDanmakuService hyws =
+        HuyaDanmakuService(roomId: "11352944", onDanmaku: (v) {});
+    hyws.connect();
   }
 
 //发送弹幕道屏幕
@@ -53,8 +62,9 @@ class HomeController extends GetxController {
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) {
     stopDanmakuSocket();
-    if (item.tvgId == null) return;
+    if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
     final String rid = item.tvgId!;
+
     switch (item.group) {
       case '斗鱼':
       case 'douyu':
@@ -63,7 +73,7 @@ class HomeController extends GetxController {
             onDanmaku: (LiveDanmakuItem? node) {
               sendDanmakuBullet(node);
             });
-        dyDanmakuService!.startConnect();
+        dyDanmakuService!.connect();
         break;
       default:
     }
