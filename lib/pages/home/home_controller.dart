@@ -24,6 +24,8 @@ class HomeController extends GetxController {
 
   final barrageWallController = BarrageWallController();
   DouyuDnamakuService? dyDanmakuService;
+  BilibiliDanmakuService? blDanmakuService;
+  HuyaDanmakuService? hyDanmakuService;
   @override
   void onInit() {
     super.onInit();
@@ -35,13 +37,6 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
-
-    BilibiliDanmakuService bws =
-        BilibiliDanmakuService(roomId: "10375360", onDanmaku: (v) {});
-
-    HuyaDanmakuService hyws =
-        HuyaDanmakuService(roomId: "11352944", onDanmaku: (v) {});
-    hyws.connect();
   }
 
 //发送弹幕道屏幕
@@ -75,6 +70,24 @@ class HomeController extends GetxController {
             });
         dyDanmakuService!.connect();
         break;
+      case 'B站':
+      case 'bilibili':
+        blDanmakuService = BilibiliDanmakuService(
+            roomId: rid,
+            onDanmaku: (LiveDanmakuItem? node) {
+              sendDanmakuBullet(node);
+            });
+        blDanmakuService?.connect();
+        break;
+      case '虎牙':
+      case 'huya':
+        hyDanmakuService = HuyaDanmakuService(
+            roomId: rid,
+            onDanmaku: (LiveDanmakuItem? node) {
+              sendDanmakuBullet(node);
+            });
+        hyDanmakuService?.connect();
+        break;
       default:
     }
   }
@@ -84,6 +97,10 @@ class HomeController extends GetxController {
     //barrageWallController.disable();
     dyDanmakuService?.dispose();
     dyDanmakuService = null;
+    blDanmakuService?.displose();
+    blDanmakuService = null;
+    hyDanmakuService?.displose();
+    hyDanmakuService = null;
   }
 
   void initPlayer(int id) {
