@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-03 16:32:43 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 11:44:34
+ * @Last Modified time: 2022-09-08 11:47:00
  */
 
 import 'package:flutter/material.dart';
@@ -76,7 +76,8 @@ class PlUrlListView extends StatefulWidget {
 class _PlUrlListViewState extends State<PlUrlListView> {
   PlayListItem? selectedItem;
   void selectUrl(PlayListItem e) {
-    if (e.url == selectedItem?.url) return widget.onUrlTap(e);
+    if (e.url == selectedItem?.url) return;
+    widget.onUrlTap(e);
     setState(() {
       selectedItem = e;
     });

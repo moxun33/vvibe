@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-08 09:29:34 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 10:32:22
+ * @Last Modified time: 2022-09-08 11:48:55
  */
 
 import 'dart:async';
@@ -111,6 +111,7 @@ class BilibiliDanmakuService {
               String uid = jd["info"][2][0].toString();
               // addDanmaku(LiveDanmakuItem(name, msg));
               debugPrint('B站弹幕--> $uid $name: $msg');
+              onDanmaku(LiveDanmakuItem(name: name, msg: msg, uid: uid));
               break;
             default:
           }
