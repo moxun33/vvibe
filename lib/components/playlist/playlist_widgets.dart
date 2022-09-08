@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-03 16:32:43 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-07 14:24:00
+ * @Last Modified time: 2022-09-08 11:44:34
  */
 
 import 'package:flutter/material.dart';
@@ -76,7 +76,7 @@ class PlUrlListView extends StatefulWidget {
 class _PlUrlListViewState extends State<PlUrlListView> {
   PlayListItem? selectedItem;
   void selectUrl(PlayListItem e) {
-    widget.onUrlTap(e);
+    if (e.url == selectedItem?.url) return widget.onUrlTap(e);
     setState(() {
       selectedItem = e;
     });
@@ -97,26 +97,24 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                     onPressed: () {
                       selectUrl(e);
                     },
-                    child: Tooltip(
-                        message: '${e.name}',
-                        child: SizedBox(
-                          child: Text(
-                            e.name?.trim() ?? '未知名称',
-                            maxLines: 1,
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: e.url == selectedItem?.url
-                                  ? FontWeight.bold
-                                  : FontWeight.w300,
-                              color: e.url == selectedItem?.url
-                                  ? Colors.purple
-                                  : Colors.white,
-                            ),
-                          ),
-                          width: 200,
-                        ))),
+                    child: SizedBox(
+                      child: Text(
+                        e.name?.trim() ?? '未知名称',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: e.url == selectedItem?.url
+                              ? FontWeight.bold
+                              : FontWeight.w300,
+                          color: e.url == selectedItem?.url
+                              ? Colors.purple
+                              : Colors.white,
+                        ),
+                      ),
+                      width: 200,
+                    )),
               ))
           .toList(),
     ));
