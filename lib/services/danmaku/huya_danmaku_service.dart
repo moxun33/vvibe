@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-08 10:27:05 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 11:22:30
+ * @Last Modified time: 2022-09-08 12:22:40
  */
 import 'dart:async';
 import 'dart:convert';
@@ -25,24 +25,25 @@ class HuyaDanmakuService {
 
   void connect() async {
     _channel = IOWebSocketChannel.connect("wss://cdnws.api.huya.com");
-    login();
-    setListener();
+
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       heartBeat();
       //print("时间: $totleTime s");
     });
+    await login();
+    setListener();
   }
 
   //发送心跳包
   void heartBeat() {
     Uint8List heartbeat = huyaWsHeartbeat();
-    _channel!.sink.add(heartbeat);
+    _channel?.sink.add(heartbeat);
   }
 
   //设置监听
   void setListener() {
-    _channel!.stream.listen((msg) {
+    _channel?.stream.listen((msg) {
       Uint8List list = Uint8List.fromList(msg);
       decode(list);
     });
@@ -64,15 +65,16 @@ class HuyaDanmakuService {
     return HuyaRoomGlobalProfile.fromJson(json);
   }
 
-  void login() async {
+  Future<HuyaRoomGlobalProfile> login() async {
     final HuyaRoomGlobalProfile globalProfile = await _getChatInfo(roomId);
     final danmakuId = globalProfile.roomProfile.lUid;
     Uint8List regData = regDataEncode(danmakuId);
-    _channel!.sink.add(regData);
+    _channel?.sink.add(regData);
     debugPrint("虎牙login");
     Uint8List heartbeat = huyaWsHeartbeat();
     //print("heartbeat");
-    _channel!.sink.add(heartbeat);
+    _channel?.sink.add(heartbeat);
+    return globalProfile;
   }
 
   //对消息进行解码
@@ -91,5 +93,7 @@ class HuyaDanmakuService {
   void displose() {
     timer?.cancel();
     _channel?.sink.close();
+    _channel = null;
+    debugPrint('管虎牙ws');
   }
 }

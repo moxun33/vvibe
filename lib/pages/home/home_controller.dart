@@ -55,11 +55,10 @@ class HomeController extends GetxController {
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
-  void startDanmakuSocket(PlayListItem item) {
+  void startDanmakuSocket(PlayListItem item) async {
     stopDanmakuSocket();
     if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
     final String rid = item.tvgId!;
-
     switch (item.group) {
       case '斗鱼':
       case 'douyu':
@@ -95,12 +94,12 @@ class HomeController extends GetxController {
 //断开所有弹幕连接
   void stopDanmakuSocket() {
     //barrageWallController.disable();
+
     dyDanmakuService?.dispose();
-    dyDanmakuService = null;
+
     blDanmakuService?.displose();
-    blDanmakuService = null;
+
     hyDanmakuService?.displose();
-    hyDanmakuService = null;
   }
 
   void initPlayer(int id) {
@@ -149,6 +148,7 @@ class HomeController extends GetxController {
 
   void onPlaybackStream() {
     player?.playbackStream.listen((PlaybackState state) {
+      debugPrint(' playback stream ${state.isPlaying}');
       if (state.isPlaying) {
         EasyLoading.dismiss();
       }

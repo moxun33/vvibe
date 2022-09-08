@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-07 14:10:22 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 09:41:08
+ * @Last Modified time: 2022-09-08 12:19:29
  */
 import 'dart:async';
 import 'dart:convert';
@@ -37,12 +37,12 @@ class DouyuDnamakuService {
   //发送心跳包
   void heartBeat() {
     String heartbeat = 'type@=mrkl/';
-    _channel!.sink.add(encode(heartbeat));
+    _channel?.sink.add(encode(heartbeat));
   }
 
   //设置监听
   void setListener() {
-    _channel!.stream.listen((msg) {
+    _channel?.stream.listen((msg) {
       Uint8List list = Uint8List.fromList(msg);
       final LiveDanmakuItem? danmaku = decode(list);
       onDanmaku(danmaku);
@@ -55,13 +55,13 @@ class DouyuDnamakuService {
     String login =
         "type@=loginreq/room_id@=$roomID/dfl@=sn@A=105@Sss@A=1/username@=61609154/uid@=61609154/ver@=20190610/aver@=218101901/ct@=0/";
     //print(login);
-    _channel!.sink.add(encode(login));
+    _channel?.sink.add(encode(login));
     String joingroup = "type@=joingroup/rid@=$roomID/gid@=-9999/";
     //print(joingroup);
-    _channel!.sink.add(encode(joingroup));
+    _channel?.sink.add(encode(joingroup));
     String heartbeat = 'type@=mrkl/';
     //print(heartbeat);
-    _channel!.sink.add(encode(heartbeat));
+    _channel?.sink.add(encode(heartbeat));
   }
 
   Uint8List encode(String msg) {
@@ -123,5 +123,6 @@ class DouyuDnamakuService {
   void dispose() {
     timer?.cancel();
     _channel?.sink.close();
+    _channel = null;
   }
 }

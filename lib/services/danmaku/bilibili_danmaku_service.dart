@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-08 09:29:34 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 11:48:55
+ * @Last Modified time: 2022-09-08 12:19:28
  */
 
 import 'dart:async';
@@ -46,7 +46,7 @@ class BilibiliDanmakuService {
 
   void sendHeartBeat() {
     List<int> code = [0, 0, 0, 0, 0, 16, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1];
-    _channel!.sink.add(Uint8List.fromList(code));
+    _channel?.sink.add(Uint8List.fromList(code));
   }
 
   //加入房间
@@ -61,7 +61,7 @@ class BilibiliDanmakuService {
         "\"key\":\""
         "\"}";
     //debugPrint(msg);
-    _channel!.sink.add(encode(7, msg: msg));
+    _channel?.sink.add(encode(7, msg: msg));
     sendHeartBeat();
   }
 
@@ -155,5 +155,6 @@ class BilibiliDanmakuService {
   void displose() {
     timer?.cancel();
     _channel?.sink.close();
+    _channel = null;
   }
 }
