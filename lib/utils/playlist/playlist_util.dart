@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
 
@@ -35,14 +36,14 @@ class PlaylistUtil {
   Future<List<PlayListItem>> parsePlaylistFile(String filePath) async {
     try {
       if (filePath.endsWith('.m3u')) {
-        final lines = await readFileLines(filePath);
-        return parseM3uContents(lines);
+        final lines = await compute(readFileLines, filePath);
+        return compute(parseM3uContents, lines);
       }
 
       if (filePath.endsWith('.txt')) {
         final lines = await readFileLines(filePath);
 
-        return parseTxtContents(lines);
+        return compute(parseTxtContents, lines);
       }
 
       return [];

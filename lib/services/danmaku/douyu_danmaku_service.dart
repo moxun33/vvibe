@@ -8,9 +8,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
+import 'package:vvibe/utils/color_util.dart';
 import 'package:web_socket_channel/io.dart';
 
 class DouyuDnamakuService {
@@ -79,17 +81,19 @@ class DouyuDnamakuService {
     return Uint8List.fromList(data);
   }
 
-//提取弹幕消息的字段值
-  String extractChatMsg(String byteDatas, String start, String end) {
-    if (!(byteDatas.contains(start) && byteDatas.contains(end)))
-      return ''.toString();
-    try {
-      return byteDatas
-          .substring(byteDatas.indexOf(start), byteDatas.indexOf(end))
-          .replaceAll(start, "");
-    } catch (e) {
-      return ''.toString();
+//解析消息
+  Map<String, String> parseMsg(String msg) {
+    final baseArr = msg.split("/");
+    Map<String, String> msgMap = {};
+
+    for (var i = 0; i < baseArr.length; i++) {
+      final kv = baseArr[i].split('@=');
+      if (kv.length > 1) {
+        final v = kv[0] == 'ic' ? kv[1].replaceAll('@S', '/') : kv[1];
+        msgMap[kv[0]] = v;
+      }
     }
+    return msgMap;
   }
 
   //对消息进行解码
@@ -110,23 +114,21 @@ class DouyuDnamakuService {
       decodedMsgLen += len;
       String byteDatas =
           utf8.decode(singleMsgBuffer.sublist(12, singleMsgBuffer.length - 2));
-      //type@=chatmsg/rid@=4549169/uid@=115902484/nn@=坐享骑橙/txt@=坑/cid@=486d1c603c494315b011110000000000/ic@=avatar_v3@S202208@S788d2957c66f46529a6ec0b8520c3489/level@=33/sahf@=0/col@=5/rg@=4/cst@=1662646767542/bnn@=橙記/bl@=22/brid@=4549169/hc@=eaccdb9a398c4648d7821dca31d4fb97/diaf@=1/hl@=1/ifs@=1/el@=/lk@=/fl@=22/hb@=1232@S/dms@=5/pdg@=29/pdk@=88/ail@=1446@S/ext@=/
+      //type@=chatmsg/rid@=4549169/uid@=115902484/nn@=消息内容/txt@=坑/cid@=486d1c603c494315b011110000000000/ic@=avatar_v3@S202208@S788d2957c66f46529a6ec0b8520c3489/level@=33/sahf@=0/col@=5/rg@=4/cst@=1662646767542/bnn@=橙記/bl@=22/brid@=4549169/hc@=eaccdb9a398c4648d7821dca31d4fb97/diaf@=1/hl@=1/ifs@=1/el@=/lk@=/fl@=22/hb@=1232@S/dms@=5/pdg@=29/pdk@=88/ail@=1446@S/ext@=/
 
-      //目前只处理弹幕信息所以简单点
-
-      if (byteDatas.contains("type@=chatmsg")) {
-        final nickname = extractChatMsg(byteDatas, 'nn@=', '/txt');
-        final uid = extractChatMsg(byteDatas, 'uid@=', '/nn');
-        final content = extractChatMsg(byteDatas, 'txt@=', '/cid');
-        final String colorStr = extractChatMsg(byteDatas, 'col@=', '/rg');
-        final String ic =
-            extractChatMsg(byteDatas, 'ic@=', '/level').replaceAll('@S', '/');
+      if (byteDatas.startsWith("type@=chatmsg")) {
+        final msgMap = parseMsg(byteDatas);
+        final nickname = msgMap['nn'] ?? '';
+        final uid = msgMap['uid'] ?? '';
+        final content = msgMap['txt'] ?? '';
+        final Color color = ColorUtil.fromDecimal(msgMap['col']);
+        final String ic = msgMap['ic'] ?? '';
         final Map<String, dynamic> ext = {
           'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
         };
         debugPrint('斗鱼弹幕-->$uid $nickname: $content');
-        danmaku =
-            LiveDanmakuItem(name: nickname, msg: content, uid: uid, ext: ext);
+        danmaku = LiveDanmakuItem(
+            name: nickname, msg: content, uid: uid, ext: ext, color: color);
       }
     }
     return danmaku;

@@ -30,8 +30,8 @@ class HomePage extends GetView<HomeController> {
             debug: !Global.isRelease,
             safeBottomHeight:
                 Get.height ~/ 4 * 3, // do not send bullets to the safe area
-            speed: 15,
-            speedCorrectionInMilliseconds: 15000,
+            speed: 10,
+            speedCorrectionInMilliseconds: 10000,
             bullets: [],
             child: LiveVideoFrame(
               videoWidget: nativeVideo,
@@ -49,13 +49,12 @@ class HomePage extends GetView<HomeController> {
           children: <Widget>[
             //  PlayerContextMenu(),
             Expanded(
-                flex: 4,
-                child: ContextMenuOverlay(
-                  child: ContextMenuRegion(
-                    contextMenu: PlayerContextMenu(),
-                    child: videoFrame,
-                  ),
-                )),
+              flex: 4,
+              child: GestureDetector(
+                onDoubleTap: () => controller.togglePlayList(),
+                child: videoFrame,
+              ),
+            ),
             Container(
                 width:
                     controller.playListShowed ? controller.playListBarWidth : 0,
