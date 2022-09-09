@@ -2,12 +2,12 @@
  * @Author: Moxx 
  * @Date: 2022-09-02 16:32:16 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-03 19:46:10
+ * @Last Modified time: 2022-09-09 23:41:14
  */
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
+import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -143,25 +143,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     widget.onUrlTap(e);
                   },
                 )
-              : Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                    ),
-                    Icon(
-                      Icons.adjust_rounded,
-                      color: Colors.white,
-                    ),
-                    Text(
-                      '解析中',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+              : Spinning(),
           height: MediaQuery.of(context).size.height,
           decoration: new BoxDecoration(
               color: Colors.black87,

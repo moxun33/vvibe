@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-03 16:32:43 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-08 12:19:27
+ * @Last Modified time: 2022-09-09 23:43:39
  */
 
 import 'package:flutter/material.dart';
@@ -151,7 +151,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
             if (widget.data.length < index + 1) return SizedBox();
             final e = widget.data[index];
             return Container(
-              height: 30,
+              height: 25,
               color: Colors.black12,
               alignment: Alignment.centerLeft,
               child: TextButton(
