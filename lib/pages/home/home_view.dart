@@ -30,8 +30,8 @@ class HomePage extends GetView<HomeController> {
             debug: !Global.isRelease,
             safeBottomHeight:
                 Get.height ~/ 4 * 3, // do not send bullets to the safe area
-            speed: 10,
-            speedCorrectionInMilliseconds: 10000,
+            speed: 15,
+            speedCorrectionInMilliseconds: 15000,
             bullets: [],
             child: LiveVideoFrame(
               videoWidget: nativeVideo,

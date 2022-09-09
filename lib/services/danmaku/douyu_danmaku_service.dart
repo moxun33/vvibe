@@ -6,6 +6,7 @@
  */
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -80,9 +81,15 @@ class DouyuDnamakuService {
 
 //提取弹幕消息的字段值
   String extractChatMsg(String byteDatas, String start, String end) {
-    return byteDatas
-        .substring(byteDatas.indexOf(start), byteDatas.indexOf(end))
-        .replaceAll(start, "");
+    if (!(byteDatas.contains(start) && byteDatas.contains(end)))
+      return ''.toString();
+    try {
+      return byteDatas
+          .substring(byteDatas.indexOf(start), byteDatas.indexOf(end))
+          .replaceAll(start, "");
+    } catch (e) {
+      return ''.toString();
+    }
   }
 
   //对消息进行解码

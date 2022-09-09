@@ -48,7 +48,7 @@ class HomeController extends GetxController {
           message: data?.name ?? '',
           child: Text(
             data?.msg ?? '',
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: data?.color ?? Colors.white, fontSize: 20),
           ),
         ))
       ]);
