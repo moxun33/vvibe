@@ -41,7 +41,9 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   List<PlayListItem> filterPlaylist(String keyword, List<PlayListItem> list) {
     return list
         .where((PlayListItem element) =>
-            expandKey == element.group && element.name!.contains(keyword))
+            element.name != null &&
+            expandKey == element.group &&
+            element.name!.contains(keyword))
         .toList();
   }
 
