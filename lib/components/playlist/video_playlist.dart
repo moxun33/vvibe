@@ -51,7 +51,6 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
   void onPlayFileChange(String? value) {
-    //   if (playlist.length < 1) EasyLoading.show(status: '解析中');
     setState(() {
       playlist = [];
       selectedFilename = value;
@@ -62,10 +61,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       PlaylistUtil().parsePlaylistFile("playlist/${value}").then((value) {
         setState(() => playlist = value);
         LoacalStorage().setJSON(LAST_PLAYLIST_DATA, value);
-        EasyLoading.dismiss();
       });
-    } else {
-      EasyLoading.dismiss();
     }
   }
 
@@ -139,12 +135,33 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             )),
         Expanded(
             child: Container(
-          child: PlGroupPanel(
-            data: playlist,
-            onUrlTap: (e) {
-              widget.onUrlTap(e);
-            },
-          ),
+          width: 200,
+          child: playlist.length > 0
+              ? PlGroupPanel(
+                  data: playlist,
+                  onUrlTap: (e) {
+                    widget.onUrlTap(e);
+                  },
+                )
+              : Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      width: 50,
+                    ),
+                    Icon(
+                      Icons.adjust_rounded,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      '解析中',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
           height: MediaQuery.of(context).size.height,
           decoration: new BoxDecoration(
               color: Colors.black87,

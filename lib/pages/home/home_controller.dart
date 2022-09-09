@@ -123,6 +123,7 @@ class HomeController extends GetxController {
     onPlayError();
     onVideoDemensionStream(item.url, item.name);
     player!.playOrPause();
+    startDanmakuSocket(item);
   }
 
   //停止播放器、销毁实例
@@ -142,16 +143,15 @@ class HomeController extends GetxController {
   void onCurrentStream(PlayListItem? item) {
     player?.currentStream.listen((CurrentState state) {
       debugPrint(' current stream ${jsonEncode(item)}');
-      if (item != null) startDanmakuSocket(item);
+      EasyLoading.dismiss();
     });
   }
 
   void onPlaybackStream() {
     player?.playbackStream.listen((PlaybackState state) {
       debugPrint(' playback stream ${state.isPlaying}');
-      if (state.isPlaying) {
-        EasyLoading.dismiss();
-      }
+
+      EasyLoading.dismiss();
     });
   }
 
@@ -179,6 +179,8 @@ class HomeController extends GetxController {
   //获取当前弹幕区域尺寸
   Size getDanmakuSize() => Size(
       playListShowed ? Get.width - playListBarWidth : Get.width, Get.height);
+
+  //播放列表菜单显示
   void togglePlayList() {
     playListShowed = !playListShowed;
 

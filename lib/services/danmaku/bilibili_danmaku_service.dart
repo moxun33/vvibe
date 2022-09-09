@@ -29,7 +29,7 @@ class BilibiliDanmakuService {
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       //sendXinTiaoBao();
-      // debugPrint("时间: $totleTime s");
+      debugPrint("bilibili时间: $totleTime s");
       // _channel!.sink.close();
       // initLive();
       sendHeartBeat();
@@ -111,13 +111,21 @@ class BilibiliDanmakuService {
               String name = jd["info"][2][1].toString();
               String uid = jd["info"][2][0].toString();
 
-              final String extStr = jd["info"][0][15] ?? "{}";
-              Map<String, dynamic> extMap = jsonDecode(extStr);
-              Color color = ColorUtil.fromDecimal(jd["info"][0][3]);
+              /* final extStr = jd["info"][0][15];
+              print(extStr);
+              Map<String, dynamic> extMap = extStr != null
+                  ? new Map<String, dynamic>.from(jsonDecode(extStr))
+                  : {};
+              Color color =
+                  ColorUtil.fromDecimal(extMap['extra']?['color']?.toString()); */
               // addDanmaku(LiveDanmakuItem(name, msg));
               debugPrint('B站弹幕--> $uid $name: $msg');
               onDanmaku(LiveDanmakuItem(
-                  name: name, msg: msg, uid: uid, ext: extMap, color: color));
+                name: name,
+                msg: msg,
+                uid: uid,
+                ext: {},
+              ));
               break;
             default:
           }

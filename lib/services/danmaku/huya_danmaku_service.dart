@@ -29,7 +29,7 @@ class HuyaDanmakuService {
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       heartBeat();
-      //print("时间: $totleTime s");
+      debugPrint("huya时间: $totleTime s");
     });
     await login();
     setListener();
@@ -53,9 +53,13 @@ class HuyaDanmakuService {
     var resp = await Dio(new BaseOptions(headers: {
       'User-Agent':
           'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
-    })).get(
+    }))
+        .get(
       'https://m.huya.com/$roomId',
-    );
+    )
+        .catchError((e) {
+      debugPrint(e);
+    });
     String value = resp.data;
     var dataLive = parse(value);
     var body = dataLive.getElementsByTagName('body')[0];
@@ -65,16 +69,21 @@ class HuyaDanmakuService {
     return HuyaRoomGlobalProfile.fromJson(json);
   }
 
-  Future<HuyaRoomGlobalProfile> login() async {
-    final HuyaRoomGlobalProfile globalProfile = await _getChatInfo(roomId);
-    final danmakuId = globalProfile.roomProfile.lUid;
-    Uint8List regData = regDataEncode(danmakuId);
-    _channel?.sink.add(regData);
-    debugPrint("虎牙login");
-    Uint8List heartbeat = huyaWsHeartbeat();
-    //print("heartbeat");
-    _channel?.sink.add(heartbeat);
-    return globalProfile;
+  Future<HuyaRoomGlobalProfile?> login() async {
+    try {
+      final HuyaRoomGlobalProfile globalProfile = await _getChatInfo(roomId);
+      final int? danmakuId = globalProfile.roomProfile.lUid;
+      if (danmakuId == null) return null;
+      Uint8List regData = regDataEncode(danmakuId);
+      _channel?.sink.add(regData);
+      debugPrint("虎牙login");
+      Uint8List heartbeat = huyaWsHeartbeat();
+      //print("heartbeat");
+      _channel?.sink.add(heartbeat);
+      return globalProfile;
+    } catch (e) {
+      return null;
+    }
   }
 
   //对消息进行解码
@@ -94,6 +103,6 @@ class HuyaDanmakuService {
     timer?.cancel();
     _channel?.sink.close();
     _channel = null;
-    debugPrint('管虎牙ws');
+    debugPrint('关闭虎牙ws');
   }
 }

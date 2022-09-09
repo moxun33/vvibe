@@ -42,7 +42,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Container(
-            width: 130,
+            width: 140,
             height: 220,
             color: Colors.white,
             child: ListView.builder(

@@ -57,13 +57,19 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      playlist = widget.data;
+    });
+  }
+
+  @override
   void didUpdateWidget(covariant PlGroupPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-
+    // debugPrint('PlGroupPanel didUpdateWidget ${widget.data.length}');
     setState(() {
-      playlist = searchKey.isNotEmpty
-          ? filterPlaylist(searchKey, widget.data)
-          : widget.data;
+      playlist = widget.data;
     });
   }
 
@@ -188,10 +194,10 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                       ? LastChildLayoutType.foot
                       : LastChildLayoutType.none,
               collectGarbage: (List<int> garbages) {
-                debugPrint('collect garbage : $garbages');
+                //   debugPrint('collect garbage : $garbages');
               },
               viewportBuilder: (int firstIndex, int lastIndex) {
-                debugPrint('viewport : [$firstIndex,$lastIndex]');
+                //   debugPrint('viewport : [$firstIndex,$lastIndex]');
               }),
           itemCount: widget.data.length + 1,
         ));
