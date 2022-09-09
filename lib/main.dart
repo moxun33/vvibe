@@ -12,17 +12,20 @@ import 'package:get/get.dart';
 import 'init.dart';
 
 void main() async {
-  init();
+  final theme = await init();
 
-  Global.init().then((e) => runApp(MyApp()));
+  Global.init().then((e) => runApp(MyApp(theme: theme)));
 }
 
 class MyApp extends StatelessWidget {
+  final ThemeData theme;
+  const MyApp({Key? key, required this.theme}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'VVibe',
-      theme: ThemeData(fontFamily: Platform.isWindows ? '微软雅黑' : null),
+      theme: theme,
       home: IndexPage(),
       initialBinding: IndexBinding(),
       debugShowCheckedModeBanner: false,

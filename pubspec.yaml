@@ -74,6 +74,7 @@ dependencies:
   dropdown_button2: ^1.7.2
   flutter_barrage: ^0.5.1
   extended_list: ^3.0.0
+  json_theme: ^4.0.1+1
 
 dev_dependencies:
   flutter_test:
