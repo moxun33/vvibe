@@ -7,6 +7,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/init.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
@@ -114,23 +115,28 @@ class HomeController extends GetxController {
       initPlayer(new DateTime.now().millisecondsSinceEpoch);
     }
 
-    EasyLoading.show(status: "拼命加载中");
+    EasyLoading.show(
+      status: "拼命加载中",
+      indicator: SizedBox(
+        width: 40,
+        child: Spinning(),
+      ),
+    );
     MediaSource media = Media.network(item.url, parse: true);
-    player!.open(media, autoStart: true);
-    player!.setUserAgent('Windows ZTE');
+    player?.open(media, autoStart: true);
+    player?.setUserAgent('Windows ZTE');
     onCurrentStream(item);
     onPlaybackStream();
     onPlayError();
     onVideoDemensionStream(item.url, item.name);
-    player!.playOrPause();
-    startDanmakuSocket(item);
+    player?.playOrPause();
   }
 
   //停止播放器、销毁实例
   void stopPlayer({bool dispose = false}) {
     if (player == null) return;
-    player!.stop();
-    player!.dispose();
+    player?.stop();
+    player?.dispose();
     if (dispose) player = null;
   }
 
@@ -143,7 +149,10 @@ class HomeController extends GetxController {
   void onCurrentStream(PlayListItem? item) {
     player?.currentStream.listen((CurrentState state) {
       debugPrint(' current stream ${jsonEncode(item)}');
-      EasyLoading.dismiss();
+      if (state.media != null && item != null) {
+        startDanmakuSocket(item);
+        EasyLoading.dismiss();
+      }
     });
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vvibe/components/player/settings/setting_alert_dialog.dart';
 
 class PlayerContextMenu extends StatefulWidget {
   const PlayerContextMenu({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
       case 'scanUrl':
         return Icons.satellite_alt_outlined;
       case 'verifyUrl':
-        return Icons.scanner_outlined;
+        return Icons.library_add_check_outlined;
       case 'setting':
         return Icons.settings_applications_outlined;
       case 'about':
@@ -35,6 +36,30 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
         return Icons.exit_to_app_outlined;
       default:
         return Icons.home_outlined;
+    }
+  }
+
+  void onItemTap(type) {
+    switch (type) {
+      case 'openUrl':
+        break;
+      case 'scanUrl':
+        break;
+      case 'verifyUrl':
+        break;
+      case 'setting':
+        showDialog(
+            context: context,
+            builder: (context) {
+              return SettingAlertDialog();
+            });
+        break;
+      case 'about':
+        break;
+      case 'close':
+        break;
+      default:
+        break;
     }
   }
 
@@ -73,7 +98,9 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
                               ),
                             ],
                           )),
-                      onPressed: () {},
+                      onPressed: () {
+                        onItemTap(item['value']);
+                      },
                     ),
                   );
                 })));

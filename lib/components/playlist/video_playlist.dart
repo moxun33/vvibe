@@ -2,7 +2,7 @@
  * @Author: Moxx 
  * @Date: 2022-09-02 16:32:16 
  * @Last Modified by: Moxx
- * @Last Modified time: 2022-09-09 23:41:14
+ * @Last Modified time: 2022-09-10 00:55:23
  */
 import 'package:flutter/material.dart';
 import 'package:vvibe/common/values/values.dart';
@@ -15,9 +15,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import '../../utils/playlist/playlist_util.dart';
 
 class VideoPlaylist extends StatefulWidget {
-  const VideoPlaylist({Key? key, required this.onUrlTap}) : super(key: key);
+  const VideoPlaylist({Key? key, required this.onUrlTap, this.visible = false})
+      : super(key: key);
   final void Function(PlayListItem item) onUrlTap;
-
+  final bool visible;
   @override
   _VideoPlaylistState createState() => _VideoPlaylistState();
 }
@@ -143,7 +144,11 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     widget.onUrlTap(e);
                   },
                 )
-              : Spinning(),
+              : (widget.visible
+                  ? Spinning()
+                  : SizedBox(
+                      width: 0,
+                    )),
           height: MediaQuery.of(context).size.height,
           decoration: new BoxDecoration(
               color: Colors.black87,

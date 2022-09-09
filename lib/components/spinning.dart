@@ -40,13 +40,16 @@ class _SpinningState extends State<Spinning> with TickerProviderStateMixin {
     return Center(
       child: RotationTransition(
         turns: _animation,
-        child: Padding(
+        child: Container(
+          width: 40,
+          color: Colors.transparent,
           padding: const EdgeInsets.all(8.0),
           child: Wrap(
             children: [
-              Cirle(Colors.green),
-              Cirle(Colors.purple),
-              Cirle(Colors.blue),
+              Icon(
+                Icons.filter_vintage_sharp,
+                color: Colors.purple,
+              ),
             ],
           ),
         ),

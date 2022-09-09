@@ -59,6 +59,7 @@ class HomePage extends GetView<HomeController> {
                 width:
                     controller.playListShowed ? controller.playListBarWidth : 0,
                 child: VideoPlaylist(
+                  visible: controller.playListShowed,
                   onUrlTap: controller.onPlayUrlChange,
                 )),
           ],
