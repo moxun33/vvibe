@@ -17,9 +17,9 @@ class IndexController extends GetxController {
   @override
   void onClose() {}
 
-  // 展示欢迎页，倒计时1.5秒之后进入应用
+  // 展示欢迎页，倒计时.5秒之后进入应用
   Future startCountdownTimer() async {
-    await Future.delayed(Duration(milliseconds: 1500), () {
+    await Future.delayed(Duration(milliseconds: 500), () {
       isloadWelcomePage.value = false;
     });
   }

@@ -1,7 +1,7 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
-import 'package:vvibe/components/player/settings/playlist_subscrition.dart';
+import 'package:vvibe/components/player/settings/playlist_subscription.dart';
 
 class SettingTabBarView extends StatefulWidget {
   @override
@@ -49,7 +49,7 @@ class _SettingTabBarViewState extends State<SettingTabBarView> {
               flex: 1,
               child: TabBarView(
                 children: [
-                  PlaylistSubscrition(),
+                  PlaylistSubscription(),
                   Center(child: Text(" ")),
                 ],
               ),

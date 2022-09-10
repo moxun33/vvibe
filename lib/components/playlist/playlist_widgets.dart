@@ -159,20 +159,24 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                     selectUrl(e);
                   },
                   child: SizedBox(
-                    child: Text(
-                      e.name?.trim() ?? '未知名称',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: e.url == selectedItem?.url
-                            ? FontWeight.bold
-                            : FontWeight.w300,
-                        color: e.url == selectedItem?.url
-                            ? Colors.purple
-                            : Colors.white,
+                    child: Tooltip(
+                      child: Text(
+                        e.name?.trim() ?? '未知名称',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: e.url == selectedItem?.url
+                              ? FontWeight.bold
+                              : FontWeight.w300,
+                          color: e.url == selectedItem?.url
+                              ? Colors.purple
+                              : Colors.white,
+                        ),
                       ),
+                      message: e.name,
+                      waitDuration: Duration(seconds: 1),
                     ),
                     width: 200,
                   )),
