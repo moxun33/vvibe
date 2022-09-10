@@ -11,6 +11,7 @@ import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:vvibe/utils/screen_device.dart';
 
 import '../../utils/playlist/playlist_util.dart';
 
@@ -25,30 +26,32 @@ class VideoPlaylist extends StatefulWidget {
 
 class _VideoPlaylistState extends State<VideoPlaylist> {
   List<PlayListItem> playlist = [];
-  List<String> playFiles = [];
+  List<Map<String, dynamic>> playFiles = []; //本地、订阅列表
   String? selectedFilename = null;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
   @override
-  void initState() {
+  void initState() async {
     super.initState();
-    PlaylistUtil().getPlayListFiles(basename: true).then((list) {
-      setState(() => playFiles = list);
-      final lastFile = LoacalStorage().getString(LAST_LOCAL_PLAYLIST_FILE);
-      if (lastFile != '' && list.contains(lastFile)) {
-        onPlayFileChange(lastFile);
-      } else {
-        if (list.length > 0) {
-          onPlayFileChange(list.first);
-        }
+    final _files = await PlaylistUtil().getPlayListFiles(basename: true);
+    final _urls = await PlaylistUtil().getSubUrls(), urls = _urls;
+    urls.addAll(_files.map((e) => {'name': e}));
+    setState(() => playFiles = urls);
+    final lastFile = LoacalStorage().getString(LAST_LOCAL_PLAYLIST_FILE);
+    if (lastFile != '' && _files.contains(lastFile)) {
+      onPlayFileChange(lastFile);
+    } else {
+      if (_files.length > 0) {
+        onPlayFileChange(_files.first);
       }
-    });
+    }
   }
 
-  void updatePlaylistFiles() {
-    PlaylistUtil().getPlayListFiles(basename: true).then((value) {
-      setState(() => playFiles = value);
-    });
+  void updatePlaylistFiles() async {
+    final files = await PlaylistUtil().getPlayListFiles(basename: true);
+    final urls = await PlaylistUtil().getSubUrls();
+    urls.addAll(files.map((e) => {'name': e}));
+    setState(() => playFiles = urls);
   }
 
   void onPlayFileChange(String? value) {
@@ -64,6 +67,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
         LoacalStorage().setJSON(LAST_PLAYLIST_DATA, value);
       });
     }
+    updatePlaylistFiles();
   }
 
   //state发生变化时会回调该方法,可以是class
@@ -109,6 +113,10 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
+                dropdownWidth: 220,
+                onMenuStateChange: (isOpen) {
+                  updatePlaylistFiles();
+                },
                 value: selectedFilename,
                 icon: const Icon(Icons.keyboard_arrow_down),
                 onChanged: (String? value) {
@@ -116,20 +124,36 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   onPlayFileChange(value);
                 },
                 itemHeight: 30,
+                dropdownMaxHeight: getDeviceHeight(context) - 50.0,
                 isDense: true,
                 //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white),
-                items: playFiles.map<DropdownMenuItem<String>>((String v) {
+                items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
-                    value: v,
-                    child: Text(
-                      v,
-                      //overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        color: Colors.purple,
+                    value: v['name'],
+                    child: Wrap(children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 5, 4, 0),
+                        child: Icon(
+                          v['url'] != null
+                              ? Icons.insert_link_outlined
+                              : Icons.file_present_outlined,
+                          size: 12,
+                          color: Colors.purple,
+                        ),
                       ),
-                    ),
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          v['name'],
+                          //overflow: TextOverflow.ellipsis,
+                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.purple,
+                          ),
+                        ),
+                      )
+                    ]),
                   );
                 }).toList(),
               ),

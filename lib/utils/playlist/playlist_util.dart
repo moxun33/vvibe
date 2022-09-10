@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:vvibe/common/values/storage.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
+import 'package:vvibe/utils/local_storage.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -50,6 +52,12 @@ class PlaylistUtil {
     } catch (e) {
       return [];
     }
+  }
+
+//获取订阅地址列表
+  Future<List<Map<String, dynamic>>> getSubUrls() async {
+    final list = await LoacalStorage().getJSON(PLAYLIST_SUB_URLS);
+    return list != null ? List<Map<String, dynamic>>.from(list) : [];
   }
 
 //根据url解析远程txt或m3u内容

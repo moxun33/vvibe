@@ -11,8 +11,8 @@ class PlayerContextMenu extends StatefulWidget {
 class _PlayerContextMenuState extends State<PlayerContextMenu> {
   final List<Map<String, String>> playerCtxMenus = [
     {'value': 'openUrl', 'label': '打开链接'},
-    {'value': 'scanUrl', 'label': '扫源工具'},
-    {'value': 'verifyUrl', 'label': '验证有效性'},
+    {'value': 'scanVerify', 'label': '扫源验证'},
+
     {'value': 'setting', 'label': '软件设置'},
     {'value': 'about', 'label': '关于软件'},
     // {'value': 'close', 'label': '关闭菜单'},
@@ -22,10 +22,9 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     switch (type) {
       case 'openUrl':
         return Icons.add_link_outlined;
-      case 'scanUrl':
+      case 'scanVerify':
         return Icons.satellite_alt_outlined;
-      case 'verifyUrl':
-        return Icons.library_add_check_outlined;
+
       case 'setting':
         return Icons.settings_applications_outlined;
       case 'about':
@@ -43,9 +42,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     switch (type) {
       case 'openUrl':
         break;
-      case 'scanUrl':
-        break;
-      case 'verifyUrl':
+      case 'scanVerify':
         break;
       case 'setting':
         showDialog(
@@ -68,7 +65,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     return SingleChildScrollView(
         child: Container(
             width: 140,
-            height: 220,
+            height: 180,
             color: Colors.white,
             child: ListView.builder(
                 shrinkWrap: true,
