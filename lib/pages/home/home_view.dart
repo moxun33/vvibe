@@ -31,6 +31,7 @@ class HomePage extends GetView<HomeController> {
             safeBottomHeight:
                 Get.height ~/ 4 * 3, // do not send bullets to the safe area
             speed: 10,
+            massiveMode: true,
             speedCorrectionInMilliseconds: 10000,
             bullets: [],
             child: LiveVideoFrame(

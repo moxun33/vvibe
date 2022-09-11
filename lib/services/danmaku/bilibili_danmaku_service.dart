@@ -61,7 +61,7 @@ class BilibiliDanmakuService {
         "\"type\":2,"
         "\"key\":\""
         "\"}";
-    //debugPrint(msg);
+    debugPrint('B站login');
     _channel?.sink.add(encode(7, msg: msg));
     sendHeartBeat();
   }

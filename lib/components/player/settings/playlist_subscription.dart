@@ -157,7 +157,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
                           Tooltip(
                             child: Icon(Icons.question_mark_outlined),
                             message:
-                                '注意：\n订阅接口响应必须为.m3u或.txt格式的文本内容;\n暂时支持斗鱼、虎牙和B站实时弹幕，请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id',
+                                '注意：订阅接口URL必须以.m3u或.txt结尾\n订阅接口响应必须为.m3u或.txt格式的文本内容;\n暂时支持斗鱼、虎牙和B站实时弹幕，请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id',
                           )
                         ],
                       )),

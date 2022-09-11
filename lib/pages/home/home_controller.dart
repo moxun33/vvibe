@@ -24,6 +24,7 @@ class HomeController extends GetxController {
   final playListBarWidth = 200.0;
 
   final barrageWallController = BarrageWallController();
+  PlayListItem? playingUrl;
   DouyuDnamakuService? dyDanmakuService;
   BilibiliDanmakuService? blDanmakuService;
   HuyaDanmakuService? hyDanmakuService;
@@ -117,7 +118,7 @@ class HomeController extends GetxController {
     if (player == null) {
       initPlayer(new DateTime.now().millisecondsSinceEpoch);
     }
-
+    playingUrl = item;
     EasyLoading.show(
       status: "拼命加载中",
       indicator: SizedBox(
@@ -128,7 +129,7 @@ class HomeController extends GetxController {
     MediaSource media = Media.network(item.url, parse: true);
     player?.open(media, autoStart: true);
     player?.setUserAgent('Windows ZTE');
-    onCurrentStream(item);
+    onCurrentStream();
     onPlaybackStream();
     onPlayError();
     onVideoDemensionStream(item.url, item.name);
@@ -137,6 +138,7 @@ class HomeController extends GetxController {
 
   //停止播放器、销毁实例
   void stopPlayer({bool dispose = false}) {
+    playingUrl = null;
     if (player == null) return;
     player?.stop();
     player?.dispose();
@@ -149,11 +151,10 @@ class HomeController extends GetxController {
     startPlay(item);
   }
 
-  void onCurrentStream(PlayListItem? item) {
+  void onCurrentStream() {
     player?.currentStream.listen((CurrentState state) {
-      debugPrint(' current stream ${jsonEncode(item)}');
-      if (state.media != null && item != null) {
-        startDanmakuSocket(item);
+      debugPrint(' current stream ${jsonEncode(playingUrl)}');
+      if (state.media != null) {
         EasyLoading.dismiss();
       }
     });
@@ -162,14 +163,16 @@ class HomeController extends GetxController {
   void onPlaybackStream() {
     player?.playbackStream.listen((PlaybackState state) {
       debugPrint(' playback stream ${state.isPlaying}');
-
+      if (state.isPlaying && playingUrl != null) {
+        startDanmakuSocket(playingUrl!);
+      }
       EasyLoading.dismiss();
     });
   }
 
   void onPlayError() {
     player?.errorStream.listen((e) {
-      EasyLoading.showError('加载失败');
+      EasyLoading.showError('播放失败了');
       EasyLoading.dismiss();
     });
   }
@@ -205,8 +208,8 @@ class HomeController extends GetxController {
   @override
   void dispose() {
     stopPlayer(dispose: Global.isRelease);
-    super.dispose();
     setWindowTitle('vvibe');
     stopDanmakuSocket();
+    super.dispose();
   }
 }
