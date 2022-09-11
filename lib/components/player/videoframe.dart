@@ -1,22 +1,27 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/utils/ffi_util.dart';
 
 class LiveVideoFrame extends StatefulWidget {
-  const LiveVideoFrame({
-    Key? key,
-    required this.videoWidget,
-    required this.player,
-    //required this.isFullscreen,
-    required this.togglePlayList,
-    required this.stopPlayer,
-  }) : super(key: key);
+  LiveVideoFrame(
+      {Key? key,
+      required this.videoWidget,
+      required this.player,
+      //required this.isFullscreen,
+      required this.togglePlayList,
+      required this.stopPlayer,
+      this.playingUrl})
+      : super(key: key);
 
   final Widget videoWidget;
-  final Player player;
+  final Player? player;
   //final bool isFullscreen;
   final Function togglePlayList;
   final Function stopPlayer;
+  PlayListItem? playingUrl;
 
   @override
   State<LiveVideoFrame> createState() => _LiveVideoFrameState();
@@ -24,12 +29,12 @@ class LiveVideoFrame extends StatefulWidget {
 
 class _LiveVideoFrameState extends State<LiveVideoFrame>
     with SingleTickerProviderStateMixin {
-  Player get player => widget.player;
+  Player? get player => widget.player;
 
   bool _hideControls = true;
   bool _displayTapped = false;
   Timer? _hideTimer;
-  late StreamSubscription<PlaybackState> playPauseStream;
+  late StreamSubscription<PlaybackState>? playPauseStream;
   late AnimationController playPauseController;
 
   @override
@@ -37,14 +42,14 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
     super.initState();
     playPauseController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
-    playPauseStream = player.playbackStream
+    playPauseStream = player?.playbackStream
         .listen((event) => setPlaybackMode(event.isPlaying));
-    if (player.playback.isPlaying) playPauseController.forward();
+    if (player?.playback.isPlaying == true) playPauseController.forward();
   }
 
   @override
   void dispose() {
-    playPauseStream.cancel();
+    playPauseStream?.cancel();
     playPauseController.dispose();
     super.dispose();
   }
@@ -59,13 +64,23 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
   }
 
   void playOrPuase() {
-    if (player.playback.isPlaying) {
-      player.pause();
+    if (player?.playback.isPlaying == true) {
+      player?.pause();
       playPauseController.reverse();
     } else {
-      player.play();
+      player?.play();
 
       playPauseController.forward();
+    }
+  }
+
+  void _getMetaInfo() async {
+    if (widget.playingUrl != null &&
+        widget.playingUrl!.url != null &&
+        player?.playback.isPlaying == true) {
+      final info =
+          await compute(FfiUtil().getMediaInfo, widget.playingUrl!.url!);
+      print(info);
     }
   }
 
@@ -73,7 +88,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          if (player.playback.isPlaying) {
+          if (player?.playback.isPlaying == true) {
             if (_displayTapped) {
               setState(() => _hideControls = true);
             } else {
@@ -124,8 +139,9 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   color: Colors.white,
                                   splashRadius: 12,
                                   iconSize: 28,
-                                  tooltip:
-                                      player.playback.isPlaying ? '暂停' : '播放',
+                                  tooltip: player?.playback.isPlaying == true
+                                      ? '暂停'
+                                      : '播放',
                                   icon: AnimatedIcon(
                                       icon: AnimatedIcons.play_pause,
                                       progress: playPauseController),
@@ -134,7 +150,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   },
                                 ),
                               ),
-                              /*    IconButton(
+                              /*  IconButton(
                                 tooltip: '停止',
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
@@ -145,7 +161,19 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   }
                                   widget.stopPlayer();
                                 },
+                              ),
+                              SizedBox(
+                                width: 20,
                               ), */
+                              IconButton(
+                                tooltip: '元数据',
+                                color: Colors.white,
+                                iconSize: 20,
+                                icon: Icon(Icons.info_outline),
+                                onPressed: () {
+                                  _getMetaInfo();
+                                },
+                              ),
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],
@@ -202,7 +230,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
 }
 
 class VolumeControl extends StatefulWidget {
-  final Player player;
+  final Player? player;
   final Color? thumbColor;
 
   const VolumeControl({
@@ -220,7 +248,7 @@ class _VolumeControlState extends State<VolumeControl> {
   bool _showVolume = false;
   double unmutedVolume = 0.5;
 
-  Player get player => widget.player;
+  Player? get player => widget.player;
 
   @override
   Widget build(BuildContext context) {
@@ -252,13 +280,15 @@ class _VolumeControlState extends State<VolumeControl> {
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
-                        label: (player.general.volume * 100).toInt().toString(),
+                        label: (player?.general.volume ?? 1 * 100)
+                            .toInt()
+                            .toString(),
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
-                        value: player.general.volume,
+                        value: player?.general.volume ?? 1.0,
                         onChanged: (volume) {
-                          player.setVolume(volume);
+                          player?.setVolume(volume);
                           setState(() {});
                         },
                       ),
@@ -287,9 +317,9 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   IconData getIcon() {
-    if (player.general.volume > .5) {
+    if ((player?.general.volume ?? 0) > .5) {
       return Icons.volume_up_sharp;
-    } else if (player.general.volume > 0) {
+    } else if ((player?.general.volume ?? 0) > 0) {
       return Icons.volume_down_sharp;
     } else {
       return Icons.volume_off_sharp;
@@ -297,11 +327,11 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   void muteUnmute() {
-    if (player.general.volume > 0) {
-      unmutedVolume = player.general.volume;
-      player.setVolume(0);
+    if ((player?.general.volume ?? 0) > 0) {
+      unmutedVolume = player?.general.volume ?? 1.0;
+      player?.setVolume(0);
     } else {
-      player.setVolume(unmutedVolume);
+      player?.setVolume(unmutedVolume);
     }
     setState(() {});
   }

@@ -23,26 +23,6 @@ class HomePage extends GetView<HomeController> {
           )
         : Video(player: controller.player!, showControls: false);
 
-    final videoFrame = ContextMenuOverlay(
-      child: ContextMenuRegion(
-        contextMenu: PlayerContextMenu(),
-        child: BarrageWall(
-            debug: !Global.isRelease,
-            safeBottomHeight:
-                Get.height ~/ 4 * 3, // do not send bullets to the safe area
-            speed: 10,
-            massiveMode: true,
-            speedCorrectionInMilliseconds: 10000,
-            bullets: [],
-            child: LiveVideoFrame(
-              videoWidget: nativeVideo,
-              player: controller.player!,
-              togglePlayList: controller.togglePlayList,
-              stopPlayer: controller.stopPlayer,
-            ),
-            controller: controller.barrageWallController),
-      ),
-    );
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
         return Container(
@@ -53,7 +33,28 @@ class HomePage extends GetView<HomeController> {
               flex: 4,
               child: GestureDetector(
                 onDoubleTap: () => controller.togglePlayList(),
-                child: videoFrame,
+                child: ContextMenuOverlay(
+                  child: ContextMenuRegion(
+                    contextMenu: PlayerContextMenu(),
+                    child: BarrageWall(
+                        debug: !Global.isRelease,
+                        safeBottomHeight: Get.height ~/
+                            4 *
+                            3, // do not send bullets to the safe area
+                        speed: 10,
+                        massiveMode: true,
+                        speedCorrectionInMilliseconds: 10000,
+                        bullets: [],
+                        child: LiveVideoFrame(
+                          playingUrl: controller.playingUrl,
+                          videoWidget: nativeVideo,
+                          player: controller.player,
+                          togglePlayList: controller.togglePlayList,
+                          stopPlayer: controller.stopPlayer,
+                        ),
+                        controller: controller.barrageWallController),
+                  ),
+                ),
               ),
             ),
             Container(

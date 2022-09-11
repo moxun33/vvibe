@@ -17,7 +17,7 @@ import 'package:vvibe/services/services.dart';
 class HomeController extends GetxController {
   Player? player;
   bool playListShowed = false;
-
+  int playerId = 0;
   final playListBarWidth = 200.0;
 
   final barrageWallController = BarrageWallController();
@@ -28,7 +28,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    initPlayer(1);
+    initPlayer();
   }
 
   @override
@@ -110,43 +110,60 @@ class HomeController extends GetxController {
     hyDanmakuService?.displose();
   }
 
-  void initPlayer(int id) {
+  void initPlayer() {
+    playerId = playerId + 1;
     player = Player(
-        id: id,
-        commandlineArguments: [],
+        id: playerId,
+        commandlineArguments: [
+          '--http-reconnect',
+          '--sout-livehttp-caching',
+        ],
         registerTexture: !Global.useNativeView);
+    update();
   }
 
   void startPlay(PlayListItem item, {bool? first}) {
     if (player == null) {
-      initPlayer(new DateTime.now().millisecondsSinceEpoch);
+      initPlayer();
     }
+    _showLoading();
+
     playingUrl = item;
+    update();
     LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
-    EasyLoading.show(
-      status: "拼命加载中",
-      indicator: SizedBox(
-        width: 40,
-        child: Spinning(),
-      ),
+
+    MediaSource media = Media.network(
+      item.url,
+      parse: true,
+      timeout: Duration(seconds: 10),
     );
-    MediaSource media = Media.network(item.url, parse: true);
     player?.open(media, autoStart: true);
     player?.setUserAgent('Windows ZTE');
     onCurrentStream();
     onPlaybackStream();
     onPlayError();
-    onVideoDemensionStream(item.url, item.name);
+    onVideoDemensionStream();
+    onProgressStream();
     player?.playOrPause();
   }
 
-  //停止播放器、销毁实例
+  //停止播放、销毁实例
   void stopPlayer({bool dispose = false}) {
-    playingUrl = null;
-    if (player == null) return;
-    player?.stop();
     player?.dispose();
-    if (dispose) player = null;
+    player = null;
+    playingUrl = null;
+    stopDanmakuSocket();
+    update();
+  }
+
+  void _showLoading({String? status}) {
+    EasyLoading.show(
+      status: status ?? "正在打开",
+      indicator: SizedBox(
+        width: 40,
+        child: Spinning(),
+      ),
+    );
   }
 
 //播放url改变
@@ -158,34 +175,45 @@ class HomeController extends GetxController {
   void onCurrentStream() {
     player?.currentStream.listen((CurrentState state) {
       debugPrint(' current stream ${jsonEncode(playingUrl)}');
-      if (state.media != null) {
-        EasyLoading.dismiss();
-      }
     });
   }
 
   void onPlaybackStream() {
     player?.playbackStream.listen((PlaybackState state) {
       debugPrint(' playback stream ${state.isPlaying}');
-      if (state.isPlaying && playingUrl != null) {
-        startDanmakuSocket(playingUrl!);
+    });
+  }
+
+  void onProgressStream() {
+    player?.bufferingProgressStream.listen((double e) {
+      final percent = e.toInt();
+      print('缓冲进度 $percent% ');
+
+      if (percent >= 100) {
+        EasyLoading.dismiss();
+        if (playingUrl != null) {
+          startDanmakuSocket(playingUrl!);
+        }
+      } else {
+        _showLoading(status: "缓冲 ${percent}%");
       }
-      EasyLoading.dismiss();
     });
   }
 
   void onPlayError() {
     player?.errorStream.listen((e) {
-      EasyLoading.showError('播放失败了');
+      EasyLoading.showError('播放失败了', duration: Duration(minutes: 10));
       EasyLoading.dismiss();
       debugPrint('播放异常： $e ');
       debugPrint('播放器错误： ${player?.error} ');
     });
   }
 
-  void onVideoDemensionStream(String? url, String? title) {
-    final name =
-        player?.current.media?.metas['title'] ?? title ?? url ?? 'vvibe';
+  void onVideoDemensionStream() {
+    final name = player?.current.media?.metas['title'] ??
+        playingUrl?.name ??
+        playingUrl?.url ??
+        'vvibe';
     player?.videoDimensionsStream.listen((videoDimensions) {
       final ratio = videoDimensions.width.toString() +
           'x' +
@@ -215,7 +243,7 @@ class HomeController extends GetxController {
   void dispose() {
     stopPlayer(dispose: Global.isRelease);
     setWindowTitle('vvibe');
-    stopDanmakuSocket();
+
     super.dispose();
   }
 }

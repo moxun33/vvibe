@@ -32,7 +32,6 @@ class FfiUtil {
   Future<String?> getMediaInfo(String url) async {
     String info =
         await api.getMediaInfo(url: url, ffprobeDir: Directory('assets/').path);
-    print(info);
     return info;
   }
 }
