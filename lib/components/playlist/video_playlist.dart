@@ -11,11 +11,8 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/local_storage.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:vvibe/utils/screen_device.dart';
-
-import '../../utils/playlist/playlist_util.dart';
+import 'package:vvibe/utils/utils.dart';
 
 class VideoPlaylist extends StatefulWidget {
   const VideoPlaylist({Key? key, required this.onUrlTap, this.visible = false})
@@ -156,6 +153,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
+                hint:
+                    Text('选择播放列表', style: TextStyle(color: Colors.purple[100])),
                 value: selectedFilename,
                 icon: const Icon(Icons.keyboard_arrow_down),
                 onChanged: (String? value) {

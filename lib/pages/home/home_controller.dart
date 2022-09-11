@@ -1,21 +1,18 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/global.dart';
-import 'package:vvibe/init.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/services/danmaku/bilibili_danmaku_service.dart';
-import 'package:vvibe/services/danmaku/huya_danmaku_service.dart';
+import 'package:vvibe/utils/local_storage.dart';
 import 'package:window_size/window_size.dart';
-import 'package:vvibe/services/danmaku/douyu_danmaku_service.dart';
+import 'package:vvibe/services/services.dart';
 
 class HomeController extends GetxController {
   Player? player;
@@ -39,6 +36,10 @@ class HomeController extends GetxController {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
     final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
+    final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+    if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
+      startPlay(lastPlayUrl['url']);
+    }
   }
 
 //发送弹幕道屏幕
@@ -61,7 +62,9 @@ class HomeController extends GetxController {
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
     stopDanmakuSocket();
-    barrageWallController.disable();
+    if (barrageWallController.isEnabled) {
+      barrageWallController.disable();
+    }
     if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
     final String rid = item.tvgId!;
     switch (item.group) {
@@ -119,6 +122,7 @@ class HomeController extends GetxController {
       initPlayer(new DateTime.now().millisecondsSinceEpoch);
     }
     playingUrl = item;
+    LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item);
     EasyLoading.show(
       status: "拼命加载中",
       indicator: SizedBox(
@@ -174,6 +178,8 @@ class HomeController extends GetxController {
     player?.errorStream.listen((e) {
       EasyLoading.showError('播放失败了');
       EasyLoading.dismiss();
+      debugPrint('播放异常： $e ');
+      debugPrint('播放器错误： ${player?.error} ');
     });
   }
 

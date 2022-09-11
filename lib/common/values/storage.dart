@@ -11,6 +11,7 @@ const String REGISTRATION_ID = 'reegistration_id';
 const LAST_PLAYLIST_FILE_OR_SUB = 'LAST_PLAYLIST_FILE_OR_SUB';
 //最后的播放列表
 const LAST_PLAYLIST_DATA = 'LAST_LOCAL_PLAYLIST_DATA';
-
+//最后播放的视频url
+const LAST_PLAY_VIDEO_URL = 'LAST_PLAY_VIDEO_URL';
 //远程订阅的订阅地址列表
 const PLAYLIST_SUB_URLS = 'PLAYLIST_SUB_URLS';

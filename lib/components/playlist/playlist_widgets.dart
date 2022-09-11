@@ -69,7 +69,9 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
     super.didUpdateWidget(oldWidget);
     // debugPrint('PlGroupPanel didUpdateWidget ${widget.data.length}');
     setState(() {
-      playlist = widget.data;
+      playlist = searchKey.isNotEmpty
+          ? filterPlaylist(searchKey, widget.data)
+          : widget.data;
     });
   }
 
@@ -145,7 +147,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: getDeviceHeight(context),
+        height: getDeviceHeight(context) - 130,
         child: ExtendedListView.builder(
           itemBuilder: (context, index) {
             if (widget.data.length < index + 1) return SizedBox();
@@ -164,7 +166,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                         e.name?.trim() ?? '未知名称',
                         maxLines: 1,
                         softWrap: false,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.clip,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: e.url == selectedItem?.url

@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/pages/login/login_model.dart';
-import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/utils.dart';
+import 'package:window_size/window_size.dart';
 
 /// 全局配置
 class Global {
@@ -24,9 +26,14 @@ class Global {
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 
   /// init
-  static Future init() async {
+  static Future<ThemeData> init() async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      setWindowMaxSize(const Size(3840, 2160));
+      setWindowMinSize(const Size(1280, 720));
+    }
+    DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
 
     // Ruquest 模块初始化
     Request();
@@ -64,6 +71,7 @@ class Global {
           SystemUiOverlayStyle(statusBarColor: Colors.transparent);
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }
+    return genTheme();
   }
 
   // 持久化 用户信息
