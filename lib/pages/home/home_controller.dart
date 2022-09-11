@@ -42,22 +42,25 @@ class HomeController extends GetxController {
 
 //发送弹幕道屏幕
   void sendDanmakuBullet(LiveDanmakuItem? data) {
-    if (data?.msg != null)
-      barrageWallController.send([
-        new Bullet(
-            child: Tooltip(
-          message: data?.name ?? '',
-          child: Text(
-            data?.msg ?? '',
-            style: TextStyle(color: data?.color ?? Colors.white, fontSize: 20),
-          ),
-        ))
-      ]);
+    if (data?.msg != null) if (!barrageWallController.isEnabled) {
+      barrageWallController.enable();
+    }
+    barrageWallController.send([
+      new Bullet(
+          child: Tooltip(
+        message: data?.name ?? '',
+        child: Text(
+          data?.msg ?? '',
+          style: TextStyle(color: data?.color ?? Colors.white, fontSize: 20),
+        ),
+      ))
+    ]);
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
     stopDanmakuSocket();
+    barrageWallController.disable();
     if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
     final String rid = item.tvgId!;
     switch (item.group) {

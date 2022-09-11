@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/common/values/storage.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/request.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -61,7 +63,22 @@ class PlaylistUtil {
   }
 
 //根据url解析远程txt或m3u内容
-  Future<List<PlayListItem>> parsePlaylistUrl(String url) async {
+  Future<List<PlayListItem>> parsePlaylistSubUrl(String url) async {
+    final resp = await Dio().get(url);
+    if (resp.statusCode == 200) {
+      final String _data = resp.data;
+      final List<String> lines = _data.split('\n');
+      if (url.endsWith('.m3u')) {
+        return compute(parseM3uContents, lines);
+      }
+
+      if (url.endsWith('.txt')) {
+        return compute(parseTxtContents, lines);
+      }
+
+      return [];
+    }
+
     return [];
   }
 

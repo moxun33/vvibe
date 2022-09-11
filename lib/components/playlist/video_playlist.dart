@@ -4,6 +4,8 @@
  * @Last Modified by: Moxx
  * @Last Modified time: 2022-09-10 00:55:23
  */
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
@@ -28,23 +30,39 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   List<PlayListItem> playlist = [];
   List<Map<String, dynamic>> playFiles = []; //本地、订阅列表
   String? selectedFilename = null;
+  bool loading = true;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+    _initData();
+  }
+
+  void _initData() async {
     final _files = await PlaylistUtil().getPlayListFiles(basename: true);
+    //订阅url列表
     final _urls = await PlaylistUtil().getSubUrls(), urls = _urls;
     urls.addAll(_files.map((e) => {'name': e}));
     setState(() => playFiles = urls);
-    final lastFile = LoacalStorage().getString(LAST_LOCAL_PLAYLIST_FILE);
-    if (lastFile != '' && _files.contains(lastFile)) {
-      onPlayFileChange(lastFile);
-    } else {
-      if (_files.length > 0) {
-        onPlayFileChange(_files.first);
-      }
+    final lastSelect = LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
+    if (lastSelect == null) {
+      setState(() {
+        loading = false;
+      });
+      return;
     }
+
+    final lastFile = lastSelect['name'];
+
+    if (lastFile != '' && _files.contains(lastFile)) {
+      onPlayFileChange(jsonEncode(lastSelect));
+    }
+    //初始化订阅url的列表
+
+    setState(() {
+      loading = false;
+    });
   }
 
   void updatePlaylistFiles() async {
@@ -54,20 +72,38 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     setState(() => playFiles = urls);
   }
 
-  void onPlayFileChange(String? value) {
+//切换播放文件或订阅
+  void onPlayFileChange(String? value) async {
     setState(() {
       playlist = [];
       selectedFilename = value;
     });
 
     if (value != null) {
-      LoacalStorage().setString(LAST_LOCAL_PLAYLIST_FILE, value);
-      PlaylistUtil().parsePlaylistFile("playlist/${value}").then((value) {
-        setState(() => playlist = value);
-        LoacalStorage().setJSON(LAST_PLAYLIST_DATA, value);
+      setState(() {
+        loading = true;
       });
+      final map = jsonDecode(value);
+      debugPrint(value);
+      LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
+      List<PlayListItem> data = [];
+      if (map['url'] != null) {
+        data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
+        PlaylistUtil().parsePlaylistSubUrl(map['url']).then((list) {
+          setState(() => playlist = list);
+          LoacalStorage().setJSON(LAST_PLAYLIST_DATA, list);
+        });
+      } else {
+        //本地文件
+        data =
+            await PlaylistUtil().parsePlaylistFile("playlist/${map['name']}");
+      }
+      setState(() {
+        playlist = data;
+        loading = false;
+      });
+      LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
     }
-    updatePlaylistFiles();
   }
 
   //state发生变化时会回调该方法,可以是class
@@ -81,6 +117,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   @override
   void didUpdateWidget(covariant VideoPlaylist oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.visible && playFiles.length < 1) {
+      _initData();
+    }
   }
 
   //组件被从父节点移除时回调的方法，如果没插入到其他节点会随后调用dispose完全释放
@@ -130,7 +169,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 style: const TextStyle(color: Colors.white),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
-                    value: v['name'],
+                    value: jsonEncode(v),
                     child: Wrap(children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 4, 0),
@@ -168,7 +207,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     widget.onUrlTap(e);
                   },
                 )
-              : (widget.visible
+              : (widget.visible && loading
                   ? Spinning()
                   : SizedBox(
                       width: 0,
