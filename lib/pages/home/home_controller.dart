@@ -38,11 +38,11 @@ class HomeController extends GetxController {
     // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
-      startPlay(lastPlayUrl['url']);
+      startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
   }
 
-//发送弹幕道屏幕
+//发送弹幕到屏幕
   void sendDanmakuBullet(LiveDanmakuItem? data) {
     if (data?.msg != null) if (!barrageWallController.isEnabled) {
       barrageWallController.enable();
@@ -122,7 +122,7 @@ class HomeController extends GetxController {
       initPlayer(new DateTime.now().millisecondsSinceEpoch);
     }
     playingUrl = item;
-    LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item);
+    LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
     EasyLoading.show(
       status: "拼命加载中",
       indicator: SizedBox(
