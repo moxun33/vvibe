@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -71,6 +73,12 @@ class Global {
           SystemUiOverlayStyle(statusBarColor: Colors.transparent);
       SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }
+    //自定义easyloading
+    EasyLoading.instance
+      ..indicatorWidget = SizedBox(
+        width: 40,
+        child: Spinning(),
+      );
     return genTheme();
   }
 

@@ -126,7 +126,7 @@ class HomeController extends GetxController {
     if (player == null) {
       initPlayer();
     }
-    _showLoading();
+    EasyLoading.show(status: '正在打开');
 
     playingUrl = item;
     update();
@@ -156,17 +156,7 @@ class HomeController extends GetxController {
     update();
   }
 
-  void _showLoading({String? status}) {
-    EasyLoading.show(
-      status: status ?? "正在打开",
-      indicator: SizedBox(
-        width: 40,
-        child: Spinning(),
-      ),
-    );
-  }
-
-//播放url改变
+  //播放url改变
   void onPlayUrlChange(PlayListItem item) {
     if (item.url == null) return;
     startPlay(item);
@@ -187,7 +177,6 @@ class HomeController extends GetxController {
   void onProgressStream() {
     player?.bufferingProgressStream.listen((double e) {
       final percent = e.toInt();
-      print('缓冲进度 $percent% ');
 
       if (percent >= 100) {
         EasyLoading.dismiss();
@@ -195,15 +184,18 @@ class HomeController extends GetxController {
           startDanmakuSocket(playingUrl!);
         }
       } else {
-        _showLoading(status: "缓冲 ${percent}%");
+        print('缓冲进度 $percent% ');
+
+        EasyLoading.show(status: "缓冲 ${percent}%");
       }
     });
   }
 
   void onPlayError() {
     player?.errorStream.listen((e) {
-      EasyLoading.showError('播放失败了', duration: Duration(minutes: 10));
       EasyLoading.dismiss();
+      EasyLoading.showError('播放失败了', duration: Duration(minutes: 10));
+
       debugPrint('播放异常： $e ');
       debugPrint('播放器错误： ${player?.error} ');
     });
@@ -223,7 +215,7 @@ class HomeController extends GetxController {
     });
   }
 
-  void updateWIndowTitle() {}
+  void updateWindowTitle() {}
 
   //获取当前弹幕区域尺寸
   Size getDanmakuSize() => Size(

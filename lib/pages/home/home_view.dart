@@ -29,6 +29,7 @@ class HomePage extends GetView<HomeController> {
             child: Row(
           children: <Widget>[
             //  PlayerContextMenu(),
+
             Expanded(
               flex: 4,
               child: GestureDetector(
