@@ -1,6 +1,6 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+
 import 'package:vvibe/components/player/settings/playlist_subscription.dart';
 
 class SettingTabBarView extends StatefulWidget {
@@ -8,12 +8,16 @@ class SettingTabBarView extends StatefulWidget {
   _SettingTabBarViewState createState() => _SettingTabBarViewState();
 }
 
-class _SettingTabBarViewState extends State<SettingTabBarView> {
+class _SettingTabBarViewState extends State<SettingTabBarView>
+    with TickerProviderStateMixin {
   final tabs = [
     {'value': 'subscribe', 'label': '订阅'},
     {'value': 'player', 'label': '播放器'}
   ];
-
+  late TabController _tabController = TabController(
+    length: tabs.length,
+    vsync: this,
+  );
   @override
   void initState() {
     super.initState();
@@ -31,6 +35,7 @@ class _SettingTabBarViewState extends State<SettingTabBarView> {
         isScrollable: true,
         labelColor: Colors.purple,
         indicatorWeight: 3,
+        controller: _tabController,
         indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
         unselectedLabelColor: Colors.black87,
         indicatorColor: Colors.purple[300],
@@ -39,22 +44,21 @@ class _SettingTabBarViewState extends State<SettingTabBarView> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: tabs.length,
-        child: Expanded(
-            child: Column(
-          children: [
-            _buildTabBar(),
-            Expanded(
-              flex: 1,
-              child: TabBarView(
-                children: [
-                  PlaylistSubscription(),
-                  Center(child: Text(" ")),
-                ],
-              ),
-            )
-          ],
-        )));
+    return Expanded(
+        child: Column(
+      children: [
+        _buildTabBar(),
+        Expanded(
+          flex: 1,
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              PlaylistSubscription(),
+              Center(child: Text(" ")),
+            ],
+          ),
+        )
+      ],
+    ));
   }
 }
