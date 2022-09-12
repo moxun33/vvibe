@@ -10,8 +10,7 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  
-  
+
 env:
   # APP name
   APP_NAME: vvibe
@@ -28,30 +27,30 @@ jobs:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          
+          channel: "stable"
+
       - name: Build
         run: |
           flutter config --enable-windows-desktop
           flutter pub get
           flutter build windows
-    
+
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
-          type: 'zip'
+          type: "zip"
           filename: vvibe-${{github.ref_name}}-windows.zip
           directory: build/windows/runner/Release
-      
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{github.ref_name}}
           draft: true
           prerelease: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           files: |
-            build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-windows.zip
+            build/windows/runner/Release/vvibe-${{github.ref_name}}-windows.zip
 
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3
