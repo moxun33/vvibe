@@ -16,6 +16,7 @@
 - 播放本地文件``m3u``或``txt``播放列表
 - 订阅远程``m3u``或``txt``播放列表
 - 支持``虎牙``，``斗鱼``和``哔哩哔哩``的实时弹幕 （请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id）
+- 播放列表管理，分组、搜索
   
 ## 多平台
 
@@ -33,9 +34,9 @@
 
 ## 截图
 
-![img](https://github.com/moxun33/vvibe/raw/main/screenshot/player.png)
+![img](https://raw.githubusercontent.com/moxun33/vvibe/main/screenshots/player.png)
 
-![img](https://github.com/moxun33/vvibe/raw/main/screenshot/settings.png)
+![img](https://raw.githubusercontent.com/moxun33/vvibe/main/screenshots/settings.png)
 
 ## 注意
 
