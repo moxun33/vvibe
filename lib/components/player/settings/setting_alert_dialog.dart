@@ -1,7 +1,6 @@
 //播放器的设置弹窗
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vvibe/components/player/settings/playlist_subscription.dart';
 import 'package:vvibe/components/player/settings/setting_tabs.dart';
 
 class SettingAlertDialog extends StatefulWidget {
@@ -22,7 +21,7 @@ class _SettingAlertDialogState extends State<SettingAlertDialog> {
       content: SizedBox(
         width: 1000,
         height: Get.size.height,
-        child: PlaylistSubscription(),
+        child: SettingTabBarView(),
       ),
     );
   }

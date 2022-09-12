@@ -6,6 +6,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -50,6 +51,10 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   void onSearch(String keyword) {
     final newList = filterPlaylist(keyword, widget.data);
     print('newList ${newList.length}');
+    if (newList.length < 1) {
+      EasyLoading.showInfo('没有搜索结果');
+      return;
+    }
     setState(() {
       searchKey = keyword;
       playlist = newList;

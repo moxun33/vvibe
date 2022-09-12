@@ -44,8 +44,7 @@ class _SettingTabBarViewState extends State<SettingTabBarView>
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: Column(
+    return Column(
       children: [
         _buildTabBar(),
         Expanded(
@@ -59,6 +58,6 @@ class _SettingTabBarViewState extends State<SettingTabBarView>
           ),
         )
       ],
-    ));
+    );
   }
 }
