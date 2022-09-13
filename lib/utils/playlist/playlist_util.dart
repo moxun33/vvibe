@@ -153,4 +153,9 @@ class PlaylistUtil {
   Map<String, List<PlayListItem>> getPlaylistgroups(List<PlayListItem> list) {
     return groupBy(list, (e) => e.group ?? "未分组");
   }
+
+  //检查是否为有效的url
+  bool validateUrl(String url) {
+    return Uri.tryParse(url)?.hasAbsolutePath ?? false;
+  }
 }

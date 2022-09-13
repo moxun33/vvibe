@@ -2,13 +2,15 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:55:49
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 16:06:56
+ * @LastEditTime: 2022-09-13 16:19:36
  * @FilePath: \vvibe\lib\components\player\settings\open_url_dialog.dart
  * @Description: 打开链接弹窗
  * @aqmj
  */
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 class OpenUrlDialog extends StatefulWidget {
   OpenUrlDialog({Key? key, required this.onOpenUrl}) : super(key: key);
@@ -27,6 +29,23 @@ class _OpenUrlDialogState extends State<OpenUrlDialog> {
     }
     Navigator.pop(context);
     widget.onOpenUrl(url);
+  }
+
+  void checkClipboard() async {
+    ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data != null) {
+      final valid = PlaylistUtil().validateUrl(data.text ?? '');
+      if (valid) {
+        _urlController.text = data.text!;
+      }
+    }
+    debugPrint('粘贴板 ${data?.text}');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkClipboard();
   }
 
   @override

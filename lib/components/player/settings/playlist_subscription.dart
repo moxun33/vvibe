@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
-import 'package:vvibe/models/subscription_url.dart';
 import 'package:vvibe/utils/utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -37,10 +36,6 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     }
   }
 
-  bool _validateUrl(String url) {
-    return Uri.tryParse(url)?.hasAbsolutePath ?? false;
-  }
-
   void _submitForm() {
     //验证通过提交数据
     final name = _nameController.text, url = _urlController.text;
@@ -48,7 +43,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
       EasyLoading.showError('名称和地址都不能为空');
       return;
     }
-    if (!_validateUrl(url)) {
+    if (!PlaylistUtil().validateUrl(url)) {
       EasyLoading.showError('订阅地址无效');
       return;
     }
