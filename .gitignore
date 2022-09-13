@@ -49,4 +49,5 @@ app.*.map.json
 target/
 
 flutter_rust_bridge_codegen.exe
-./playlist/*
+./playlist/*.m3u
+./playlist/*.txt
