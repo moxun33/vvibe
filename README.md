@@ -49,6 +49,6 @@
 
 2、由于``dart_vlc``的``ffi``版本与``flutter-rust_bridge``的``ffi``版本冲突，目前强制使用``ffi 2.x``版本
 
-3、本应用不内置播放源，请自行准备直播源
+3、本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
 
 4、直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
