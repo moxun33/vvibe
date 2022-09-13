@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-09-13 22:11:13
+ * @LastEditTime: 2022-09-13 22:40:50
  * @FilePath: \vvibe\lib\components\player\player_context_menu.dart
  * @Description: 
  * @qmj
@@ -18,10 +18,12 @@ class PlayerContextMenu extends StatefulWidget {
       {Key? key,
       required this.onOpenUrl,
       required this.showPlaylist,
+      required this.playListShowed,
       required this.child})
       : super(key: key);
   final void Function(String url) onOpenUrl;
   final void Function() showPlaylist;
+  final bool playListShowed;
   final Widget child;
   @override
   _PlayerContextMenuState createState() => _PlayerContextMenuState();
@@ -41,6 +43,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
             });
         break;
       case '播放列表':
+        if (widget.playListShowed) return;
         widget.showPlaylist();
         break;
       case 'scanVerify':

@@ -39,6 +39,7 @@ class HomePage extends GetView<HomeController> {
                   child: PlayerContextMenu(
                     onOpenUrl: controller.onOpenOneUrl,
                     showPlaylist: controller.togglePlayList,
+                    playListShowed: controller.playListShowed,
                     child: BarrageWall(
                         debug: false, //!Global.isRelease,
                         safeBottomHeight: Get.height ~/

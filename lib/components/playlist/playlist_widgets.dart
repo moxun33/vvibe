@@ -19,11 +19,11 @@ class PlGroupPanel extends StatefulWidget {
   const PlGroupPanel(
       {Key? key,
       required this.data,
-      this.expansionCallback,
+      //this.expansionCallback,
       required this.onUrlTap})
       : super(key: key);
   final List<PlayListItem> data;
-  final ExpansionPanelCallback? expansionCallback;
+  // final ExpansionPanelCallback? expansionCallback;
   final void Function(PlayListItem item) onUrlTap;
   @override
   State<PlGroupPanel> createState() => _PlGroupPanelState();
@@ -87,48 +87,55 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   Widget build(BuildContext context) {
     final groups = PlaylistUtil().getPlaylistgroups(playlist),
         keyList = groups.keys.toList();
-    return SingleChildScrollView(
-        child: ExpansionPanelList(
-            expansionCallback: (i, expanded) =>
-                toggleExpand(i, expanded, keyList[i]),
-            children: keyList.map<ExpansionPanel>((String key) {
-              final urlList = groups[key] ?? [];
-              return ExpansionPanel(
-                  canTapOnHeader: true,
-                  backgroundColor: Colors.white10,
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return Container(
-                      child: ListTile(
-                        hoverColor: Colors.purple[100],
-                        title: Text(key, style: TextStyle(fontSize: 14)),
-                        subtitle: isExpanded
-                            ? TextField(
-                                decoration: InputDecoration(
-                                    fillColor: Colors.white,
-                                    hintText: '搜索',
-                                    hintStyle:
-                                        TextStyle(color: Colors.white30)),
-                                style: TextStyle(
-                                    fontSize: 12.0, color: Colors.white),
-                                onSubmitted: ((value) {
-                                  onSearch(value);
-                                }),
-                              )
-                            : SizedBox(height: 0, width: 0),
-                        textColor: isExpanded ? Colors.white70 : Colors.white,
-                      ),
-                      height: isExpanded ? 60 : 20,
-                    );
-                  },
-                  body: expandKey == key
-                      ? PlUrlListView(data: urlList, onUrlTap: widget.onUrlTap)
-                      : SizedBox(
-                          height: 0,
-                          width: 0,
-                        ),
-                  isExpanded: expandKey == key // expanded[key] ?? false,
-                  );
-            }).toList()));
+    return ContextMenuRegion(
+        onItemSelected: (item) {},
+        menuItems: [
+          MenuItem(title: '强制刷新列表'),
+        ],
+        child: SingleChildScrollView(
+            child: ExpansionPanelList(
+                expansionCallback: (i, expanded) =>
+                    toggleExpand(i, expanded, keyList[i]),
+                children: keyList.map<ExpansionPanel>((String key) {
+                  final urlList = groups[key] ?? [];
+                  return ExpansionPanel(
+                      canTapOnHeader: true,
+                      backgroundColor: Colors.white10,
+                      headerBuilder: (BuildContext context, bool isExpanded) {
+                        return Container(
+                          child: ListTile(
+                            hoverColor: Colors.purple[100],
+                            title: Text(key, style: TextStyle(fontSize: 14)),
+                            subtitle: isExpanded
+                                ? TextField(
+                                    decoration: InputDecoration(
+                                        fillColor: Colors.white,
+                                        hintText: '搜索',
+                                        hintStyle:
+                                            TextStyle(color: Colors.white30)),
+                                    style: TextStyle(
+                                        fontSize: 12.0, color: Colors.white),
+                                    onSubmitted: ((value) {
+                                      onSearch(value);
+                                    }),
+                                  )
+                                : SizedBox(height: 0, width: 0),
+                            textColor:
+                                isExpanded ? Colors.white70 : Colors.white,
+                          ),
+                          height: isExpanded ? 60 : 20,
+                        );
+                      },
+                      body: expandKey == key
+                          ? PlUrlListView(
+                              data: urlList, onUrlTap: widget.onUrlTap)
+                          : SizedBox(
+                              height: 0,
+                              width: 0,
+                            ),
+                      isExpanded: expandKey == key // expanded[key] ?? false,
+                      );
+                }).toList())));
   }
 }
 
@@ -155,7 +162,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   }
 
   //菜单点击
-  void onItemTap(BuildContext context, MenuItem item, PlayListItem url) {
+  void _onUrlItemTap(BuildContext context, MenuItem item, PlayListItem url) {
     final value = item.title;
 
     switch (value) {
@@ -208,7 +215,9 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 color: Colors.black12,
                 alignment: Alignment.centerLeft,
                 child: ContextMenuRegion(
-                  onItemSelected: (item) => {onItemTap(context, item, e)},
+                  onItemSelected: (item) {
+                    _onUrlItemTap(context, item, e);
+                  },
                   menuItems: [
                     MenuItem(title: '复制链接'),
                   ],
