@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-13 14:05:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-13 16:48:44
+ * @FilePath: \vvibe\lib\pages\home\home_view.dart
+ * @Description: 
+ * @qmj
+ */
 import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
@@ -16,13 +25,6 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final nativeVideo = Global.useNativeView
-        ? NativeVideo(
-            player: controller.player!,
-            showControls: false,
-          )
-        : Video(player: controller.player!, showControls: false);
-
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
         return Container(
@@ -38,9 +40,10 @@ class HomePage extends GetView<HomeController> {
                   child: ContextMenuRegion(
                     contextMenu: PlayerContextMenu(
                       onOpenUrl: controller.onOpenOneUrl,
+                      showPlaylist: controller.togglePlayList,
                     ),
                     child: BarrageWall(
-                        debug: !Global.isRelease,
+                        debug: false, //!Global.isRelease,
                         safeBottomHeight: Get.height ~/
                             4 *
                             3, // do not send bullets to the safe area
@@ -48,13 +51,42 @@ class HomePage extends GetView<HomeController> {
                         massiveMode: true,
                         speedCorrectionInMilliseconds: 10000,
                         bullets: [],
-                        child: LiveVideoFrame(
-                          playingUrl: controller.playingUrl,
-                          videoWidget: nativeVideo,
-                          player: controller.player,
-                          togglePlayList: controller.togglePlayList,
-                          stopPlayer: controller.stopPlayer,
-                        ),
+                        child: controller.player != null
+                            ? LiveVideoFrame(
+                                playingUrl: controller.playingUrl,
+                                videoWidget: Global.useNativeView
+                                    ? NativeVideo(
+                                        player: controller.player!,
+                                        showControls: false,
+                                      )
+                                    : Video(
+                                        player: controller.player,
+                                        showControls: false),
+                                player: controller.player,
+                                togglePlayList: controller.togglePlayList,
+                                stopPlayer: controller.stopPlayer,
+                              )
+                            : Container(
+                                color: Colors.black87,
+                                child: Center(
+                                  child: Wrap(
+                                    direction: Axis.vertical,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 50,
+                                    children: [
+                                      SizedBox(
+                                          width: 200,
+                                          child:
+                                              Image.asset('assets/logo.png')),
+                                      Text('这里空空如也😊',
+                                          style: TextStyle(
+                                              color: Colors.purple[300],
+                                              fontSize: 40))
+                                    ],
+                                  ),
+                                ),
+                              ),
                         controller: controller.barrageWallController),
                   ),
                 ),

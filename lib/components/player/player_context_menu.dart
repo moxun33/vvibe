@@ -4,8 +4,11 @@ import 'package:vvibe/components/player/settings/open_url_dialog.dart';
 import 'package:vvibe/components/player/settings/setting_alert_dialog.dart';
 
 class PlayerContextMenu extends StatefulWidget {
-  PlayerContextMenu({Key? key, required this.onOpenUrl}) : super(key: key);
+  PlayerContextMenu(
+      {Key? key, required this.onOpenUrl, required this.showPlaylist})
+      : super(key: key);
   final void Function(String url) onOpenUrl;
+  final void Function() showPlaylist;
   @override
   _PlayerContextMenuState createState() => _PlayerContextMenuState();
 }
@@ -13,6 +16,7 @@ class PlayerContextMenu extends StatefulWidget {
 class _PlayerContextMenuState extends State<PlayerContextMenu> {
   final List<Map<String, String>> playerCtxMenus = [
     {'value': 'openUrl', 'label': '打开链接'},
+    {'value': 'playlist', 'label': '播放列表'},
     {'value': 'scanVerify', 'label': '扫源验证'},
 
     {'value': 'setting', 'label': '软件设置'},
@@ -24,6 +28,8 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     switch (type) {
       case 'openUrl':
         return Icons.add_link_outlined;
+      case 'playlist':
+        return Icons.menu_open_outlined;
       case 'scanVerify':
         return Icons.satellite_alt_outlined;
       case 'setting':
@@ -50,6 +56,9 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
                 onOpenUrl: widget.onOpenUrl,
               );
             });
+        break;
+      case 'playlist':
+        widget.showPlaylist();
         break;
       case 'scanVerify':
         EasyLoading.showInfo('TODO');
@@ -80,7 +89,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     return SingleChildScrollView(
         child: Container(
             width: 140,
-            height: 180,
+            height: 210,
             color: Colors.white,
             child: ListView.builder(
                 shrinkWrap: true,

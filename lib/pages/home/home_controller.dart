@@ -28,7 +28,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    initPlayer();
+    // initPlayer();
   }
 
   @override
@@ -153,7 +153,9 @@ class HomeController extends GetxController {
     player = null;
     playingUrl = null;
     stopDanmakuSocket();
+    barrageWallController.disable();
     update();
+    setWindowTitle('vvibe');
   }
 
   //播放url改变

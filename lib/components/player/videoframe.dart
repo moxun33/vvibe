@@ -150,13 +150,13 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   },
                                 ),
                               ),
-                              /*  IconButton(
+                              IconButton(
                                 tooltip: '停止',
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
                                 onPressed: () {
-                                  if (player.playback.isPlaying) {
-                                    player.pause();
+                                  if (player?.playback.isPlaying == true) {
+                                    player?.pause();
                                     playPauseController.reverse();
                                   }
                                   widget.stopPlayer();
@@ -164,7 +164,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                               ),
                               SizedBox(
                                 width: 20,
-                              ), */
+                              ),
                               IconButton(
                                 tooltip: '元数据',
                                 color: Colors.white,

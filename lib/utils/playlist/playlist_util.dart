@@ -141,7 +141,6 @@ class PlaylistUtil {
               url: url));
         }
       }
-      final groups = getPlaylistgroups(list);
       return list;
     } catch (e) {
       print('读取M3U文本行内容出错: $e');
