@@ -125,7 +125,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
             controller: _urlController,
             decoration: InputDecoration(
                 hintText: "URL地址, 如: http://localhost/live.m3u",
-                icon: Icon(Icons.subscriptions_outlined),
+                icon: Icon(Icons.add_link_sharp),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.close),
                   onPressed: () {

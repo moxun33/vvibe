@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-05 14:43:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-13 15:27:45
+ * @FilePath: \vvibe\lib\models\playlist_item.dart
+ * @Description: 
+ * @qmj
+ */
 // To parse this JSON data, do
 //
 //     final playListItem = playListItemFromJson(jsonString);

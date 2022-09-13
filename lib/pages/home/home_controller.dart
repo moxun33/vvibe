@@ -38,7 +38,7 @@ class HomeController extends GetxController {
     // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
-      startPlay(PlayListItem.fromJson(lastPlayUrl));
+      //     startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
   }
 
@@ -194,7 +194,7 @@ class HomeController extends GetxController {
   void onPlayError() {
     player?.errorStream.listen((e) {
       EasyLoading.dismiss();
-      EasyLoading.showError('播放失败了', duration: Duration(minutes: 10));
+      EasyLoading.showError('播放失败了', duration: Duration(seconds: 10));
 
       debugPrint('播放异常： $e ');
       debugPrint('播放器错误： ${player?.error} ');
@@ -226,6 +226,15 @@ class HomeController extends GetxController {
     playListShowed = !playListShowed;
 
     update();
+  }
+
+//打开单个播放url
+  void onOpenOneUrl(String url) {
+    debugPrint('打开链接 $url');
+    if (url.isEmpty) return;
+    final PlayListItem item =
+        PlayListItem.fromJson({'url': url, 'name': 'vvibe'});
+    startPlay(item);
   }
 
   @override

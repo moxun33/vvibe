@@ -36,7 +36,9 @@ class HomePage extends GetView<HomeController> {
                 onDoubleTap: () => controller.togglePlayList(),
                 child: ContextMenuOverlay(
                   child: ContextMenuRegion(
-                    contextMenu: PlayerContextMenu(),
+                    contextMenu: PlayerContextMenu(
+                      onOpenUrl: controller.onOpenOneUrl,
+                    ),
                     child: BarrageWall(
                         debug: !Global.isRelease,
                         safeBottomHeight: Get.height ~/
