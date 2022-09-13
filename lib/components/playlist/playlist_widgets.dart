@@ -5,8 +5,9 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:native_context_menu/native_context_menu.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -95,10 +96,27 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   canTapOnHeader: true,
                   backgroundColor: Colors.white10,
                   headerBuilder: (BuildContext context, bool isExpanded) {
-                    return PlGroupTitleTile(
-                      isExpanded: isExpanded,
-                      groupKey: key,
-                      onSearch: onSearch,
+                    return Container(
+                      child: ListTile(
+                        hoverColor: Colors.purple[100],
+                        title: Text(key, style: TextStyle(fontSize: 14)),
+                        subtitle: isExpanded
+                            ? TextField(
+                                decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    hintText: '搜索',
+                                    hintStyle:
+                                        TextStyle(color: Colors.white30)),
+                                style: TextStyle(
+                                    fontSize: 12.0, color: Colors.white),
+                                onSubmitted: ((value) {
+                                  onSearch(value);
+                                }),
+                              )
+                            : SizedBox(height: 0, width: 0),
+                        textColor: isExpanded ? Colors.white70 : Colors.white,
+                      ),
+                      height: isExpanded ? 60 : 20,
                     );
                   },
                   body: expandKey == key
@@ -110,50 +128,6 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   isExpanded: expandKey == key // expanded[key] ?? false,
                   );
             }).toList()));
-  }
-}
-
-//播放列表分组标题面板
-class PlGroupTitleTile extends StatefulWidget {
-  PlGroupTitleTile(
-      {Key? key,
-      required this.isExpanded,
-      required this.groupKey,
-      required this.onSearch})
-      : super(key: key);
-  final bool isExpanded;
-  final String groupKey;
-  final void Function(String keyword) onSearch;
-  @override
-  _PlGroupTitleTileState createState() => _PlGroupTitleTileState();
-}
-
-class _PlGroupTitleTileState extends State<PlGroupTitleTile> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ListTile(
-        hoverColor: Colors.purple[100],
-        title: Text(widget.groupKey, style: TextStyle(fontSize: 14)),
-        subtitle: widget.isExpanded
-            ? TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    hintText: '搜索',
-                    hintStyle: TextStyle(color: Colors.white30)),
-                style: TextStyle(fontSize: 12.0, color: Colors.white),
-                onSubmitted: ((value) {
-                  widget.onSearch(value);
-                }),
-              )
-            : SizedBox(height: 0, width: 0),
-        textColor: widget.isExpanded ? Colors.white70 : Colors.white,
-      ),
-      height: widget.isExpanded ? 60 : 20,
-    );
   }
 }
 
@@ -169,15 +143,6 @@ class PlUrlListView extends StatefulWidget {
 }
 
 class _PlUrlListViewState extends State<PlUrlListView> {
-  PlayListItem? selectedItem;
-  void selectUrl(PlayListItem e) {
-    if (e.url == selectedItem?.url) return;
-    widget.onUrlTap(e);
-    setState(() {
-      selectedItem = e;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -187,36 +152,13 @@ class _PlUrlListViewState extends State<PlUrlListView> {
             if (widget.data.length < index + 1) return SizedBox();
             final e = widget.data[index];
             return Container(
-              height: 28,
-              color: Colors.black12,
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                  onPressed: () {
-                    selectUrl(e);
-                  },
-                  child: SizedBox(
-                    child: Tooltip(
-                      child: Text(
-                        e.name?.trim() ?? '未知名称',
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: e.url == selectedItem?.url
-                              ? FontWeight.bold
-                              : FontWeight.w300,
-                          color: e.url == selectedItem?.url
-                              ? Colors.purple
-                              : Colors.white,
-                        ),
-                      ),
-                      message: e.name,
-                      waitDuration: Duration(seconds: 1),
-                    ),
-                    width: 200,
-                  )),
-            );
+                height: 28,
+                color: Colors.black12,
+                alignment: Alignment.centerLeft,
+                child: PlaylistUrlTile(
+                  url: e,
+                  onSelectUrl: widget.onUrlTap,
+                ));
           },
           extendedListDelegate: ExtendedListDelegate(
 
@@ -241,5 +183,76 @@ class _PlUrlListViewState extends State<PlUrlListView> {
               }),
           itemCount: widget.data.length + 1,
         ));
+  }
+}
+
+//播放地址显示行,标题右键菜单
+class PlaylistUrlTile extends StatefulWidget {
+  const PlaylistUrlTile(
+      {Key? key, required this.url, required this.onSelectUrl})
+      : super(key: key);
+  final PlayListItem url;
+  final void Function(PlayListItem url) onSelectUrl;
+  @override
+  _PlaylistUrlTileState createState() => _PlaylistUrlTileState();
+}
+
+class _PlaylistUrlTileState extends State<PlaylistUrlTile> {
+  final List<Map<String, dynamic>> _urlCtxMenus = [
+    {'value': 'copy', 'label': '复制链接', 'icon': Icons.copy_all_outlined},
+  ];
+  PlayListItem? selectedItem;
+  void selectUrl(PlayListItem e) {
+    if (e.url == selectedItem?.url) return;
+    widget.onSelectUrl(e);
+    setState(() {
+      selectedItem = e;
+    });
+  }
+
+//菜单点击
+  void onItemTap(BuildContext context, Map<String, dynamic> item) {
+    final value = item['value'];
+  }
+
+  Widget _buildUrlBtn() {
+    final e = widget.url;
+    return TextButton(
+        onPressed: () {
+          selectUrl(e);
+        },
+        child: SizedBox(
+          child: Tooltip(
+            child: Text(
+              e.name?.trim() ?? '未知名称',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.clip,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: e.url == selectedItem?.url
+                    ? FontWeight.bold
+                    : FontWeight.w300,
+                color:
+                    e.url == selectedItem?.url ? Colors.purple : Colors.white,
+              ),
+            ),
+            message: e.name,
+            waitDuration: Duration(seconds: 1),
+          ),
+          width: 200,
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContextMenuRegion(
+      onDismissed: () => setState(() {}),
+      onItemSelected: (item) => setState(() {}),
+      menuItems: [
+        MenuItem(title: '复制链接'),
+      ],
+      child: _buildUrlBtn(),
+    );
   }
 }

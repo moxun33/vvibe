@@ -163,6 +163,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 },
                 itemHeight: 30,
                 dropdownMaxHeight: getDeviceHeight(context) - 50.0,
+                isDense: true,
                 //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {

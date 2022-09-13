@@ -1,13 +1,12 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 16:48:44
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-09-13 22:12:05
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
  */
-import 'package:context_menus/context_menus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:vvibe/global.dart';
@@ -36,12 +35,10 @@ class HomePage extends GetView<HomeController> {
               flex: 4,
               child: GestureDetector(
                 onDoubleTap: () => controller.togglePlayList(),
-                child: ContextMenuOverlay(
-                  child: ContextMenuRegion(
-                    contextMenu: PlayerContextMenu(
-                      onOpenUrl: controller.onOpenOneUrl,
-                      showPlaylist: controller.togglePlayList,
-                    ),
+                child: Container(
+                  child: PlayerContextMenu(
+                    onOpenUrl: controller.onOpenOneUrl,
+                    showPlaylist: controller.togglePlayList,
                     child: BarrageWall(
                         debug: false, //!Global.isRelease,
                         safeBottomHeight: Get.height ~/
