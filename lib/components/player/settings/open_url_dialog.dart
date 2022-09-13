@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:55:49
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 16:19:36
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-09-13 20:57:04
  * @FilePath: \vvibe\lib\components\player\settings\open_url_dialog.dart
  * @Description: 打开链接弹窗
  * @aqmj
@@ -39,7 +39,6 @@ class _OpenUrlDialogState extends State<OpenUrlDialog> {
         _urlController.text = data.text!;
       }
     }
-    debugPrint('粘贴板 ${data?.text}');
   }
 
   @override

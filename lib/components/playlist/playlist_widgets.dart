@@ -40,6 +40,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   List<PlayListItem> filterPlaylist(String keyword, List<PlayListItem> list) {
+    if (keyword.isEmpty) return widget.data;
     return list
         .where((PlayListItem element) =>
             element.name != null &&
@@ -94,26 +95,10 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   canTapOnHeader: true,
                   backgroundColor: Colors.white10,
                   headerBuilder: (BuildContext context, bool isExpanded) {
-                    return Container(
-                      child: ListTile(
-                        hoverColor: Colors.purple[100],
-                        title: Text(key),
-                        subtitle: isExpanded
-                            ? TextField(
-                                decoration: InputDecoration(
-                                    fillColor: Colors.white,
-                                    hintText: '搜索',
-                                    hintStyle:
-                                        TextStyle(color: Colors.white30)),
-                                style: TextStyle(
-                                    fontSize: 12.0, color: Colors.white),
-                                onChanged: (v) => onSearch(v),
-                                onSubmitted: ((value) => onSearch(value)),
-                              )
-                            : SizedBox(height: 0, width: 0),
-                        textColor: isExpanded ? Colors.white70 : Colors.white,
-                      ),
-                      height: isExpanded ? 60 : 20,
+                    return PlGroupTitleTile(
+                      isExpanded: isExpanded,
+                      groupKey: key,
+                      onSearch: onSearch,
                     );
                   },
                   body: expandKey == key
@@ -125,6 +110,50 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   isExpanded: expandKey == key // expanded[key] ?? false,
                   );
             }).toList()));
+  }
+}
+
+//播放列表分组标题面板
+class PlGroupTitleTile extends StatefulWidget {
+  PlGroupTitleTile(
+      {Key? key,
+      required this.isExpanded,
+      required this.groupKey,
+      required this.onSearch})
+      : super(key: key);
+  final bool isExpanded;
+  final String groupKey;
+  final void Function(String keyword) onSearch;
+  @override
+  _PlGroupTitleTileState createState() => _PlGroupTitleTileState();
+}
+
+class _PlGroupTitleTileState extends State<PlGroupTitleTile> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ListTile(
+        hoverColor: Colors.purple[100],
+        title: Text(widget.groupKey, style: TextStyle(fontSize: 14)),
+        subtitle: widget.isExpanded
+            ? TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    hintText: '搜索',
+                    hintStyle: TextStyle(color: Colors.white30)),
+                style: TextStyle(fontSize: 12.0, color: Colors.white),
+                onSubmitted: ((value) {
+                  widget.onSearch(value);
+                }),
+              )
+            : SizedBox(height: 0, width: 0),
+        textColor: widget.isExpanded ? Colors.white70 : Colors.white,
+      ),
+      height: widget.isExpanded ? 60 : 20,
+    );
   }
 }
 

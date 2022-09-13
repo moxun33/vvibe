@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 16:53:51
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-09-13 21:13:24
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -77,15 +77,11 @@ class PlaylistUtil {
     if (resp.statusCode == 200) {
       final String _data = resp.data;
       final List<String> lines = _data.split('\n');
-      if (url.endsWith('.m3u')) {
+      if (lines.length > 0 && lines[0].startsWith('#EXTM3U')) {
         return compute(parseM3uContents, lines);
-      }
-
-      if (url.endsWith('.txt')) {
+      } else {
         return compute(parseTxtContents, lines);
       }
-
-      return [];
     }
 
     return [];
@@ -136,7 +132,7 @@ class PlaylistUtil {
 
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
-        if (i > 0 && lines[i].startsWith("#EXTINF:-1")) {
+        if (i > 0 && lines[i].startsWith("#EXTINF:")) {
           final info = lines[i],
               url = lines[i + 1],
               name = info.split(',').last.trim();
