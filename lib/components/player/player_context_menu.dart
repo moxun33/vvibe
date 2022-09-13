@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-13 14:05:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-13 16:53:46
+ * @FilePath: \vvibe\lib\components\player\player_context_menu.dart
+ * @Description: 
+ * @qmj
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/components/player/settings/open_url_dialog.dart';

@@ -1,12 +1,19 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-13 14:05:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-13 16:53:41
+ * @FilePath: \vvibe\lib\pages\home\home_controller.dart
+ * @Description: 
+ * @qmj
+ */
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/common/values/values.dart';
-import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';

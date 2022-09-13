@@ -1,3 +1,12 @@
+<!--
+ * @Author: Moxx
+ * @Date: 2022-09-13 14:05:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-13 16:53:04
+ * @FilePath: \vvibe\README.md
+ * @Description: 
+ * @qmj
+-->
 # vvibe
 
 <img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png?token=GHSAT0AAAAAABRX4K3QRU76NHLPZDLZ2JWSYY67OQA">
@@ -17,6 +26,7 @@
 - 订阅远程``m3u``或``txt``播放列表
 - 支持``虎牙``，``斗鱼``和``哔哩哔哩``的实时弹幕 （请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id）
 - 播放列表管理，分组、搜索
+- 打开单个网络链接
   
 ## 多平台
 
