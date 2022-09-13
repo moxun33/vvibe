@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 16:53:41
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-09-13 22:19:52
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -69,7 +69,7 @@ class HomeController extends GetxController {
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
     stopDanmakuSocket();
-    if (barrageWallController.isEnabled) {
+    if (barrageWallController.isEnabled && player != null) {
       barrageWallController.disable();
     }
     if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;

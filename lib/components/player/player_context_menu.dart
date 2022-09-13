@@ -70,7 +70,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
   @override
   Widget build(BuildContext context) {
     return ContextMenuRegion(
-      onDismissed: () => setState(() {}),
+      // onDismissed: () => setState(() {}),
       onItemSelected: (item) {
         _onItemSelect(context, item);
       },

@@ -6,6 +6,7 @@
  */
 
 import 'package:flutter/material.dart' hide MenuItem;
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 
@@ -143,80 +144,30 @@ class PlUrlListView extends StatefulWidget {
 }
 
 class _PlUrlListViewState extends State<PlUrlListView> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: getDeviceHeight(context) - 130,
-        child: ExtendedListView.builder(
-          itemBuilder: (context, index) {
-            if (widget.data.length < index + 1) return SizedBox();
-            final e = widget.data[index];
-            return Container(
-                height: 28,
-                color: Colors.black12,
-                alignment: Alignment.centerLeft,
-                child: PlaylistUrlTile(
-                  url: e,
-                  onSelectUrl: widget.onUrlTap,
-                ));
-          },
-          extendedListDelegate: ExtendedListDelegate(
-
-              /// follow max child trailing layout offset and layout with full cross axis extend
-              /// last child as loadmore item/no more item in [ExtendedGridView] and [WaterfallFlow]
-              /// with full cross axis extend
-              //  LastChildLayoutType.fullCrossAxisExtend,
-
-              /// as foot at trailing and layout with full cross axis extend
-              /// show no more item at trailing when children are not full of viewport
-              /// if children is full of viewport, it's the same as fullCrossAxisExtend
-              //  LastChildLayoutType.foot,
-              lastChildLayoutTypeBuilder: (int index) =>
-                  index == widget.data.length
-                      ? LastChildLayoutType.foot
-                      : LastChildLayoutType.none,
-              collectGarbage: (List<int> garbages) {
-                //   debugPrint('collect garbage : $garbages');
-              },
-              viewportBuilder: (int firstIndex, int lastIndex) {
-                //   debugPrint('viewport : [$firstIndex,$lastIndex]');
-              }),
-          itemCount: widget.data.length + 1,
-        ));
-  }
-}
-
-//播放地址显示行,标题右键菜单
-class PlaylistUrlTile extends StatefulWidget {
-  const PlaylistUrlTile(
-      {Key? key, required this.url, required this.onSelectUrl})
-      : super(key: key);
-  final PlayListItem url;
-  final void Function(PlayListItem url) onSelectUrl;
-  @override
-  _PlaylistUrlTileState createState() => _PlaylistUrlTileState();
-}
-
-class _PlaylistUrlTileState extends State<PlaylistUrlTile> {
-  final List<Map<String, dynamic>> _urlCtxMenus = [
-    {'value': 'copy', 'label': '复制链接', 'icon': Icons.copy_all_outlined},
-  ];
   PlayListItem? selectedItem;
+
   void selectUrl(PlayListItem e) {
     if (e.url == selectedItem?.url) return;
-    widget.onSelectUrl(e);
+    widget.onUrlTap(e);
     setState(() {
       selectedItem = e;
     });
   }
 
-//菜单点击
-  void onItemTap(BuildContext context, Map<String, dynamic> item) {
-    final value = item['value'];
+  //菜单点击
+  void onItemTap(BuildContext context, MenuItem item, PlayListItem url) {
+    final value = item.title;
+
+    switch (value) {
+      case '复制链接':
+        Clipboard.setData(ClipboardData(text: url.url));
+        EasyLoading.showSuccess('复制成功');
+        break;
+      default:
+    }
   }
 
-  Widget _buildUrlBtn() {
-    final e = widget.url;
+  Widget _buildUrlBtn(e) {
     return TextButton(
         onPressed: () {
           selectUrl(e);
@@ -246,13 +197,46 @@ class _PlaylistUrlTileState extends State<PlaylistUrlTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ContextMenuRegion(
-      onDismissed: () => setState(() {}),
-      onItemSelected: (item) => setState(() {}),
-      menuItems: [
-        MenuItem(title: '复制链接'),
-      ],
-      child: _buildUrlBtn(),
-    );
+    return Container(
+        height: getDeviceHeight(context) - 130,
+        child: ExtendedListView.builder(
+          itemBuilder: (context, index) {
+            if (widget.data.length < index + 1) return SizedBox();
+            final e = widget.data[index];
+            return Container(
+                height: 28,
+                color: Colors.black12,
+                alignment: Alignment.centerLeft,
+                child: ContextMenuRegion(
+                  onItemSelected: (item) => {onItemTap(context, item, e)},
+                  menuItems: [
+                    MenuItem(title: '复制链接'),
+                  ],
+                  child: _buildUrlBtn(e),
+                ));
+          },
+          extendedListDelegate: ExtendedListDelegate(
+
+              /// follow max child trailing layout offset and layout with full cross axis extend
+              /// last child as loadmore item/no more item in [ExtendedGridView] and [WaterfallFlow]
+              /// with full cross axis extend
+              //  LastChildLayoutType.fullCrossAxisExtend,
+
+              /// as foot at trailing and layout with full cross axis extend
+              /// show no more item at trailing when children are not full of viewport
+              /// if children is full of viewport, it's the same as fullCrossAxisExtend
+              //  LastChildLayoutType.foot,
+              lastChildLayoutTypeBuilder: (int index) =>
+                  index == widget.data.length
+                      ? LastChildLayoutType.foot
+                      : LastChildLayoutType.none,
+              collectGarbage: (List<int> garbages) {
+                //   debugPrint('collect garbage : $garbages');
+              },
+              viewportBuilder: (int firstIndex, int lastIndex) {
+                //   debugPrint('viewport : [$firstIndex,$lastIndex]');
+              }),
+          itemCount: widget.data.length + 1,
+        ));
   }
 }
