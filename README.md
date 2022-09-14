@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-09-14 21:26:11
+ * @LastEditTime: 2022-09-14 22:06:45
  * @FilePath: \vvibe\README.md
  * @Description: 
  * @qmj
@@ -11,12 +11,14 @@
 
 <img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png?token=GHSAT0AAAAAABRX4K3QRU76NHLPZDLZ2JWSYY67OQA">
 
-![img](https://img.shields.io/badge/language-dart-blue.svg?style=for-the-badge&color=00ACC1)
-![img](https://img.shields.io/badge/flutter-00B0FF?style=for-the-badge&logo=flutter)
-[![img](https://img.shields.io/github/downloads/moxun33/vvibe/total?style=for-the-badge&color=ac30fe)](https://github.com/moxun33/vvibe/releases)
-![img](https://img.shields.io/github/license/moxun33/vvibe?style=for-the-badge)
-![img](https://img.shields.io/github/stars/moxun33/vvibe?style=for-the-badge)
-![img](https://img.shields.io/github/issues/moxun33/vvibe?style=for-the-badge&color=9C27B0)
+![img](https://img.shields.io/badge/language-dart-blue.svg?color=00ACC1)
+![img](https://img.shields.io/badge/flutter-00B0FF?logo=flutter)
+![img](https://img.shields.io/github/downloads/moxun33/vvibe/total)
+[![img](https://img.shields.io/github/v/release/moxun33/vvibe?display_name=tag&include_prereleases)](https://github.com/moxun33/vvibe/releases)
+![img](https://img.shields.io/github/license/moxun33/vvibe)
+![img](https://img.shields.io/github/stars/moxun33/vvibe)
+![img](https://img.shields.io/github/issues/moxun33/vvibe)
+![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)
 
 > 自用的视频直播观看软件
 
