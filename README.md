@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-09-14 22:06:45
+ * @LastEditTime: 2022-09-14 22:25:09
  * @FilePath: \vvibe\README.md
  * @Description: 
  * @qmj
@@ -43,6 +43,8 @@
 ``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart --skip-deps-check``
 
 - 启动项目
+  
+> 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/)
 
 ## 截图
 
