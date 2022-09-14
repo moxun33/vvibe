@@ -249,6 +249,12 @@ class _PlUrlTileState extends State<PlUrlTile>
 //检查url访问性
   void _checkUrlAccessible(PlayListItem url) async {
     if (url.url == null) return;
+    if (!url.url!.startsWith('http')) {
+      setState(() {
+        urlStatus = 204;
+      });
+      return;
+    }
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
     if (mounted) {
       setState(() {
@@ -265,6 +271,8 @@ class _PlUrlTileState extends State<PlUrlTile>
           size: 10,
           color: Colors.green,
         );
+      case 204:
+        return SizedBox();
       case 504:
         return Tooltip(
           child: Icon(
