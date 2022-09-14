@@ -248,7 +248,13 @@ class _PlUrlTileState extends State<PlUrlTile>
 
 //检查url访问性
   void _checkUrlAccessible(PlayListItem url) async {
-    if (url.url == null) return;
+    if (url.url == null) {
+      setState(() {
+        urlStatus = 204;
+      });
+      return;
+    }
+
     if (!url.url!.startsWith('http')) {
       setState(() {
         urlStatus = 204;
@@ -272,7 +278,9 @@ class _PlUrlTileState extends State<PlUrlTile>
           color: Colors.green,
         );
       case 204:
-        return SizedBox();
+        return SizedBox(
+          width: 0,
+        );
       case 504:
         return Tooltip(
           child: Icon(
@@ -319,6 +327,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             child: Tooltip(
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 2.0,
                 children: [
                   _getIcon(urlStatus),
                   SizedBox(

@@ -151,6 +151,17 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                 ),
                               ),
                               IconButton(
+                                tooltip: '重新加载',
+                                color: Colors.white,
+                                icon: Icon(Icons.rotate_right_outlined),
+                                onPressed: () {
+                                  playOrPuase();
+                                },
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              IconButton(
                                 tooltip: '停止',
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
