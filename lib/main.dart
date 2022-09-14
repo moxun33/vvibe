@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-13 14:05:05
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-14 09:24:10
+ * @FilePath: \vvibe\lib\main.dart
+ * @Description: 
+ * @qmj
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
