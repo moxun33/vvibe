@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-13 22:16:50
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-14 10:36:05
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -64,24 +64,29 @@ class HomePage extends GetView<HomeController> {
                                 togglePlayList: controller.togglePlayList,
                                 stopPlayer: controller.stopPlayer,
                               )
-                            : Container(
-                                color: Colors.black87,
-                                child: Center(
-                                  child: Wrap(
-                                    direction: Axis.vertical,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    spacing: 50,
-                                    children: [
-                                      SizedBox(
-                                          width: 200,
-                                          child:
-                                              Image.asset('assets/logo.png')),
-                                      Text('这里空空如也😊',
-                                          style: TextStyle(
-                                              color: Colors.purple[300],
-                                              fontSize: 40))
-                                    ],
+                            : GestureDetector(
+                                onTap: () {
+                                  controller.togglePlayList();
+                                },
+                                child: Container(
+                                  color: Colors.black87,
+                                  child: Center(
+                                    child: Wrap(
+                                      direction: Axis.vertical,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      spacing: 50,
+                                      children: [
+                                        SizedBox(
+                                            width: 200,
+                                            child:
+                                                Image.asset('assets/logo.png')),
+                                        Text('这里空空如也😊',
+                                            style: TextStyle(
+                                                color: Colors.purple[300],
+                                                fontSize: 40))
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

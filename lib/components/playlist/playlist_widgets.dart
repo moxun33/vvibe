@@ -161,47 +161,6 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     });
   }
 
-  //菜单点击
-  void _onUrlItemTap(BuildContext context, MenuItem item, PlayListItem url) {
-    final value = item.title;
-
-    switch (value) {
-      case '复制链接':
-        Clipboard.setData(ClipboardData(text: url.url));
-        EasyLoading.showSuccess('复制成功');
-        break;
-      default:
-    }
-  }
-
-  Widget _buildUrlBtn(e) {
-    return TextButton(
-        onPressed: () {
-          selectUrl(e);
-        },
-        child: SizedBox(
-          child: Tooltip(
-            child: Text(
-              e.name?.trim() ?? '未知名称',
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.clip,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: e.url == selectedItem?.url
-                    ? FontWeight.bold
-                    : FontWeight.w300,
-                color:
-                    e.url == selectedItem?.url ? Colors.purple : Colors.white,
-              ),
-            ),
-            message: e.name,
-            waitDuration: Duration(seconds: 1),
-          ),
-          width: 200,
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -210,19 +169,11 @@ class _PlUrlListViewState extends State<PlUrlListView> {
           itemBuilder: (context, index) {
             if (widget.data.length < index + 1) return SizedBox();
             final e = widget.data[index];
-            return Container(
-                height: 28,
-                color: Colors.black12,
-                alignment: Alignment.centerLeft,
-                child: ContextMenuRegion(
-                  onItemSelected: (item) {
-                    _onUrlItemTap(context, item, e);
-                  },
-                  menuItems: [
-                    MenuItem(title: '复制链接'),
-                  ],
-                  child: _buildUrlBtn(e),
-                ));
+            return PlUrlTile(
+              onSelectUrl: selectUrl,
+              selectedItem: selectedItem,
+              url: e,
+            );
           },
           extendedListDelegate: ExtendedListDelegate(
 
@@ -246,6 +197,81 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 //   debugPrint('viewport : [$firstIndex,$lastIndex]');
               }),
           itemCount: widget.data.length + 1,
+        ));
+  }
+}
+
+//播放列表标题
+class PlUrlTile extends StatefulWidget {
+  const PlUrlTile(
+      {Key? key,
+      required this.url,
+      required this.onSelectUrl,
+      this.selectedItem})
+      : super(key: key);
+  final PlayListItem url;
+  final void Function(PlayListItem url) onSelectUrl;
+  final PlayListItem? selectedItem;
+  @override
+  _PlUrlTileState createState() => _PlUrlTileState();
+}
+
+class _PlUrlTileState extends State<PlUrlTile> {
+  void _selectUrl(PlayListItem url) {}
+
+  //菜单点击
+  void _onMenuItemTap(BuildContext context, MenuItem item, PlayListItem url) {
+    final value = item.title;
+
+    switch (value) {
+      case '复制链接':
+        Clipboard.setData(ClipboardData(text: url.url));
+        EasyLoading.showSuccess('复制成功');
+        break;
+      default:
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final e = widget.url;
+    return Container(
+        height: 25,
+        color: Colors.black12,
+        alignment: Alignment.centerLeft,
+        child: ContextMenuRegion(
+          onItemSelected: (item) {
+            _onMenuItemTap(context, item, e);
+          },
+          menuItems: [
+            MenuItem(title: '复制链接'),
+          ],
+          child: TextButton(
+              onPressed: () {
+                _selectUrl(e);
+              },
+              child: SizedBox(
+                child: Tooltip(
+                  child: Text(
+                    e.name?.trim() ?? '未知名称',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.clip,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: e.url == widget.selectedItem?.url
+                          ? FontWeight.bold
+                          : FontWeight.w300,
+                      color: e.url == widget.selectedItem?.url
+                          ? Colors.purple
+                          : Colors.white,
+                    ),
+                  ),
+                  message: e.name,
+                  waitDuration: Duration(seconds: 1),
+                ),
+                width: 200,
+              )),
         ));
   }
 }

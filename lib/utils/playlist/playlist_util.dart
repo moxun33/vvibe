@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-13 21:13:24
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-14 10:32:46
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -141,6 +141,9 @@ class PlaylistUtil {
                   defVal: '未分组'),
               tvgName: getM3uPropItem(info, new RegExp(r'tvg-name="(.*?)"')),
               tvgLogo: getM3uPropItem(info, new RegExp(r'tvg-logo="(.*?)"')),
+              catchup: getM3uPropItem(info, new RegExp(r'catchup="(.*?)"')),
+              catchupSource:
+                  getM3uPropItem(info, new RegExp(r'catchup-source="(.*?)"')),
               name: name,
               tvgId: getM3uPropItem(info, new RegExp(r'tvg-id="(.*?)"')),
               url: url));

@@ -1,54 +1,64 @@
-/*
- * @Author: Moxx
- * @Date: 2022-09-05 14:43:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-13 15:27:45
- * @FilePath: \vvibe\lib\models\playlist_item.dart
- * @Description: 
- * @qmj
- */
 // To parse this JSON data, do
 //
 //     final playListItem = playListItemFromJson(jsonString);
 
 import 'dart:convert';
 
+/* {
+  "name":"",
+  "group":"",
+  "url":"",
+"tvgId":"",
+"tvgName":"",
+"tvgLogo":"",
+"catchup":"append",
+"catchup-source":"?playseek=${(b)yyyyMMddHHmmss}-${(e)yyyyMMddHHmmss}"
+} */
 PlayListItem playListItemFromJson(String str) =>
     PlayListItem.fromJson(json.decode(str));
 
 String playListItemToJson(PlayListItem data) => json.encode(data.toJson());
 
 class PlayListItem {
-  PlayListItem(
-      {this.group,
-      this.name,
-      this.tvgId,
-      this.url,
-      this.tvgLogo,
-      this.tvgName});
+  PlayListItem({
+    this.name,
+    this.group,
+    this.url,
+    this.tvgId,
+    this.tvgName,
+    this.tvgLogo,
+    this.catchup,
+    this.catchupSource,
+  });
 
-  String? group;
   String? name;
-  String? tvgId;
+  String? group;
   String? url;
+  String? tvgId;
   String? tvgName;
   String? tvgLogo;
+  String? catchup;
+  String? catchupSource;
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
-        group: json["group"],
         name: json["name"],
-        tvgId: json["tvgId"],
+        group: json["group"],
         url: json["url"],
+        tvgId: json["tvgId"],
         tvgName: json["tvgName"],
         tvgLogo: json["tvgLogo"],
+        catchup: json["catchup"],
+        catchupSource: json["catchup-source"],
       );
 
   Map<String, dynamic> toJson() => {
-        "group": group,
         "name": name,
-        "tvgId": tvgId,
+        "group": group,
         "url": url,
+        "tvgId": tvgId,
         "tvgName": tvgName,
         "tvgLogo": tvgLogo,
+        "catchup": catchup,
+        "catchup-source": catchupSource,
       };
 }
