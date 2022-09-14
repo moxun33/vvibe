@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-08-30 15:53:32
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-14 11:08:09
+ * @FilePath: \vvibe\lib\common\values\cache.dart
+ * @Description: 
+ * @qmj
+ */
 // 是否启用缓存
 const CACHE_ENABLE = false;
 

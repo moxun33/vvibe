@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-13 22:19:52
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-14 11:09:30
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -25,7 +25,6 @@ class HomeController extends GetxController {
   Player? player;
   bool playListShowed = false;
   int playerId = 0;
-  final playListBarWidth = 200.0;
 
   final barrageWallController = BarrageWallController();
   PlayListItem? playingUrl;
@@ -228,7 +227,7 @@ class HomeController extends GetxController {
 
   //获取当前弹幕区域尺寸
   Size getDanmakuSize() => Size(
-      playListShowed ? Get.width - playListBarWidth : Get.width, Get.height);
+      playListShowed ? Get.width - PLAYLIST_BAR_WIDTH : Get.width, Get.height);
 
   //播放列表菜单显示
   void togglePlayList() {

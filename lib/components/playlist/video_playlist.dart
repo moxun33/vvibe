@@ -146,7 +146,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       children: [
         Container(
             height: 30,
-            width: 200,
+            width: PLAYLIST_BAR_WIDTH,
             padding: const EdgeInsets.fromLTRB(5, 2, 5, 0),
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
@@ -200,12 +200,15 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             )),
         Expanded(
             child: Container(
-          width: 200,
+          width: PLAYLIST_BAR_WIDTH,
           child: playlist.length > 0
               ? PlGroupPanel(
                   data: playlist,
                   onUrlTap: (e) {
                     widget.onUrlTap(e);
+                  },
+                  forceRefreshPlaylist: () {
+                    onPlayFileChange(selectedFilename);
                   },
                 )
               : (widget.visible && loading

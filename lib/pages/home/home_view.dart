@@ -9,6 +9,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/global.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
@@ -96,8 +97,7 @@ class HomePage extends GetView<HomeController> {
               ),
             ),
             Container(
-                width:
-                    controller.playListShowed ? controller.playListBarWidth : 0,
+                width: controller.playListShowed ? PLAYLIST_BAR_WIDTH : 0,
                 child: VideoPlaylist(
                   visible: controller.playListShowed,
                   onUrlTap: controller.onPlayUrlChange,

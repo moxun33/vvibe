@@ -9,6 +9,8 @@ import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
+import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/components.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -20,11 +22,13 @@ class PlGroupPanel extends StatefulWidget {
       {Key? key,
       required this.data,
       //this.expansionCallback,
+      required this.forceRefreshPlaylist,
       required this.onUrlTap})
       : super(key: key);
   final List<PlayListItem> data;
   // final ExpansionPanelCallback? expansionCallback;
   final void Function(PlayListItem item) onUrlTap;
+  final void Function() forceRefreshPlaylist;
   @override
   State<PlGroupPanel> createState() => _PlGroupPanelState();
 }
@@ -53,7 +57,6 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
 
   void onSearch(String keyword) {
     final newList = filterPlaylist(keyword, widget.data);
-    print('newList ${newList.length}');
     if (newList.length < 1) {
       EasyLoading.showInfo('没有搜索结果');
       return;
@@ -87,65 +90,65 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   Widget build(BuildContext context) {
     final groups = PlaylistUtil().getPlaylistgroups(playlist),
         keyList = groups.keys.toList();
-    return ContextMenuRegion(
-        onItemSelected: (item) {},
-        menuItems: [
-          MenuItem(title: '强制刷新列表'),
-        ],
-        child: SingleChildScrollView(
-            child: ExpansionPanelList(
-                expansionCallback: (i, expanded) =>
-                    toggleExpand(i, expanded, keyList[i]),
-                children: keyList.map<ExpansionPanel>((String key) {
-                  final urlList = groups[key] ?? [];
-                  return ExpansionPanel(
-                      canTapOnHeader: true,
-                      backgroundColor: Colors.white10,
-                      headerBuilder: (BuildContext context, bool isExpanded) {
-                        return Container(
-                          child: ListTile(
-                            hoverColor: Colors.purple[100],
-                            title: Text(key, style: TextStyle(fontSize: 14)),
-                            subtitle: isExpanded
-                                ? TextField(
-                                    decoration: InputDecoration(
-                                        fillColor: Colors.white,
-                                        hintText: '搜索',
-                                        hintStyle:
-                                            TextStyle(color: Colors.white30)),
-                                    style: TextStyle(
-                                        fontSize: 12.0, color: Colors.white),
-                                    onSubmitted: ((value) {
-                                      onSearch(value);
-                                    }),
-                                  )
-                                : SizedBox(height: 0, width: 0),
-                            textColor:
-                                isExpanded ? Colors.white70 : Colors.white,
-                          ),
-                          height: isExpanded ? 60 : 20,
-                        );
-                      },
-                      body: expandKey == key
-                          ? PlUrlListView(
-                              data: urlList, onUrlTap: widget.onUrlTap)
-                          : SizedBox(
-                              height: 0,
-                              width: 0,
-                            ),
-                      isExpanded: expandKey == key // expanded[key] ?? false,
-                      );
-                }).toList())));
+    return SingleChildScrollView(
+        child: ExpansionPanelList(
+            expansionCallback: (i, expanded) =>
+                toggleExpand(i, expanded, keyList[i]),
+            children: keyList.map<ExpansionPanel>((String key) {
+              final urlList = groups[key] ?? [];
+              return ExpansionPanel(
+                  canTapOnHeader: true,
+                  backgroundColor: Colors.white10,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return Container(
+                      child: ListTile(
+                        hoverColor: Colors.purple[100],
+                        title: Text(key, style: TextStyle(fontSize: 14)),
+                        subtitle: isExpanded
+                            ? TextField(
+                                decoration: InputDecoration(
+                                    fillColor: Colors.white,
+                                    hintText: '搜索',
+                                    hintStyle:
+                                        TextStyle(color: Colors.white30)),
+                                style: TextStyle(
+                                    fontSize: 12.0, color: Colors.white),
+                                onSubmitted: ((value) {
+                                  onSearch(value);
+                                }),
+                              )
+                            : SizedBox(height: 0, width: 0),
+                        textColor: isExpanded ? Colors.white70 : Colors.white,
+                      ),
+                      height: isExpanded ? 60 : 20,
+                    );
+                  },
+                  body: expandKey == key
+                      ? PlUrlListView(
+                          data: urlList,
+                          onUrlTap: widget.onUrlTap,
+                          forceRefreshPlaylist: widget.forceRefreshPlaylist)
+                      : SizedBox(
+                          height: 0,
+                          width: 0,
+                        ),
+                  isExpanded: expandKey == key // expanded[key] ?? false,
+                  );
+            }).toList()));
   }
 }
 
 //播放列表的地址列表
 class PlUrlListView extends StatefulWidget {
-  const PlUrlListView({Key? key, required this.data, required this.onUrlTap})
+  const PlUrlListView(
+      {Key? key,
+      required this.data,
+      required this.onUrlTap,
+      required this.forceRefreshPlaylist})
       : super(key: key);
   final List<PlayListItem> data;
   final void Function(PlayListItem item) onUrlTap;
-
+  final void Function() forceRefreshPlaylist;
   @override
   _PlUrlListViewState createState() => _PlUrlListViewState();
 }
@@ -165,15 +168,16 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   Widget build(BuildContext context) {
     return Container(
         height: getDeviceHeight(context) - 130,
+        color: Colors.black26,
         child: ExtendedListView.builder(
           itemBuilder: (context, index) {
             if (widget.data.length < index + 1) return SizedBox();
             final e = widget.data[index];
             return PlUrlTile(
-              onSelectUrl: selectUrl,
-              selectedItem: selectedItem,
-              url: e,
-            );
+                onSelectUrl: selectUrl,
+                selectedItem: selectedItem,
+                url: e,
+                forceRefreshPlaylist: widget.forceRefreshPlaylist);
           },
           extendedListDelegate: ExtendedListDelegate(
 
@@ -207,17 +211,38 @@ class PlUrlTile extends StatefulWidget {
       {Key? key,
       required this.url,
       required this.onSelectUrl,
+      required this.forceRefreshPlaylist,
       this.selectedItem})
       : super(key: key);
   final PlayListItem url;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
+  final void Function() forceRefreshPlaylist;
+
   @override
   _PlUrlTileState createState() => _PlUrlTileState();
 }
 
-class _PlUrlTileState extends State<PlUrlTile> {
-  void _selectUrl(PlayListItem url) {}
+class _PlUrlTileState extends State<PlUrlTile>
+    with AutomaticKeepAliveClientMixin {
+  PlayListItem? urlItem;
+  int? urlStatus;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      urlItem = widget.url;
+    });
+    _checkUrlAccessible(widget.url);
+  }
+
+  void _selectUrl(PlayListItem url) {
+    widget.onSelectUrl(url);
+  }
 
   //菜单点击
   void _onMenuItemTap(BuildContext context, MenuItem item, PlayListItem url) {
@@ -228,15 +253,62 @@ class _PlUrlTileState extends State<PlUrlTile> {
         Clipboard.setData(ClipboardData(text: url.url));
         EasyLoading.showSuccess('复制成功');
         break;
+      case '强制刷新列表':
+        widget.forceRefreshPlaylist();
+        break;
       default:
+    }
+  }
+
+//检查url访问性
+  void _checkUrlAccessible(PlayListItem url) async {
+    if (url.url == null) return;
+    final status = await PlaylistUtil().checkUrlAccessible(url.url!);
+    if (mounted) {
+      setState(() {
+        urlStatus = status;
+      });
+    }
+  }
+
+  Widget _getIcon(int? status) {
+    switch (status) {
+      case 200:
+        return Icon(
+          Icons.check,
+          size: 10,
+          color: Colors.green,
+        );
+      case 504:
+        return Tooltip(
+          child: Icon(
+            Icons.timer_off_outlined,
+            size: 10,
+            color: Colors.amber[900],
+          ),
+          message: '超时',
+        );
+      case 400:
+        return Tooltip(
+          child: Icon(
+            Icons.close,
+            size: 10,
+            color: Colors.red,
+          ),
+          message: '不可用',
+        );
+      default:
+        return SmallSpinning();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final e = widget.url;
+    super.build(context);
+    final e = urlItem;
+    if (e == null) return SizedBox();
     return Container(
-        height: 25,
+        height: 26,
         color: Colors.black12,
         alignment: Alignment.centerLeft,
         child: ContextMenuRegion(
@@ -245,33 +317,41 @@ class _PlUrlTileState extends State<PlUrlTile> {
           },
           menuItems: [
             MenuItem(title: '复制链接'),
+            MenuItem(title: '强制刷新列表'),
           ],
           child: TextButton(
-              onPressed: () {
-                _selectUrl(e);
-              },
-              child: SizedBox(
-                child: Tooltip(
-                  child: Text(
-                    e.name?.trim() ?? '未知名称',
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.clip,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: e.url == widget.selectedItem?.url
-                          ? FontWeight.bold
-                          : FontWeight.w300,
-                      color: e.url == widget.selectedItem?.url
-                          ? Colors.purple
-                          : Colors.white,
+            onPressed: () {
+              _selectUrl(e);
+            },
+            child: Tooltip(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _getIcon(urlStatus),
+                  SizedBox(
+                    width: PLAYLIST_BAR_WIDTH - 30,
+                    child: Text(
+                      e.name?.trim() ?? '未知名称',
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: e.url == widget.selectedItem?.url
+                            ? FontWeight.bold
+                            : FontWeight.w300,
+                        color: e.url == widget.selectedItem?.url
+                            ? Colors.purple
+                            : Colors.white,
+                      ),
                     ),
-                  ),
-                  message: e.name,
-                  waitDuration: Duration(seconds: 1),
-                ),
-                width: 200,
-              )),
+                  )
+                ],
+              ),
+              message: e.name,
+              waitDuration: Duration(seconds: 1),
+            ),
+          ),
         ));
   }
 }

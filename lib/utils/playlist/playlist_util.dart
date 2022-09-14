@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-14 10:32:46
+ * @LastEditTime: 2022-09-14 14:26:07
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -161,8 +161,23 @@ class PlaylistUtil {
     return groupBy(list, (e) => e.group ?? "未分组");
   }
 
-  //检查是否为有效的url
+  //检查是否为真实有效的url
   bool validateUrl(String url) {
     return Uri.tryParse(url)?.hasAbsolutePath ?? false;
+  }
+
+  Future<int?> checkUrlAccessible(String url) async {
+    try {
+      final req =
+          Dio(BaseOptions(connectTimeout: 5000, headers: {'User-Agent': 'ZTE'}))
+              .head;
+      final resp = await req(url);
+      debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
+
+      return resp.statusCode;
+    } catch (e) {
+      // debugPrint('检查 $url 可访问出错： $e');
+      return e.toString().contains('504') ? 504 : 400;
+    }
   }
 }
