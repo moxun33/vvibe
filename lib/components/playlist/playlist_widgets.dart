@@ -11,6 +11,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
+import 'package:extended_list/extended_list.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -176,18 +177,41 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: getDeviceHeight(context) - 50,
-        color: Colors.white10,
-        child: ListView.builder(
-            itemCount: widget.data.length,
-            itemBuilder: (context, index) {
-              final e = widget.data[index];
-              return PlUrlTile(
-                  onSelectUrl: selectUrl,
-                  selectedItem: selectedItem,
-                  url: e,
-                  forceRefreshPlaylist: widget.forceRefreshPlaylist);
-            }));
+        height: getDeviceHeight(context) - 130,
+        color: Colors.black26,
+        child: ExtendedListView.builder(
+          itemBuilder: (context, index) {
+            if (widget.data.length < index + 1) return SizedBox();
+            final e = widget.data[index];
+            return PlUrlTile(
+                onSelectUrl: selectUrl,
+                selectedItem: selectedItem,
+                url: e,
+                forceRefreshPlaylist: widget.forceRefreshPlaylist);
+          },
+          extendedListDelegate: ExtendedListDelegate(
+
+              /// follow max child trailing layout offset and layout with full cross axis extend
+              /// last child as loadmore item/no more item in [ExtendedGridView] and [WaterfallFlow]
+              /// with full cross axis extend
+              //  LastChildLayoutType.fullCrossAxisExtend,
+
+              /// as foot at trailing and layout with full cross axis extend
+              /// show no more item at trailing when children are not full of viewport
+              /// if children is full of viewport, it's the same as fullCrossAxisExtend
+              //  LastChildLayoutType.foot,
+              lastChildLayoutTypeBuilder: (int index) =>
+                  index == widget.data.length
+                      ? LastChildLayoutType.foot
+                      : LastChildLayoutType.none,
+              collectGarbage: (List<int> garbages) {
+                //   debugPrint('collect garbage : $garbages');
+              },
+              viewportBuilder: (int firstIndex, int lastIndex) {
+                //   debugPrint('viewport : [$firstIndex,$lastIndex]');
+              }),
+          itemCount: widget.data.length + 1,
+        ));
   }
 }
 
