@@ -187,7 +187,6 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 onSelectUrl: selectUrl,
                 selectedItem: selectedItem,
                 url: e,
-                key: GlobalObjectKey(e.toString()),
                 forceRefreshPlaylist: widget.forceRefreshPlaylist);
           });
     } else {
@@ -265,6 +264,7 @@ class _PlUrlTileState extends State<PlUrlTile>
 
 //检查url访问性
   void _checkUrlAccessible(PlayListItem url) async {
+    if (urlStatus != null) return;
     if (url.url == null) {
       setState(() {
         urlStatus = 204;
@@ -280,7 +280,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       });
       return;
     }
-    print('检测url ${widget.index} ${url.name}');
+    print('$urlStatus 检测url ${widget.index} ${url.name}');
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
     if (mounted) {
       setState(() {

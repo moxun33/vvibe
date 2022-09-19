@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-14 10:36:05
+ * @LastEditTime: 2022-09-19 16:28:09
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
