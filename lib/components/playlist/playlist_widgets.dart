@@ -11,7 +11,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
-import 'package:extended_list/extended_list.dart';
+//import 'package:extended_list/extended_list.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -235,7 +235,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     with AutomaticKeepAliveClientMixin {
   PlayListItem? urlItem;
   int? urlStatus;
-  bool loading = false;
+  bool loading = true;
 
   @override
   bool get wantKeepAlive => true;

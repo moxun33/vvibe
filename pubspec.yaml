@@ -75,13 +75,9 @@ dependencies:
   json_theme: ^4.0.1+1
   uuid: ^3.0.6
   native_context_menu: ^0.2.2+5
-<<<<<<< HEAD
-  extended_list: ^3.0.0
-=======
   # dio cache
   dio_cache_interceptor: ^3.3.1
   #extended_list: ^3.0.0
->>>>>>> 8b577a202909cfb93b6a075bd70886ca6e2033b8
 
 dev_dependencies:
   flutter_test:
