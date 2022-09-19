@@ -171,6 +171,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
                     value: jsonEncode(v),
+                    key: ObjectKey(v),
                     child: Wrap(children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 4, 0),

@@ -187,6 +187,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 onSelectUrl: selectUrl,
                 selectedItem: selectedItem,
                 url: e,
+                key: ObjectKey(e),
                 forceRefreshPlaylist: widget.forceRefreshPlaylist);
           });
     } else {
