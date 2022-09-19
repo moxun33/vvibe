@@ -21,13 +21,16 @@
 /// Execute ffprobe with default settings and return the extracted data.
 ///
 /// See [`ffprobe_config`] if you need to customize settings.
-pub fn ffprobe(path: impl AsRef<std::path::Path>,ffprobe_dir: String) -> Result<FfProbe, FfProbeError> {
+pub fn ffprobe(
+    path: impl AsRef<std::path::Path>,
+    ffprobe_dir: String,
+) -> Result<FfProbe, FfProbeError> {
     ffprobe_config(
         Config {
             count_frames: false,
         },
         path,
-        ffprobe_dir
+        ffprobe_dir,
     )
 }
 
@@ -36,7 +39,7 @@ pub fn ffprobe(path: impl AsRef<std::path::Path>,ffprobe_dir: String) -> Result<
 pub fn ffprobe_config(
     config: Config,
     path: impl AsRef<std::path::Path>,
-    ffprobe_dir: String
+    ffprobe_dir: String,
 ) -> Result<FfProbe, FfProbeError> {
     let path = path.as_ref();
 
@@ -51,9 +54,8 @@ pub fn ffprobe_config(
         "-print_format",
         "json",
         "-headers",
-        "\"User-Agent: Windows\"",
+        "\"User-Agent: Windows ZTE\"",
     ]);
-    
     if config.count_frames {
         cmd.arg("-count_frames");
     }
@@ -112,8 +114,12 @@ impl ConfigBuilder {
     }
 
     /// Run ffprobe with the config produced by this builder.
-    pub fn run(self, path: impl AsRef<std::path::Path>,ffprobe_dir:String) -> Result<FfProbe, FfProbeError> {
-        ffprobe_config(self.config, path,ffprobe_dir)
+    pub fn run(
+        self,
+        path: impl AsRef<std::path::Path>,
+        ffprobe_dir: String,
+    ) -> Result<FfProbe, FfProbeError> {
+        ffprobe_config(self.config, path, ffprobe_dir)
     }
 }
 

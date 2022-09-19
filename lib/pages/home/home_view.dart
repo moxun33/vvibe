@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 16:28:09
+ * @LastEditTime: 2022-09-19 18:07:25
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -52,6 +52,7 @@ class HomePage extends GetView<HomeController> {
                         bullets: [],
                         child: controller.player != null
                             ? LiveVideoFrame(
+                                toggleDanmaku: controller.toggleDanmakuVisible,
                                 playingUrl: controller.playingUrl,
                                 videoWidget: Global.useNativeView
                                     ? NativeVideo(

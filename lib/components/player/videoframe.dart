@@ -12,6 +12,7 @@ class LiveVideoFrame extends StatefulWidget {
       required this.player,
       //required this.isFullscreen,
       required this.togglePlayList,
+      required this.toggleDanmaku,
       required this.stopPlayer,
       this.playingUrl})
       : super(key: key);
@@ -20,6 +21,7 @@ class LiveVideoFrame extends StatefulWidget {
   final Player? player;
   //final bool isFullscreen;
   final Function togglePlayList;
+  final Function toggleDanmaku;
   final Function stopPlayer;
   PlayListItem? playingUrl;
 
@@ -32,8 +34,10 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
   Player? get player => widget.player;
 
   bool _hideControls = true;
+  bool showDanmaku = true;
   bool _displayTapped = false;
   Timer? _hideTimer;
+
   late StreamSubscription<PlaybackState>? playPauseStream;
   late AnimationController playPauseController;
 
@@ -78,10 +82,16 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
     if (widget.playingUrl != null &&
         widget.playingUrl!.url != null &&
         player?.playback.isPlaying == true) {
-      final info =
-          await compute(FfiUtil().getMediaInfo, widget.playingUrl!.url!);
+      final info = await FfiUtil().getMediaInfo(widget.playingUrl!.url!);
       print(info);
     }
+  }
+
+  void _toggleDanmakuShow() {
+    setState(() {
+      showDanmaku = !showDanmaku;
+    });
+    widget.toggleDanmaku();
   }
 
   @override
@@ -183,6 +193,20 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                 icon: Icon(Icons.info_outline),
                                 onPressed: () {
                                   _getMetaInfo();
+                                },
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              IconButton(
+                                tooltip: '点击${showDanmaku ? '关闭' : '显示'}弹幕',
+                                color: Colors.white,
+                                iconSize: 20,
+                                icon: Icon(showDanmaku
+                                    ? Icons.subtitles_outlined
+                                    : Icons.subtitles_off_sharp),
+                                onPressed: () {
+                                  _toggleDanmakuShow();
                                 },
                               ),
                               const Expanded(

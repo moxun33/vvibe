@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 15:19:50
+ * @LastEditTime: 2022-09-19 18:11:24
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -31,6 +31,7 @@ class HomeController extends GetxController {
   DouyuDnamakuService? dyDanmakuService;
   BilibiliDanmakuService? blDanmakuService;
   HuyaDanmakuService? hyDanmakuService;
+  bool danmakuManualShow = true;
   @override
   void onInit() {
     super.onInit();
@@ -44,13 +45,14 @@ class HomeController extends GetxController {
     // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
-      //     startPlay(PlayListItem.fromJson(lastPlayUrl));
+      if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
   }
 
 //发送弹幕到屏幕
   void sendDanmakuBullet(LiveDanmakuItem? data) {
-    if (data?.msg != null) if (!barrageWallController.isEnabled) {
+    if (!danmakuManualShow) return;
+    if (data?.msg != null && !barrageWallController.isEnabled) {
       barrageWallController.enable();
     }
     barrageWallController.send([
@@ -63,6 +65,17 @@ class HomeController extends GetxController {
         ),
       ))
     ]);
+  }
+
+  //显示、隐藏弹幕
+  void toggleDanmakuVisible() {
+    if (barrageWallController.isEnabled) {
+      barrageWallController.disable();
+      danmakuManualShow = false;
+    } else {
+      barrageWallController.enable();
+      danmakuManualShow = true;
+    }
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
