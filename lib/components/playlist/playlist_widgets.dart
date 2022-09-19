@@ -96,7 +96,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
         keyList = groups.keys.toList();
     return SingleChildScrollView(
         child: ExpansionPanelList(
-            expandedHeaderPadding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+            expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
             expansionCallback: (i, expanded) =>
                 toggleExpand(i, expanded, keyList[i]),
             children: keyList.map<ExpansionPanel>((String key) {
@@ -107,7 +107,15 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
                       child: ListTile(
-                        title: Text(key, style: TextStyle(fontSize: 14)),
+                        title: Tooltip(
+                          child: Text(
+                            key,
+                            style: const TextStyle(fontSize: 14),
+                            maxLines: 1,
+                          ),
+                          message: key,
+                          waitDuration: const Duration(seconds: 1),
+                        ),
                         subtitle: isExpanded
                             ? TextField(
                                 controller: _searchController,
@@ -394,7 +402,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                 ],
               ),
               message: e.name,
-              waitDuration: Duration(seconds: 1),
+              waitDuration: const Duration(seconds: 1),
             ),
           ),
         ));
