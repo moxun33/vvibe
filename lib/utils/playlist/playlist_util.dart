@@ -177,12 +177,12 @@ class PlaylistUtil {
         resp = await req(url);
       }
 
-      debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
+      //  debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
 
       return resp.statusCode;
     } on DioError catch (e) {
       final num = e.response?.statusCode ?? 500;
-
+//
       debugPrint('检查 $url 可访问出错：  $num');
 
       return num;

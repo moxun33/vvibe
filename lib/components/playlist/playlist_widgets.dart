@@ -5,7 +5,6 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
-import 'package:extended_list/extended_list.dart';
 import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -52,12 +51,11 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
 
   List<PlayListItem> filterPlaylist(String keyword, List<PlayListItem> list) {
     if (keyword.isEmpty) return widget.data;
-    return list
-        .where((PlayListItem element) =>
-            element.name != null &&
-            expandKey == element.group &&
-            element.name!.contains(keyword))
-        .toList();
+    return list.where((PlayListItem element) {
+      return element.name != null &&
+          expandKey == element.group &&
+          element.name!.toLowerCase().contains(keyword.toLowerCase());
+    }).toList();
   }
 
   void onSearch(String keyword) {
@@ -84,6 +82,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   void didUpdateWidget(covariant PlGroupPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     // debugPrint('PlGroupPanel didUpdateWidget ${widget.data.length}');
+
     setState(() {
       playlist = searchKey.isNotEmpty
           ? filterPlaylist(searchKey, widget.data)
@@ -177,6 +176,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   Widget _buildList() {
     if (widget.data.length != 0) {
       return ListView.builder(
+          shrinkWrap: true,
           itemCount: widget.data.length,
           itemExtent: 25.0,
           cacheExtent: getDeviceHeight(context) - 50.0,
@@ -187,6 +187,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
                 onSelectUrl: selectUrl,
                 selectedItem: selectedItem,
                 url: e,
+                key: GlobalObjectKey(e.toString()),
                 forceRefreshPlaylist: widget.forceRefreshPlaylist);
           });
     } else {
