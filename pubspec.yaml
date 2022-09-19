@@ -75,6 +75,7 @@ dependencies:
   json_theme: ^4.0.1+1
   uuid: ^3.0.6
   native_context_menu: ^0.2.2+5
+  extended_list: ^3.0.0
 
 dev_dependencies:
   flutter_test:

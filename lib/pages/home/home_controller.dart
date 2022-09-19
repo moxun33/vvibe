@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-14 21:13:21
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-19 15:19:50
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -155,6 +155,7 @@ class HomeController extends GetxController {
 
   //停止播放、销毁实例
   void stopPlayer({bool dispose = false}) {
+    EasyLoading.dismiss();
     player?.dispose();
     player = null;
     playingUrl = null;

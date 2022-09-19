@@ -5,6 +5,7 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
+import 'package:extended_list/extended_list.dart';
 import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -108,7 +109,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                     return Container(
                       child: ListTile(
                         dense: false,
-                        hoverColor: Colors.purple[200],
+                        hoverColor: Colors.purple,
                         title: Text(key, style: TextStyle(fontSize: 14)),
                         subtitle: isExpanded
                             ? TextField(
@@ -173,21 +174,32 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     });
   }
 
+  Widget _buildList() {
+    if (widget.data.length != 0) {
+      return ListView.builder(
+          itemCount: widget.data.length,
+          itemExtent: 25.0,
+          cacheExtent: getDeviceHeight(context) - 50.0,
+          itemBuilder: (context, index) {
+            final e = widget.data[index];
+            return PlUrlTile(
+                index: index,
+                onSelectUrl: selectUrl,
+                selectedItem: selectedItem,
+                url: e,
+                forceRefreshPlaylist: widget.forceRefreshPlaylist);
+          });
+    } else {
+      return Spinning();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
         height: getDeviceHeight(context) - 50,
         color: Colors.white10,
-        child: ListView.builder(
-            itemCount: widget.data.length,
-            itemBuilder: (context, index) {
-              final e = widget.data[index];
-              return PlUrlTile(
-                  onSelectUrl: selectUrl,
-                  selectedItem: selectedItem,
-                  url: e,
-                  forceRefreshPlaylist: widget.forceRefreshPlaylist);
-            }));
+        child: _buildList());
   }
 }
 
@@ -196,11 +208,13 @@ class PlUrlTile extends StatefulWidget {
   const PlUrlTile(
       {Key? key,
       required this.url,
+      required this.index,
       required this.onSelectUrl,
       required this.forceRefreshPlaylist,
       this.selectedItem})
       : super(key: key);
   final PlayListItem url;
+  final int index;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
   final void Function() forceRefreshPlaylist;
@@ -213,6 +227,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     with AutomaticKeepAliveClientMixin {
   PlayListItem? urlItem;
   int? urlStatus;
+  bool loading = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -223,6 +238,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     setState(() {
       urlItem = widget.url;
     });
+
     _checkUrlAccessible(widget.url);
   }
 
@@ -251,6 +267,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     if (url.url == null) {
       setState(() {
         urlStatus = 204;
+        loading = false;
       });
       return;
     }
@@ -258,12 +275,15 @@ class _PlUrlTileState extends State<PlUrlTile>
     if (!url.url!.startsWith('http')) {
       setState(() {
         urlStatus = 204;
+        loading = false;
       });
       return;
     }
+    print('检测url ${widget.index} ${url.name}');
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
     if (mounted) {
       setState(() {
+        loading = false;
         urlStatus = status;
       });
     }
@@ -290,6 +310,15 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '超时',
         );
+      case 403:
+        return Tooltip(
+          child: Icon(
+            Icons.not_accessible_outlined,
+            size: 10,
+            color: Colors.pink,
+          ),
+          message: '403禁止',
+        );
       case 400:
         return Tooltip(
           child: Icon(
@@ -299,8 +328,21 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '不可用',
         );
+      case 404:
+        return Tooltip(
+          child: Icon(
+            Icons.question_mark_outlined,
+            size: 10,
+            color: Colors.orange,
+          ),
+          message: '链接不存在',
+        );
       default:
-        return SmallSpinning();
+        return loading
+            ? SmallSpinning()
+            : SizedBox(
+                width: 0,
+              );
     }
   }
 

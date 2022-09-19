@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-14 14:26:07
+ * @LastEditTime: 2022-09-19 15:27:24
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -114,7 +114,7 @@ class PlaylistUtil {
   }
 
   //reg group-title, tvg-id, tvg-logo等属性表达式
-  String getM3uPropItem(String line, RegExp reg, {String defVal = ""}) {
+  String getTextByReg(String line, RegExp reg, {String defVal = ""}) {
     Match? match = reg.firstMatch(line);
 
     if (match != null) {
@@ -137,15 +137,15 @@ class PlaylistUtil {
               url = lines[i + 1],
               name = info.split(',').last.trim();
           list.add(PlayListItem(
-              group: getM3uPropItem(info, new RegExp(r'group-title="(.*?)"'),
+              group: getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
                   defVal: '未分组'),
-              tvgName: getM3uPropItem(info, new RegExp(r'tvg-name="(.*?)"')),
-              tvgLogo: getM3uPropItem(info, new RegExp(r'tvg-logo="(.*?)"')),
-              catchup: getM3uPropItem(info, new RegExp(r'catchup="(.*?)"')),
+              tvgName: getTextByReg(info, new RegExp(r'tvg-name="(.*?)"')),
+              tvgLogo: getTextByReg(info, new RegExp(r'tvg-logo="(.*?)"')),
+              catchup: getTextByReg(info, new RegExp(r'catchup="(.*?)"')),
               catchupSource:
-                  getM3uPropItem(info, new RegExp(r'catchup-source="(.*?)"')),
+                  getTextByReg(info, new RegExp(r'catchup-source="(.*?)"')),
               name: name,
-              tvgId: getM3uPropItem(info, new RegExp(r'tvg-id="(.*?)"')),
+              tvgId: getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
               url: url));
         }
       }
@@ -166,18 +166,26 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.hasAbsolutePath ?? false;
   }
 
-  Future<int?> checkUrlAccessible(String url) async {
+  Future<int?> checkUrlAccessible(String url, {bool isolate = false}) async {
     try {
-      final req =
-          Dio(BaseOptions(connectTimeout: 5000, headers: {'User-Agent': 'ZTE'}))
-              .head;
-      final resp = await req(url);
+      final req = Dio(new BaseOptions(
+          connectTimeout: 5000, headers: {'User-Agent': 'Windows ZTE'})).head;
+      dynamic resp;
+      if (isolate) {
+        resp = await compute(req, url);
+      } else {
+        resp = await req(url);
+      }
+
       debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
 
       return resp.statusCode;
-    } catch (e) {
-      // debugPrint('检查 $url 可访问出错： $e');
-      return e.toString().contains('504') ? 504 : 400;
+    } on DioError catch (e) {
+      final num = e.response?.statusCode ?? 500;
+
+      debugPrint('检查 $url 可访问出错：  $num');
+
+      return num;
     }
   }
 }
