@@ -107,8 +107,6 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
                       child: ListTile(
-                        dense: false,
-                        hoverColor: Colors.purple,
                         title: Text(key, style: TextStyle(fontSize: 14)),
                         subtitle: isExpanded
                             ? TextField(
@@ -281,7 +279,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       });
       return;
     }
-    print('$urlStatus 检测url ${widget.index} ${url.name}');
+    debugPrint('$urlStatus 检测url ${widget.index} ${url.name}');
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
     if (mounted) {
       setState(() {
@@ -321,6 +319,7 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '403禁止',
         );
+      case 500:
       case 400:
         return Tooltip(
           child: Icon(

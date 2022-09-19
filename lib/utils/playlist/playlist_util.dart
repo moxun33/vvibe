@@ -2,20 +2,20 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 15:27:24
+ * @LastEditTime: 2022-09-19 17:29:17
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
  */
 import 'dart:io';
-
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/common/values/storage.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
+import 'package:vvibe/models/playlist_text_group.dart';
 import 'package:vvibe/utils/local_storage.dart';
-import 'package:vvibe/utils/request.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -71,9 +71,14 @@ class PlaylistUtil {
     return list != null ? List<Map<String, dynamic>>.from(list) : [];
   }
 
+  final dioCacheOptions = CacheOptions(
+      // A default store is required for interceptor.
+      store: MemCacheStore());
 //根据url解析远程txt或m3u内容
   Future<List<PlayListItem>> parsePlaylistSubUrl(String url) async {
-    final resp = await Dio().get(url);
+    final client = Dio()
+      ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
+    final resp = await client.get(url);
     if (resp.statusCode == 200) {
       final String _data = resp.data;
       final List<String> lines = _data.split('\n');
@@ -92,16 +97,43 @@ class PlaylistUtil {
     return File(filePath).readAsLines();
   }
 
+//解析text的分组 [{'group':'name','index':0}]
+  List<PlayListTextGroup> parseTxtGroups(List<String> lines) {
+    List<PlayListTextGroup> groups = [];
+    for (var line in lines) {
+      if (line.contains(',') && line.contains('#genre#')) {
+        groups.add(PlayListTextGroup.fromJson(
+            {'group': line.split(',').first, 'index': lines.indexOf(line)}));
+      }
+    }
+    return groups;
+  }
+
+//根据txt的分组列表和子项在txt的索引匹配分组
+  String matchTxtUrlGroup(List<PlayListTextGroup> groups, int urlIndex) {
+    final matches = groups.where((element) => element.index < urlIndex);
+    if (matches.length > 0) {
+      final PlayListTextGroup group = matches.last;
+      return group.group;
+    }
+    return '未分组';
+  }
+
   //根据文本行 解析txt的播放列表文件内容
   List<PlayListItem> parseTxtContents(List<String> lines) {
     try {
+      final groups = parseTxtGroups(lines);
       final list = lines
-          .where((element) => element.indexOf(',') > -1)
+          .where((element) =>
+              element.contains(',') && !element.contains('#genre#'))
           .map((String e) {
             final List<String> arr = e.split(',');
 
             return PlayListItem(
-                group: '未分组', name: arr[0].trim(), tvgId: '', url: arr[1]);
+                group: matchTxtUrlGroup(groups, lines.indexOf(e)),
+                name: arr[0].trim(),
+                tvgId: '',
+                url: arr[1]);
           })
           .where((PlayListItem element) =>
               element.url != null && element.name != null)
@@ -183,7 +215,7 @@ class PlaylistUtil {
     } on DioError catch (e) {
       final num = e.response?.statusCode ?? 500;
 
-      //   debugPrint('检查 $url 可访问出错：  $num');
+      debugPrint('检查 $url 可访问出错：  $num');
 
       return num;
     }
