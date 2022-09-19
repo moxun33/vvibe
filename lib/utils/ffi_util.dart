@@ -1,3 +1,12 @@
+/*
+ * @Author: Moxx
+ * @Date: 2022-09-15 15:59:57
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-19 17:55:00
+ * @FilePath: \vvibe\lib\utils\ffi_util.dart
+ * @Description: 
+ * @qmj
+ */
 import 'dart:ffi';
 
 import 'dart:io';
@@ -31,7 +40,7 @@ class FfiUtil {
 //获取url的媒体元数据
   Future<String?> getMediaInfo(String url) async {
     String info =
-        await api.getMediaInfo(url: url, ffprobeDir: Directory('assets/').path);
+        await api.getMediaInfo(url: url, ffprobeDir: Directory('assets').path);
     return info;
   }
 }

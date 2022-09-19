@@ -52,12 +52,11 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
 
   List<PlayListItem> filterPlaylist(String keyword, List<PlayListItem> list) {
     if (keyword.isEmpty) return widget.data;
-    return list
-        .where((PlayListItem element) =>
-            element.name != null &&
-            expandKey == element.group &&
-            element.name!.contains(keyword))
-        .toList();
+    return list.where((PlayListItem element) {
+      return element.name != null &&
+          expandKey == element.group &&
+          element.name!.toLowerCase().contains(keyword.toLowerCase());
+    }).toList();
   }
 
   void onSearch(String keyword) {
@@ -84,6 +83,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   void didUpdateWidget(covariant PlGroupPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     // debugPrint('PlGroupPanel didUpdateWidget ${widget.data.length}');
+
     setState(() {
       playlist = searchKey.isNotEmpty
           ? filterPlaylist(searchKey, widget.data)
@@ -97,7 +97,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
         keyList = groups.keys.toList();
     return SingleChildScrollView(
         child: ExpansionPanelList(
-            expandedHeaderPadding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+            expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
             expansionCallback: (i, expanded) =>
                 toggleExpand(i, expanded, keyList[i]),
             children: keyList.map<ExpansionPanel>((String key) {
@@ -108,9 +108,15 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
                       child: ListTile(
-                        dense: false,
-                        hoverColor: Colors.purple[200],
-                        title: Text(key, style: TextStyle(fontSize: 14)),
+                        title: Tooltip(
+                          child: Text(
+                            key,
+                            style: const TextStyle(fontSize: 14),
+                            maxLines: 1,
+                          ),
+                          message: key,
+                          waitDuration: const Duration(seconds: 1),
+                        ),
                         subtitle: isExpanded
                             ? TextField(
                                 controller: _searchController,
@@ -174,44 +180,34 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: getDeviceHeight(context) - 130,
-        color: Colors.black26,
-        child: ExtendedListView.builder(
+  Widget _buildList() {
+    if (widget.data.length != 0) {
+      return ListView.builder(
+          shrinkWrap: true,
+          itemCount: widget.data.length,
+          itemExtent: 25.0,
+          cacheExtent: getDeviceHeight(context) - 50.0,
           itemBuilder: (context, index) {
-            if (widget.data.length < index + 1) return SizedBox();
             final e = widget.data[index];
             return PlUrlTile(
+                index: index,
                 onSelectUrl: selectUrl,
                 selectedItem: selectedItem,
                 url: e,
+                key: ObjectKey(e),
                 forceRefreshPlaylist: widget.forceRefreshPlaylist);
-          },
-          extendedListDelegate: ExtendedListDelegate(
+          });
+    } else {
+      return Spinning();
+    }
+  }
 
-              /// follow max child trailing layout offset and layout with full cross axis extend
-              /// last child as loadmore item/no more item in [ExtendedGridView] and [WaterfallFlow]
-              /// with full cross axis extend
-              //  LastChildLayoutType.fullCrossAxisExtend,
-
-              /// as foot at trailing and layout with full cross axis extend
-              /// show no more item at trailing when children are not full of viewport
-              /// if children is full of viewport, it's the same as fullCrossAxisExtend
-              //  LastChildLayoutType.foot,
-              lastChildLayoutTypeBuilder: (int index) =>
-                  index == widget.data.length
-                      ? LastChildLayoutType.foot
-                      : LastChildLayoutType.none,
-              collectGarbage: (List<int> garbages) {
-                //   debugPrint('collect garbage : $garbages');
-              },
-              viewportBuilder: (int firstIndex, int lastIndex) {
-                //   debugPrint('viewport : [$firstIndex,$lastIndex]');
-              }),
-          itemCount: widget.data.length + 1,
-        ));
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: getDeviceHeight(context) - 50,
+        color: Colors.white10,
+        child: _buildList());
   }
 }
 
@@ -220,11 +216,13 @@ class PlUrlTile extends StatefulWidget {
   const PlUrlTile(
       {Key? key,
       required this.url,
+      required this.index,
       required this.onSelectUrl,
       required this.forceRefreshPlaylist,
       this.selectedItem})
       : super(key: key);
   final PlayListItem url;
+  final int index;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
   final void Function() forceRefreshPlaylist;
@@ -237,6 +235,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     with AutomaticKeepAliveClientMixin {
   PlayListItem? urlItem;
   int? urlStatus;
+  bool loading = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -247,6 +246,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     setState(() {
       urlItem = widget.url;
     });
+
     _checkUrlAccessible(widget.url);
   }
 
@@ -272,9 +272,11 @@ class _PlUrlTileState extends State<PlUrlTile>
 
 //检查url访问性
   void _checkUrlAccessible(PlayListItem url) async {
+    if (urlStatus != null) return;
     if (url.url == null) {
       setState(() {
         urlStatus = 204;
+        loading = false;
       });
       return;
     }
@@ -282,12 +284,15 @@ class _PlUrlTileState extends State<PlUrlTile>
     if (!url.url!.startsWith('http')) {
       setState(() {
         urlStatus = 204;
+        loading = false;
       });
       return;
     }
+    debugPrint('$urlStatus 检测url ${widget.index} ${url.name}');
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
     if (mounted) {
       setState(() {
+        loading = false;
         urlStatus = status;
       });
     }
@@ -314,6 +319,16 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '超时',
         );
+      case 403:
+        return Tooltip(
+          child: Icon(
+            Icons.not_accessible_outlined,
+            size: 10,
+            color: Colors.pink,
+          ),
+          message: '403禁止',
+        );
+      case 500:
       case 400:
         return Tooltip(
           child: Icon(
@@ -323,8 +338,21 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '不可用',
         );
+      case 404:
+        return Tooltip(
+          child: Icon(
+            Icons.question_mark_outlined,
+            size: 10,
+            color: Colors.orange,
+          ),
+          message: '链接不存在',
+        );
       default:
-        return SmallSpinning();
+        return loading
+            ? SmallSpinning()
+            : SizedBox(
+                width: 0,
+              );
     }
   }
 
@@ -375,7 +403,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                 ],
               ),
               message: e.name,
-              waitDuration: Duration(seconds: 1),
+              waitDuration: const Duration(seconds: 1),
             ),
           ),
         ));

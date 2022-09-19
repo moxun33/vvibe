@@ -1,8 +1,8 @@
 <!--
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-14 22:25:09
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-09-19 16:47:36
  * @FilePath: \vvibe\README.md
  * @Description: 
  * @qmj
@@ -18,7 +18,7 @@
 ![img](https://img.shields.io/github/license/moxun33/vvibe)
 ![img](https://img.shields.io/github/stars/moxun33/vvibe)
 ![img](https://img.shields.io/github/issues/moxun33/vvibe)
-![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)
+[![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
 
 > 自用的视频直播观看软件
 
