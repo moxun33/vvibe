@@ -22,21 +22,20 @@ class Global {
   static bool isOfflineLogin = true;
 
   /// vlc是否使用native window
-  static bool useNativeView = true; //Global.isRelease && Platform.isWindows;
+  static bool useNativeView = false; //Global.isRelease && Platform.isWindows;
 
   /// 是否 release
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 
   /// init
   static Future<ThemeData> init() async {
-    await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       setWindowMaxSize(const Size(3840, 2160));
       setWindowMinSize(const Size(1280, 720));
     }
-
+    await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化
