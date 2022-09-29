@@ -57,7 +57,7 @@ dependencies:
   html: ^0.15.0
   dart_vlc:
     git:
-      url: https://github.com/iiijam/dart_vlc.git
+      url: https://github.com/alexmercerind/dart_vlc.git
       ref: master
 
   web_socket_channel: ^2.2.0

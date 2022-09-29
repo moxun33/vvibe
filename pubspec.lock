@@ -168,7 +168,7 @@ packages:
       path: "."
       ref: master
       resolved-ref: "89da178dbfe86cd269b942407f62fbaccf2bb72c"
-      url: "https://github.com/iiijam/dart_vlc.git"
+      url: "https://github.com/alexmercerind/dart_vlc.git"
     source: git
     version: "0.3.0"
   dart_vlc_ffi:
