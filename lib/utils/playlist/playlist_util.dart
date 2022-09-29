@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 17:29:17
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-09-29 23:50:33
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/storage.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
@@ -79,7 +80,7 @@ class PlaylistUtil {
     final client = Dio()
       ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     final resp = await client.get(url);
-    if (resp.statusCode == 200) {
+    if (resp.statusCode == 200 || resp.statusCode! < 400) {
       final String _data = resp.data;
       final List<String> lines = _data.split('\n');
       if (lines.length > 0 && lines[0].startsWith('#EXTM3U')) {
@@ -87,6 +88,8 @@ class PlaylistUtil {
       } else {
         return compute(parseTxtContents, lines);
       }
+    } else {
+      await EasyLoading.showError('加载订阅失败 ${resp.statusCode} ');
     }
 
     return [];
