@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 18:11:24
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-11-06 00:17:45
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -144,6 +144,14 @@ class HomeController extends GetxController {
   void startPlay(PlayListItem item, {bool? first}) {
     if (player == null) {
       initPlayer();
+    }
+    player?.pause();
+    stopDanmakuSocket();
+    if (!(item.url != null && item.url!.isNotEmpty)) {
+      EasyLoading.showError('播放地址错误');
+      stopPlayer();
+
+      return;
     }
     EasyLoading.show(status: '正在打开');
 
