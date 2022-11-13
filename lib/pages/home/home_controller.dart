@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-06 00:17:45
+ * @LastEditTime: 2022-11-13 18:23:11
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -215,7 +215,7 @@ class HomeController extends GetxController {
         }
       } else {
         print('缓冲进度 $percent% ');
-
+        EasyLoading.dismiss();
         EasyLoading.show(status: "缓冲 ${percent}%");
       }
     });

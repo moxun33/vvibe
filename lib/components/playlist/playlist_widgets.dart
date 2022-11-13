@@ -173,6 +173,10 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   PlayListItem? selectedItem;
 
   void selectUrl(PlayListItem e) {
+    if (!(e.url != null && e.url!.isNotEmpty)) {
+      EasyLoading.showError('缺少播放地址或地址错误');
+      return;
+    }
     if (e.url == selectedItem?.url) return;
     widget.onUrlTap(e);
     setState(() {

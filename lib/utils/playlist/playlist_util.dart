@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-05 16:23:12
+ * @LastEditTime: 2022-11-13 18:29:27
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -55,7 +55,7 @@ class PlaylistUtil {
       }
 
       if (filePath.endsWith('.txt')) {
-        final lines = await readFileLines(filePath);
+        final lines = await compute(readFileLines, filePath);
 
         return compute(parseTxtContents, lines);
       }
@@ -104,7 +104,8 @@ class PlaylistUtil {
   List<PlayListTextGroup> parseTxtGroups(List<String> lines) {
     List<PlayListTextGroup> groups = [];
     for (var line in lines) {
-      if (line.contains(',') && line.contains('#genre#')) {
+      if (line.contains(',') &&
+          (line.contains('#genre#') || !line.contains('://'))) {
         groups.add(PlayListTextGroup.fromJson(
             {'group': line.split(',').first, 'index': lines.indexOf(line)}));
       }
@@ -128,7 +129,9 @@ class PlaylistUtil {
       final groups = parseTxtGroups(lines);
       final list = lines
           .where((element) =>
-              element.contains(',') && !element.contains('#genre#'))
+              element.contains(',') &&
+              !element.contains('#genre#') &&
+              element.contains('://'))
           .map((String e) {
             final List<String> arr = e.split(',');
 
