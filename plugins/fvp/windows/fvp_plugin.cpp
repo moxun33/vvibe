@@ -134,7 +134,7 @@ namespace fvp
             ra.rtv = tex_.Get();
             player_.setRenderAPI(&ra);
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
-            player_.setBackgroundColor(1, 0, 0, 1);
+            player_.setBackgroundColor(1, 1, 1, 1);
             player_.setRenderCallback([&](void *)
                                       {
             player_.renderVideo();
@@ -153,6 +153,10 @@ namespace fvp
             player_.setMedia(url.c_str());
             player_.set(State::Playing);
             result->Success(flutter::EncodableValue(res));
+        }
+        if (method_call.method_name() == "getMediaInfo")
+        {
+            result->Success(flutter::EncodableValue(player_.mediaInfo()));
         }
         else
         {
