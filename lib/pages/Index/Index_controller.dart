@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
+import 'package:fvp/fvp.dart';
 
 class IndexController extends GetxController {
+  final _fvpPlugin = Fvp();
+  int? textureId;
   // 是否展示欢迎页
   var isloadWelcomePage = true.obs;
 
@@ -11,11 +14,21 @@ class IndexController extends GetxController {
 
   @override
   void onReady() {
-    startCountdownTimer();
+    // startCountdownTimer();
+    initPlatformState();
   }
 
   @override
   void onClose() {}
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    int ttId = await _fvpPlugin.createTexture();
+
+    print('textureId: $ttId');
+
+    textureId = ttId;
+    update();
+  }
 
   // 展示欢迎页，倒计时.5秒之后进入应用
   Future startCountdownTimer() async {

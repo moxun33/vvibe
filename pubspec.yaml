@@ -55,6 +55,9 @@ dependencies:
   flutter_cache_manager: ^3.1.0
 
   html: ^0.15.0
+  fvp:
+    path: ./plugins/fvp
+
   dart_vlc:
     git:
       url: https://github.com/alexmercerind/dart_vlc.git

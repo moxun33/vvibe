@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import fvp
 import native_context_menu
 import path_provider_macos
 import screen_retriever
@@ -15,6 +16,7 @@ import window_manager
 import window_size
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  FvpPlugin.register(with: registry.registrar(forPlugin: "FvpPlugin"))
   NativeContextMenuPlugin.register(with: registry.registrar(forPlugin: "NativeContextMenuPlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   ScreenRetrieverPlugin.register(with: registry.registrar(forPlugin: "ScreenRetrieverPlugin"))

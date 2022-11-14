@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dart_vlc
+  fvp
   native_context_menu
   screen_retriever
   url_launcher_linux

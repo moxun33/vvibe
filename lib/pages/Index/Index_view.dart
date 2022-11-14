@@ -11,12 +11,24 @@ class IndexPage extends GetView<IndexController> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
+    return Scaffold(body: GetBuilder<IndexController>(builder: (_) {
+      return Center(
+          child: AspectRatio(
+        aspectRatio: 16.0 / 9.0,
+        child: controller.textureId == null
+            ? null
+            : Texture(
+                textureId: controller.textureId!,
+                filterQuality: FilterQuality.high,
+              ),
+      ));
+    }));
+/*     return Obx(() => Scaffold(
           body: controller.isloadWelcomePage.isTrue
               ? SplashPage()
               : Global.isOfflineLogin
                   ? HomePage()
                   : LoginPage(),
-        ));
+        )); */
   }
 }
