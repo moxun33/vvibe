@@ -68,9 +68,9 @@ namespace fvp
     {
 
         const flutter::EncodableMap *argsList = std::get_if<flutter::EncodableMap>(method_call.arguments());
-
-        std::cout << "start fvp plugin!" << std::endl;
-        if (method_call.method_name() == "CreateRT")
+        const string methodName = method_call.method_name();
+        // std::cout << "start fvp plugin!" << std::endl;
+        if (methodName == "CreateRT")
         {
             MS_WARN(D3D11CreateDevice(adapter_.Get(), adapter_ ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &dev_, nullptr, &ctx_));
             if (!dev_)
@@ -134,7 +134,7 @@ namespace fvp
             ra.rtv = tex_.Get();
             player_.setRenderAPI(&ra);
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
-            player_.setBackgroundColor(1, 1, 1, 1);
+            player_.setBackgroundColor(1, 1, 1, -1);
             player_.setRenderCallback([&](void *)
                                       {
             player_.renderVideo();
@@ -142,7 +142,7 @@ namespace fvp
         }
         if (method_call.method_name() == "setMedia")
         {
-            std::cout << "to set media" << std::endl;
+            std::cout << "to set new media" << std::endl;
             auto url_it = argsList->find(flutter::EncodableValue("url"));
             std::string url;
             if (url_it != argsList->end())
@@ -150,13 +150,67 @@ namespace fvp
                 url = std::get<std::string>(url_it->second);
             }
             int res = 1;
+            player_.setNextMedia(nullptr, -1);
+            player_.set(State::Stopped);
+            player_.waitFor(State::Stopped);
+            player_.setMedia(nullptr);
             player_.setMedia(url.c_str());
             player_.set(State::Playing);
+            player_.waitFor(State::Playing);
+            // player_.setActiveTracks(MediaType::Video,std::set(0));
             result->Success(flutter::EncodableValue(res));
         }
         if (method_call.method_name() == "getMediaInfo")
         {
-            result->Success(flutter::EncodableValue(player_.mediaInfo()));
+            auto info = player_.mediaInfo();
+            VideoStreamInfo video = info.video.front();
+
+            result->Success(flutter::EncodableValue(flutter::EncodableMap{
+                {flutter::EncodableValue("start_time"), flutter::EncodableValue(info.start_time)},
+                {flutter::EncodableValue("duration"), flutter::EncodableValue(info.duration)},
+                {flutter::EncodableValue("duration"), flutter::EncodableValue(info.bit_rate)},
+                {flutter::EncodableValue("size"), flutter::EncodableValue(info.size)},
+                {flutter::EncodableValue("streams"), flutter::EncodableValue(info.streams)},
+                 {flutter::EncodableValue("metadata"), flutter::EncodableValue(flutter::EncodableMap{
+
+                })},
+                {flutter::EncodableValue("audio"), flutter::EncodableValue(flutter::EncodableMap{
+
+                })}, 
+                {flutter::EncodableValue("video"), flutter::EncodableValue(flutter::EncodableMap{
+                                                        {flutter::EncodableValue("codec"), flutter::EncodableValue(flutter::EncodableMap{
+                                                         /* {flutter::EncodableValue("codec"), flutter::EncodableValue(video.codec.codec)},
+                                                         {flutter::EncodableValue("codec_tag"), flutter::EncodableValue(video.codec.codec_tag)},
+                                                         {flutter::EncodableValue("bit_rate"), flutter::EncodableValue(video.codec.bit_rate)},
+                                                         {flutter::EncodableValue("format"), flutter::EncodableValue(video.codec.format)},
+                                                         {flutter::EncodableValue("format_name"), flutter::EncodableValue(video.codec.format_name)}, */
+                                                         {flutter::EncodableValue("width"), flutter::EncodableValue(video.codec.width)},
+                                                         {flutter::EncodableValue("height"), flutter::EncodableValue(video.codec.height)},
+                                                       })},
+                                                       {flutter::EncodableValue("rotation"), flutter::EncodableValue(video.rotation)},
+                                                       {flutter::EncodableValue("frames"), flutter::EncodableValue(video.frames)}, 
+                                                       {flutter::EncodableValue("index"), flutter::EncodableValue(video.index)},
+                                                   })},
+                /* {EncodableValue("bit_rate"), EncodableValue(EncodableList{
+                                               EncodableValue(1),
+                                               EncodableValue(2.0),
+                                               EncodableValue(4),
+            })*/
+            }));
+        }
+        if (method_call.method_name() == "playOrPause")
+        {
+            if (player_.state() == State::Playing)
+            {
+                player_.set(State::Paused);
+                player_.waitFor(State::Paused);
+            }
+            else
+            {
+                player_.set(State::Playing);
+                player_.waitFor(State::Playing);
+            }
+            result->Success(flutter::EncodableValue(1));
         }
         else
         {

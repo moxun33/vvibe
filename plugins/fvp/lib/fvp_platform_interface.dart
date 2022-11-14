@@ -34,4 +34,12 @@ abstract class FvpPlatform extends PlatformInterface {
   Future<int> setMedia(String url) {
     throw UnimplementedError('setMedia() has not been implemented.');
   }
+
+  Future<int> playOrPause() {
+    throw UnimplementedError('playOrPause() has not been implemented.');
+  }
+
+  Future<dynamic> getMediaInfo() {
+    throw UnimplementedError('getMediaInfo() has not been implemented.');
+  }
 }

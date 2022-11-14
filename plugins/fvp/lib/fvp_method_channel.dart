@@ -23,8 +23,21 @@ class MethodChannelFvp extends FvpPlatform {
   }
 
   @override
-  Future<int> setMedia(String url) async {
-    final v = await methodChannel.invokeMethod('setMedia', {'url': url});
-    return v as int;
+  Future<int> setMedia(String? url) async {
+    if (!(url != null && url.isNotEmpty)) {
+      return 0;
+      // throw ArgumentError('url 不能为空');
+    }
+    return (await methodChannel.invokeMethod('setMedia', {'url': url})) as int;
+  }
+
+  @override
+  Future<int> playOrPause() async {
+    return (await methodChannel.invokeMethod('playOrPause')) as int;
+  }
+
+  @override
+  Future<dynamic> getMediaInfo() async {
+    return methodChannel.invokeMethod('getMediaInfo');
   }
 }

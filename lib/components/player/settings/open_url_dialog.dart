@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:55:49
  * @LastEditors: moxun33
- * @LastEditTime: 2022-09-13 20:57:04
+ * @LastEditTime: 2022-11-14 20:09:08
  * @FilePath: \vvibe\lib\components\player\settings\open_url_dialog.dart
  * @Description: 打开链接弹窗
  * @aqmj

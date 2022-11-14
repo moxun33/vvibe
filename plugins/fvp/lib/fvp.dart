@@ -12,4 +12,12 @@ class Fvp {
   Future<int> setMedia(String url) {
     return FvpPlatform.instance.setMedia(url);
   }
+
+  Future<int> playOrPause() {
+    return FvpPlatform.instance.playOrPause();
+  }
+
+  Future<dynamic> getMediaInfo() {
+    return FvpPlatform.instance.getMediaInfo();
+  }
 }

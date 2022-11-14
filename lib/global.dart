@@ -19,7 +19,7 @@ class Global {
   static bool isFirstOpen = false;
 
   /// 是否离线登录
-  static bool isOfflineLogin = true;
+  static bool isOfflineLogin = false;
 
   /// vlc是否使用native window
   static bool useNativeView = false; //Global.isRelease && Platform.isWindows;
