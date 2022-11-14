@@ -1,4 +1,3 @@
-
 import 'fvp_platform_interface.dart';
 
 class Fvp {
@@ -8,5 +7,9 @@ class Fvp {
 
   Future<int> createTexture() {
     return FvpPlatform.instance.createTexture();
+  }
+
+  Future<int> setMedia(String url) {
+    return FvpPlatform.instance.setMedia(url);
   }
 }

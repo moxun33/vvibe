@@ -28,6 +28,8 @@ class IndexController extends GetxController {
 
     textureId = ttId;
     update();
+    _fvpPlugin.setMedia(
+        'https://cn-jlcc-cu-03-05.bilivideo.com/live-bvc/879488/live_230437990_1763665/index.m3u8');
   }
 
   // 展示欢迎页，倒计时.5秒之后进入应用

@@ -16,7 +16,7 @@ class IndexPage extends GetView<IndexController> {
           child: AspectRatio(
         aspectRatio: 16.0 / 9.0,
         child: controller.textureId == null
-            ? null
+            ? SplashPage()
             : Texture(
                 textureId: controller.textureId!,
                 filterQuality: FilterQuality.high,

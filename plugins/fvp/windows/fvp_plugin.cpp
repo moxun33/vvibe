@@ -67,8 +67,9 @@ namespace fvp
         std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
     {
 
-        //const auto *arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
-       
+        const flutter::EncodableMap *argsList = std::get_if<flutter::EncodableMap>(method_call.arguments());
+
+        std::cout << "start fvp plugin!" << std::endl;
         if (method_call.method_name() == "CreateRT")
         {
             MS_WARN(D3D11CreateDevice(adapter_.Get(), adapter_ ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &dev_, nullptr, &ctx_));
@@ -136,10 +137,22 @@ namespace fvp
             player_.setBackgroundColor(1, 0, 0, 1);
             player_.setRenderCallback([&](void *)
                                       {
-          player_.renderVideo();
-          texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
-            player_.setMedia("https://cn-jlcc-cu-03-08.bilivideo.com/live-bvc/352605/live_415611_4082642/index.m3u8");
+            player_.renderVideo();
+            texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+        }
+        if (method_call.method_name() == "setMedia")
+        {
+            std::cout << "to set media" << std::endl;
+            auto url_it = argsList->find(flutter::EncodableValue("url"));
+            std::string url;
+            if (url_it != argsList->end())
+            {
+                url = std::get<std::string>(url_it->second);
+            }
+            int res = 1;
+            player_.setMedia(url.c_str());
             player_.set(State::Playing);
+            result->Success(flutter::EncodableValue(res));
         }
         else
         {

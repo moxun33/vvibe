@@ -30,4 +30,8 @@ abstract class FvpPlatform extends PlatformInterface {
   Future<int> createTexture() {
     throw UnimplementedError('createTexture() has not been implemented.');
   }
+
+  Future<int> setMedia(String url) {
+    throw UnimplementedError('setMedia() has not been implemented.');
+  }
 }
