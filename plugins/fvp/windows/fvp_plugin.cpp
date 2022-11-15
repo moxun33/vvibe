@@ -31,6 +31,9 @@ using namespace std;
 namespace fvp
 {
 
+    using flutter::EncodableList;
+    using flutter::EncodableMap;
+    using flutter::EncodableValue;
     // static
     void FvpPlugin::RegisterWithRegistrar(
         flutter::PluginRegistrarWindows *registrar)
@@ -158,39 +161,60 @@ namespace fvp
             player_.set(State::Playing);
             player_.waitFor(State::Playing);
             // player_.setActiveTracks(MediaType::Video,std::set(0));
-            result->Success(flutter::EncodableValue(res));
+            result->Success(EncodableValue(res));
         }
         if (method_call.method_name() == "getMediaInfo")
         {
             auto info = player_.mediaInfo();
             VideoStreamInfo video = info.video.front();
+            AudioStreamInfo audio = info.audio.front();
 
-            result->Success(flutter::EncodableValue(flutter::EncodableMap{
-                {flutter::EncodableValue("start_time"), flutter::EncodableValue(info.start_time)},
-                {flutter::EncodableValue("duration"), flutter::EncodableValue(info.duration)},
-                {flutter::EncodableValue("duration"), flutter::EncodableValue(info.bit_rate)},
-                {flutter::EncodableValue("size"), flutter::EncodableValue(info.size)},
-                {flutter::EncodableValue("streams"), flutter::EncodableValue(info.streams)},
-                 {flutter::EncodableValue("metadata"), flutter::EncodableValue(flutter::EncodableMap{
-
-                })},
-                {flutter::EncodableValue("audio"), flutter::EncodableValue(flutter::EncodableMap{
-
-                })}, 
-                {flutter::EncodableValue("video"), flutter::EncodableValue(flutter::EncodableMap{
-                                                        {flutter::EncodableValue("codec"), flutter::EncodableValue(flutter::EncodableMap{
-                                                         /* {flutter::EncodableValue("codec"), flutter::EncodableValue(video.codec.codec)},
-                                                         {flutter::EncodableValue("codec_tag"), flutter::EncodableValue(video.codec.codec_tag)},
-                                                         {flutter::EncodableValue("bit_rate"), flutter::EncodableValue(video.codec.bit_rate)},
-                                                         {flutter::EncodableValue("format"), flutter::EncodableValue(video.codec.format)},
-                                                         {flutter::EncodableValue("format_name"), flutter::EncodableValue(video.codec.format_name)}, */
-                                                         {flutter::EncodableValue("width"), flutter::EncodableValue(video.codec.width)},
-                                                         {flutter::EncodableValue("height"), flutter::EncodableValue(video.codec.height)},
-                                                       })},
-                                                       {flutter::EncodableValue("rotation"), flutter::EncodableValue(video.rotation)},
-                                                       {flutter::EncodableValue("frames"), flutter::EncodableValue(video.frames)}, 
-                                                       {flutter::EncodableValue("index"), flutter::EncodableValue(video.index)},
-                                                   })},
+            result->Success(EncodableValue(EncodableMap{
+                {EncodableValue("start_time"), EncodableValue(info.start_time)},
+                {EncodableValue("duration"), EncodableValue(info.duration)},
+                {EncodableValue("bit_rate"), EncodableValue(info.bit_rate)},
+                {EncodableValue("size"), EncodableValue(info.size)},
+                {EncodableValue("streams"), EncodableValue(info.streams)},
+                {EncodableValue("metadata"), EncodableValue(EncodableMap{})},
+                {EncodableValue("video"), EncodableValue(EncodableMap{
+                                              {EncodableValue("codec"), EncodableValue(EncodableMap{
+                                                                            {EncodableValue("codec"), EncodableValue(video.codec.codec)},
+                                                                            /* {EncodableValue("codec_tag"), EncodableValue(video.codec.codec_tag > 0 ? video.codec.codec_tag : 0)}, */
+                                                                            {EncodableValue("profile"), EncodableValue(video.codec.profile)},
+                                                                            {EncodableValue("level"), EncodableValue(video.codec.level)},
+                                                                            {EncodableValue("bit_rate"), EncodableValue(video.codec.bit_rate)},
+                                                                            {EncodableValue("format"), EncodableValue(video.codec.format)},
+                                                                            {EncodableValue("frame_rate"), EncodableValue(video.codec.frame_rate)},
+                                                                            {EncodableValue("format_name"), EncodableValue(video.codec.format_name)},
+                                                                            {EncodableValue("width"), EncodableValue(video.codec.width)},
+                                                                            {EncodableValue("height"), EncodableValue(video.codec.height)},
+                                                                        })},
+                                              {EncodableValue("start_time"), EncodableValue(video.start_time)},
+                                              {EncodableValue("metadata"), EncodableValue(EncodableMap{})},
+                                              {EncodableValue("rotation"), EncodableValue(video.rotation)},
+                                              {EncodableValue("duration"), EncodableValue(video.duration)},
+                                              {EncodableValue("frames"), EncodableValue(video.frames)},
+                                              {EncodableValue("index"), EncodableValue(video.index)},
+                                          })},
+                {EncodableValue("audio"), EncodableValue(EncodableMap{
+                                              {EncodableValue("codec"), EncodableValue(EncodableMap{
+                                                                            {EncodableValue("codec"), EncodableValue(audio.codec.codec)},
+                                                                            /* {EncodableValue("codec_tag"), EncodableValue(audio.codec.codec_tag > 0 ? audio.codec.codec_tag : 0)}, */
+                                                                            {EncodableValue("profile"), EncodableValue(audio.codec.profile)},
+                                                                            {EncodableValue("level"), EncodableValue(audio.codec.level)},
+                                                                            {EncodableValue("bit_rate"), EncodableValue(audio.codec.bit_rate)},
+                                                                            {EncodableValue("frame_rate"), EncodableValue(audio.codec.frame_rate)},
+                                                                            {EncodableValue("channels"), EncodableValue(audio.codec.channels)},
+                                                                            {EncodableValue("block_align"), EncodableValue(audio.codec.block_align)},
+                                                                            {EncodableValue("frame_size"), EncodableValue(audio.codec.frame_size)},
+                                                                            {EncodableValue("raw_sample_size"), EncodableValue(audio.codec.raw_sample_size)},
+                                                                        })},
+                                              {EncodableValue("start_time"), EncodableValue(audio.start_time)},
+                                              {EncodableValue("metadata"), EncodableValue(EncodableMap{})},
+                                              {EncodableValue("duration"), EncodableValue(audio.duration)},
+                                              {EncodableValue("frames"), EncodableValue(audio.frames)},
+                                              {EncodableValue("index"), EncodableValue(audio.index)},
+                                          })},
                 /* {EncodableValue("bit_rate"), EncodableValue(EncodableList{
                                                EncodableValue(1),
                                                EncodableValue(2.0),
