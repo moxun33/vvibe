@@ -39,7 +39,7 @@ class FvpController extends GetxController {
   }
 
   void playOrPause() {
-    //  _fvpPlugin.playOrPause();
+    _fvpPlugin.playOrPause();
     getMediaInfo();
   }
 

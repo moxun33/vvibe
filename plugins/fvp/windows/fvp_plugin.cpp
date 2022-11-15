@@ -140,9 +140,18 @@ namespace fvp
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
             player_.setBackgroundColor(1, 1, 1, -1);
             player_.setProperty("user-agent", "FVP ZTE");
-
-            player_.onEvent([](MediaEvent event)
-                            { return true; });
+            player_.onEvent([](const MediaEvent& e){
+                                std::cout << "event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
+                                return false;
+                            });
+            player_.onMediaStatusChanged([](MediaStatus s){
+                                        //MediaStatus s = player.mediaStatus();
+                                        printf("************Media status: %#x, loading: %d, buffering: %d, prepared: %d, EOF: %d**********\n", s, s&MediaStatus::Loading, s&MediaStatus::Buffering, s&MediaStatus::Prepared, s&MediaStatus::End);
+                                        return true;
+                                    });
+             player_.onStateChanged([&](State s){
+                                    printf("state changed to %d, status: %d\n", s, player_.mediaStatus());
+                                });
             player_.setRenderCallback([&](void *)
                                       {
                                         player_.renderVideo();
