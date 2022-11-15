@@ -265,6 +265,27 @@ namespace fvp
             player_.setMute(m);
             result->Success(flutter::EncodableValue(1));
         }
+        if (method_call.method_name() == "setTimeout")
+        {
+            auto t_it = argsList->find(flutter::EncodableValue("time"));
+            int t = 10000;
+            if (t_it != argsList->end())
+            {
+                t = std::get<int>(t_it->second);
+            }
+            player_.setTimeout(t);
+            result->Success(flutter::EncodableValue(1));
+        }
+        if (method_call.method_name() == "getState")
+        {
+            State t = player_.state();
+            result->Success(flutter::EncodableValue(static_cast<int>(t)));
+        }
+        if (method_call.method_name() == "getStatus")
+        {
+            MediaStatus t = player_.mediaStatus();
+            result->Success(flutter::EncodableValue(static_cast<int>(t)));
+        }
         else
         {
             result->NotImplemented();

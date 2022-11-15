@@ -31,15 +31,13 @@ class FvpPage extends GetView<FvpController> {
             ],
           ),
           Expanded(
-              child: AspectRatio(
-            aspectRatio: 16.0 / 9.0,
             child: controller.textureId == null
                 ? Text('初始化中')
                 : Texture(
                     textureId: controller.textureId!,
                     filterQuality: FilterQuality.high,
                   ),
-          )),
+          ),
         ],
       )));
     }));

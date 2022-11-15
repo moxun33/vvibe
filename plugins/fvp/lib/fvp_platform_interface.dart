@@ -50,4 +50,16 @@ abstract class FvpPlatform extends PlatformInterface {
   Future<int> setMute(bool v) {
     throw UnimplementedError('setMute() has not been implemented.');
   }
+
+  Future<int> setTimeout(int v) {
+    throw UnimplementedError('setTimeout() has not been implemented.');
+  }
+
+  Future<int> getState() {
+    throw UnimplementedError('getState() has not been implemented.');
+  }
+
+  Future<int> getStatus() {
+    throw UnimplementedError('getStatus() has not been implemented.');
+  }
 }

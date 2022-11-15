@@ -28,8 +28,8 @@ class FvpController extends GetxController {
 
     textureId = ttId;
     update();
-    _fvpPlugin
-        .setMedia('https://hdltctwk.douyucdn2.cn/live/9965018r71MdtzaI.flv');
+    _fvpPlugin.setMedia(
+        'https://cn-jlcc-cu-03-08.bilivideo.com/live-bvc/352605/live_415611_4082642/index.m3u8');
   }
 
   void setMedia(String url) async {
@@ -45,7 +45,9 @@ class FvpController extends GetxController {
 
   void getMediaInfo() async {
     final res = await _fvpPlugin.getMediaInfo();
-    print(res);
+    print("media info $res");
+    final state = await _fvpPlugin.getState();
+    print("state $state");
   }
 
   increment() => count.value++;

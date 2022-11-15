@@ -31,4 +31,37 @@ class Fvp {
   Future<int> setMute(bool v) {
     return FvpPlatform.instance.setMute(v);
   }
+
+  Future<int> setTimeout(int v) {
+    return FvpPlatform.instance.setTimeout(v);
+  }
+
+/* enum   State : int {
+    NotRunning,
+    Stopped = NotRunning,
+    Running,
+    Playing = Running, /// start/resume to play
+    Paused,
+}; */
+  Future<int> getState() {
+    return FvpPlatform.instance.getState();
+  }
+
+/* enum MediaStatus
+{
+    NoMedia = 0, // initial status, not invalid. // what if set an empty url and closed?
+    Unloaded = 1, // unloaded // (TODO: or when a source(url) is set?)
+    Loading = 1<<1, // opening and parsing the media
+    Loaded = 1<<2, // media is loaded and parsed. player is stopped state. mediaInfo() is available now
+    Prepared = 1<<8, // all tracks are buffered and ready to decode frames. tracks failed to open decoder are ignored
+    Stalled = 1<<3, // insufficient buffering or other interruptions (timeout, user interrupt)
+    Buffering = 1<<4, // when buffering starts
+    Buffered = 1<<5, // when buffering ends
+    End = 1<<6, // reached the end of the current media, no more data to read
+    Seeking = 1<<7,
+    Invalid = 1<<31, // failed to load media because of unsupport format or invalid media source
+}; */
+  Future<int> getStatus() {
+    return FvpPlatform.instance.getStatus();
+  }
 }

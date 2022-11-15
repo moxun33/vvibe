@@ -58,4 +58,21 @@ class MethodChannelFvp extends FvpPlatform {
     return (await methodChannel.invokeMethod('setMute', {'mute': v ?? true})
         as int);
   }
+
+  //v： ms
+  @override
+  Future<int> setTimeout(int? v) async {
+    return (await methodChannel.invokeMethod('setTimeout', {'time': v ?? 10000})
+        as int);
+  }
+
+  @override
+  Future<int> getState() async {
+    return (await methodChannel.invokeMethod('getState') as int);
+  }
+
+  @override
+  Future<int> getStatus() async {
+    return (await methodChannel.invokeMethod('getStatus') as int);
+  }
 }
