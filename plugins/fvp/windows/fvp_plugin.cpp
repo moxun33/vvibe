@@ -148,7 +148,7 @@ namespace fvp
                                         player_.renderVideo();
                                         texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
         }
-        if (method_call.method_name() == "setMedia")
+        if (methodName == "setMedia")
         {
             std::cout << "to set new media" << std::endl;
             auto url_it = argsList->find(flutter::EncodableValue("url"));
@@ -168,7 +168,7 @@ namespace fvp
             // player_.setActiveTracks(MediaType::Video,std::set(0));
             result->Success(EncodableValue(res));
         }
-        if (method_call.method_name() == "getMediaInfo")
+        if (methodName == "getMediaInfo")
         {
 
             auto info = player_.mediaInfo();
@@ -185,6 +185,7 @@ namespace fvp
                 {EncodableValue("duration"), EncodableValue(info.duration)},
                 {EncodableValue("bit_rate"), EncodableValue(info.bit_rate)},
                 {EncodableValue("size"), EncodableValue(info.size)},
+                {EncodableValue("format"), EncodableValue(info.format)},
                 {EncodableValue("streams"), EncodableValue(info.streams)},
                 {EncodableValue("metadata"), EncodableValue(EncodableMap{})},
                 {EncodableValue("video"), EncodableValue(EncodableMap{
@@ -234,7 +235,7 @@ namespace fvp
             }));
         }
 
-        if (method_call.method_name() == "playOrPause")
+        if (methodName == "playOrPause")
         {
             if (player_.state() == State::Playing)
             {
@@ -248,7 +249,7 @@ namespace fvp
             }
             result->Success(flutter::EncodableValue(1));
         }
-        if (method_call.method_name() == "setVolume")
+        if (methodName == "setVolume")
         {
             auto v_it = argsList->find(flutter::EncodableValue("volume"));
             float v = 1.0;
@@ -259,7 +260,7 @@ namespace fvp
             player_.setVolume(v);
             result->Success(flutter::EncodableValue(1));
         }
-        if (method_call.method_name() == "setMute")
+        if (methodName == "setMute")
         {
             auto m_it = argsList->find(flutter::EncodableValue("mute"));
             bool m = true;
@@ -270,7 +271,7 @@ namespace fvp
             player_.setMute(m);
             result->Success(flutter::EncodableValue(1));
         }
-        if (method_call.method_name() == "setTimeout")
+        if (methodName == "setTimeout")
         {
             auto t_it = argsList->find(flutter::EncodableValue("time"));
             int t = 10000;
@@ -281,17 +282,17 @@ namespace fvp
             player_.setTimeout(t);
             result->Success(flutter::EncodableValue(1));
         }
-        if (method_call.method_name() == "getState")
+        if (methodName == "getState")
         {
             State t = player_.state();
             result->Success(flutter::EncodableValue(static_cast<int>(t)));
         }
-        if (method_call.method_name() == "getStatus")
+        if (methodName == "getStatus")
         {
             MediaStatus t = player_.mediaStatus();
             result->Success(flutter::EncodableValue(static_cast<int>(t)));
         }
-        if (method_call.method_name() == "snapshot")
+        if (methodName == "snapshot")
         {
 
             Player::SnapshotRequest req{};
@@ -304,7 +305,7 @@ namespace fvp
                                  return "snapshots/" + std::to_string(ms.count()) + "-snapshot.jpg"; });
             result->Success(flutter::EncodableValue("done"));
         }
-        if (method_call.method_name() == "setUserAgent")
+        if (methodName == "setUserAgent")
         {
             auto v_it = argsList->find(flutter::EncodableValue("ua"));
             string v = "FVP";

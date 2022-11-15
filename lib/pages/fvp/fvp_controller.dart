@@ -45,10 +45,10 @@ class FvpController extends GetxController {
 
   void getMediaInfo() async {
     final res = await _fvpPlugin.getMediaInfo();
-    print("media info $res");
+    print(res);
     final state = await _fvpPlugin.getState();
     print("state $state");
-    _fvpPlugin.snapshot();
+    //  _fvpPlugin.snapshot();
   }
 
   increment() => count.value++;
