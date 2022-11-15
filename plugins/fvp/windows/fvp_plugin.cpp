@@ -236,6 +236,28 @@ namespace fvp
             }
             result->Success(flutter::EncodableValue(1));
         }
+        if (method_call.method_name() == "setVolume")
+        {
+            auto v_it = argsList->find(flutter::EncodableValue("volume"));
+            float v;
+            if (v_it != argsList->end())
+            {
+                v_it = std::get<float>(v_it->second);
+            }
+            player_.setVolume(v);
+            result->Success(flutter::EncodableValue(1));
+        }
+        if (method_call.method_name() == "setMute")
+        {
+            auto v_it = argsList->find(flutter::EncodableValue("mute"));
+            bool v;
+            if (v_it != argsList->end())
+            {
+                v_it = std::get<boolean>(v_it->second);
+            }
+            player_.setMute(v);
+            result->Success(flutter::EncodableValue(1));
+        }
         else
         {
             result->NotImplemented();

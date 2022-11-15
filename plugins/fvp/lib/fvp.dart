@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'fvp_platform_interface.dart';
 
 class Fvp {
@@ -22,7 +24,11 @@ class Fvp {
     return FvpPlatform.instance.getMediaInfo();
   }
 
-  Future<int> setValume(int v) {
+  Future<int> setValume(double v) {
     return FvpPlatform.instance.setVolume(v);
+  }
+
+  Future<int> setMute(bool v) {
+    return FvpPlatform.instance.setMute(v);
   }
 }

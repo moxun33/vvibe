@@ -42,9 +42,15 @@ class MethodChannelFvp extends FvpPlatform {
         await methodChannel.invokeMethod('getMediaInfo'));
   }
 
-//v: 0 - 1
+//v: 0 , 0.5,0.6, 1.0
   @override
-  Future<int> setVolume(int v) async {
-    return (await methodChannel.invokeMethod('setVolume') as int);
+  Future<int> setVolume(double v) async {
+    return (await methodChannel.invokeMethod('setVolume', {'volume': v})
+        as int);
+  }
+
+  @override
+  Future<int> setMute(bool v) async {
+    return (await methodChannel.invokeMethod('setMute', {'mute': v}) as int);
   }
 }
