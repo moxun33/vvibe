@@ -165,7 +165,13 @@ namespace fvp
         }
         if (method_call.method_name() == "getMediaInfo")
         {
+
             auto info = player_.mediaInfo();
+            if (!(info.start_time > 0 && info.video.size() > 0 && info.audio.size() > 0))
+            {
+                result->Error("get metadata failed");
+                return;
+            }
             VideoStreamInfo video = info.video.front();
             AudioStreamInfo audio = info.audio.front();
 
@@ -222,6 +228,7 @@ namespace fvp
             })*/
             }));
         }
+
         if (method_call.method_name() == "playOrPause")
         {
             if (player_.state() == State::Playing)
@@ -239,23 +246,23 @@ namespace fvp
         if (method_call.method_name() == "setVolume")
         {
             auto v_it = argsList->find(flutter::EncodableValue("volume"));
-            float v;
+            float v = 1.0;
             if (v_it != argsList->end())
             {
-                v_it = std::get<float>(v_it->second);
+                v = (float)std::get<double>(v_it->second);
             }
             player_.setVolume(v);
             result->Success(flutter::EncodableValue(1));
         }
         if (method_call.method_name() == "setMute")
         {
-            auto v_it = argsList->find(flutter::EncodableValue("mute"));
-            bool v;
-            if (v_it != argsList->end())
+            auto m_it = argsList->find(flutter::EncodableValue("mute"));
+            bool m = true;
+            if (m_it != argsList->end())
             {
-                v_it = std::get<boolean>(v_it->second);
+                m = std::get<bool>(m_it->second);
             }
-            player_.setMute(v);
+            player_.setMute(m);
             result->Success(flutter::EncodableValue(1));
         }
         else

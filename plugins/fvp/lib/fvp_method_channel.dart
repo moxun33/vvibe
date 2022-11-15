@@ -37,20 +37,25 @@ class MethodChannelFvp extends FvpPlatform {
   }
 
   @override
-  Future<Map<String, dynamic>> getMediaInfo() async {
-    return Map<String, dynamic>.from(
-        await methodChannel.invokeMethod('getMediaInfo'));
+  Future<Map<String, dynamic>?> getMediaInfo() async {
+    try {
+      return Map<String, dynamic>.from(
+          await methodChannel.invokeMethod('getMediaInfo'));
+    } catch (e) {
+      return null;
+    }
   }
 
 //v: 0 , 0.5,0.6, 1.0
   @override
   Future<int> setVolume(double v) async {
-    return (await methodChannel.invokeMethod('setVolume', {'volume': v})
-        as int);
+    return (await methodChannel.invokeMethod(
+        'setVolume', {'volume': v > 0 && v <= 1 ? v : 1.0}) as int);
   }
 
   @override
-  Future<int> setMute(bool v) async {
-    return (await methodChannel.invokeMethod('setMute', {'mute': v}) as int);
+  Future<int> setMute(bool? v) async {
+    return (await methodChannel.invokeMethod('setMute', {'mute': v ?? true})
+        as int);
   }
 }
