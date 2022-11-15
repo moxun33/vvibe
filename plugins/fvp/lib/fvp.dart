@@ -64,4 +64,12 @@ class Fvp {
   Future<int> getStatus() {
     return FvpPlatform.instance.getStatus();
   }
+
+  Future<String?> snapshot() {
+    return FvpPlatform.instance.snapshot();
+  }
+
+  Future<int> setUserAgent(String? ua) {
+    return FvpPlatform.instance.setUserAgent(ua);
+  }
 }

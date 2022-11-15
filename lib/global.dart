@@ -41,6 +41,7 @@ class Global {
     // 本地存储初始化
     await LoacalStorage.init();
 
+    await PlaylistUtil().getSnapshotDir();
     // 极光推送初始化
     // await PushManager.setup();
 

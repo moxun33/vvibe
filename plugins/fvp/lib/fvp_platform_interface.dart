@@ -62,4 +62,12 @@ abstract class FvpPlatform extends PlatformInterface {
   Future<int> getStatus() {
     throw UnimplementedError('getStatus() has not been implemented.');
   }
+
+  Future<String?> snapshot() {
+    throw UnimplementedError('snapshot() has not been implemented.');
+  }
+
+  Future<int> setUserAgent(String? ua) {
+    throw UnimplementedError('setUserAgent() has not been implemented.');
+  }
 }

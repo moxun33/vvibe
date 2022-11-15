@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
- * @LastEditors: moxun33
- * @LastEditTime: 2022-11-13 18:29:27
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-11-15 16:40:54
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -23,13 +23,23 @@ class PlaylistUtil {
   factory PlaylistUtil() => _instance;
 
   PlaylistUtil._();
-  //本地播放列表目录
-  Future<Directory> getPlayListDir() async {
-    final dir = Directory('playlist');
+  //创建目录（在应用根目录下）
+  Future<Directory> createDir(String dirName) async {
+    final dir = Directory(dirName);
     if (!await (dir.exists())) {
       await dir.create();
     }
     return dir;
+  }
+
+  //本地播放列表目录
+  Future<Directory> getPlayListDir() async {
+    return createDir('playlist');
+  }
+
+//本地视频截图
+  Future<Directory> getSnapshotDir() async {
+    return createDir('snapshots');
   }
 
   //获取本地播放列表文件列表

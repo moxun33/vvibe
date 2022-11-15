@@ -75,4 +75,19 @@ class MethodChannelFvp extends FvpPlatform {
   Future<int> getStatus() async {
     return (await methodChannel.invokeMethod('getStatus') as int);
   }
+
+  @override
+  Future<String?> snapshot() async {
+    try {
+      return methodChannel.invokeMethod('snapshot');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<int> setUserAgent(String? ua) async {
+    return (await methodChannel
+        .invokeMethod('setUserAgent', {'ua': ua ?? 'VVibe ZTE'}) as int);
+  }
 }

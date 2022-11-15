@@ -4,6 +4,7 @@
 #include <flutter/plugin_registrar_windows.h>
 #include <flutter/standard_method_codec.h>
 
+#include <chrono>
 #include <memory>
 #include <sstream>
 
@@ -138,10 +139,14 @@ namespace fvp
             player_.setRenderAPI(&ra);
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
             player_.setBackgroundColor(1, 1, 1, -1);
+            player_.setProperty("user-agent", "FVP ZTE");
+
+            player_.onEvent([](MediaEvent event)
+                            { return true; });
             player_.setRenderCallback([&](void *)
                                       {
-            player_.renderVideo();
-            texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+                                        player_.renderVideo();
+                                        texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
         }
         if (method_call.method_name() == "setMedia")
         {
@@ -285,6 +290,30 @@ namespace fvp
         {
             MediaStatus t = player_.mediaStatus();
             result->Success(flutter::EncodableValue(static_cast<int>(t)));
+        }
+        if (method_call.method_name() == "snapshot")
+        {
+
+            Player::SnapshotRequest req{};
+            //player_.snapshot(&req, nullptr);
+            player_.snapshot(&req, [](Player::SnapshotRequest *r, double t)
+                             {
+                                std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
+                                    std::chrono::system_clock::now().time_since_epoch()
+                                );
+                                 return "snapshots/" + std::to_string(ms.count()) + "-snapshot.jpg"; });
+            result->Success(flutter::EncodableValue("done"));
+        }
+        if (method_call.method_name() == "setUserAgent")
+        {
+            auto v_it = argsList->find(flutter::EncodableValue("ua"));
+            string v = "FVP";
+            if (v_it != argsList->end())
+            {
+                v = std::get<string>(v_it->second);
+            }
+            player_.setProperty("user-agent", v);
+            result->Success(flutter::EncodableValue(1));
         }
         else
         {

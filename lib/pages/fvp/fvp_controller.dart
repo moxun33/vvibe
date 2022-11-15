@@ -39,7 +39,7 @@ class FvpController extends GetxController {
   }
 
   void playOrPause() {
-    _fvpPlugin.playOrPause();
+    //  _fvpPlugin.playOrPause();
     getMediaInfo();
   }
 
@@ -48,6 +48,7 @@ class FvpController extends GetxController {
     print("media info $res");
     final state = await _fvpPlugin.getState();
     print("state $state");
+    _fvpPlugin.snapshot();
   }
 
   increment() => count.value++;
