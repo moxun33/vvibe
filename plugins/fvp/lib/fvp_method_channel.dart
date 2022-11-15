@@ -5,9 +5,16 @@ import 'fvp_platform_interface.dart';
 
 /// An implementation of [FvpPlatform] that uses method channels.
 class MethodChannelFvp extends FvpPlatform {
+  MethodChannelFvp._() {
+    methodChannel.setMethodCallHandler(methodCallHandler);
+  }
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('fvp');
+
+  @override
+  Future<void> methodCallHandler(MethodCall call) async {}
 
   @override
   Future<String?> getPlatformVersion() async {

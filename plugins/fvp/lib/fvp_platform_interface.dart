@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'fvp_method_channel.dart';
@@ -9,6 +10,10 @@ abstract class FvpPlatform extends PlatformInterface {
   static final Object _token = Object();
 
   static FvpPlatform _instance = MethodChannelFvp();
+
+  Future<void> methodCallHandler(MethodCall call) {
+    throw UnimplementedError('methodCallHandler() has not been implemented.');
+  }
 
   /// The default instance of [FvpPlatform] to use.
   ///
