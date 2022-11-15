@@ -35,11 +35,15 @@ namespace fvp
     using flutter::EncodableList;
     using flutter::EncodableMap;
     using flutter::EncodableValue;
+    std::unique_ptr<flutter::MethodChannel<EncodableValue>,
+                    std::default_delete<flutter::MethodChannel<EncodableValue>>>
+        channel = nullptr;
+
     // static
     void FvpPlugin::RegisterWithRegistrar(
         flutter::PluginRegistrarWindows *registrar)
     {
-        auto channel =
+        channel =
             std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
                 registrar->messenger(), "fvp",
                 &flutter::StandardMethodCodec::GetInstance());
@@ -140,18 +144,21 @@ namespace fvp
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
             player_.setBackgroundColor(1, 1, 1, -1);
             player_.setProperty("user-agent", "FVP ZTE");
-            player_.onEvent([](const MediaEvent& e){
+            player_.onEvent([](const MediaEvent &e)
+                            {
                                 std::cout << "event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
-                                return false;
-                            });
-            player_.onMediaStatusChanged([](MediaStatus s){
+                                return false; });
+            player_.onMediaStatusChanged([](MediaStatus s)
+                                         {
                                         //MediaStatus s = player.mediaStatus();
                                         printf("************Media status: %#x, loading: %d, buffering: %d, prepared: %d, EOF: %d**********\n", s, s&MediaStatus::Loading, s&MediaStatus::Buffering, s&MediaStatus::Prepared, s&MediaStatus::End);
-                                        return true;
-                                    });
-             player_.onStateChanged([&](State s){
+                                         
+                                        channel->InvokeMethod("onMediaStatusChanged", std::make_unique<flutter::EncodableValue>(EncodableValue(static_cast<int>(s))));
+                                        return true; });
+            player_.onStateChanged([&](State s)
+                                   {
                                     printf("state changed to %d, status: %d\n", s, player_.mediaStatus());
-                                });
+                                 channel->InvokeMethod("onStateChanged",std::make_unique<flutter::EncodableValue>(EncodableValue(static_cast<int>(s)))); });
             player_.setRenderCallback([&](void *)
                                       {
                                         player_.renderVideo();
@@ -256,74 +263,74 @@ namespace fvp
                 player_.set(State::Playing);
                 player_.waitFor(State::Playing);
             }
-            result->Success(flutter::EncodableValue(1));
+            result->Success(EncodableValue(1));
         }
         if (methodName == "setVolume")
         {
-            auto v_it = argsList->find(flutter::EncodableValue("volume"));
+            auto v_it = argsList->find(EncodableValue("volume"));
             float v = 1.0;
             if (v_it != argsList->end())
             {
                 v = (float)std::get<double>(v_it->second);
             }
             player_.setVolume(v);
-            result->Success(flutter::EncodableValue(1));
+            result->Success(EncodableValue(1));
         }
         if (methodName == "setMute")
         {
-            auto m_it = argsList->find(flutter::EncodableValue("mute"));
+            auto m_it = argsList->find(EncodableValue("mute"));
             bool m = true;
             if (m_it != argsList->end())
             {
                 m = std::get<bool>(m_it->second);
             }
             player_.setMute(m);
-            result->Success(flutter::EncodableValue(1));
+            result->Success(EncodableValue(1));
         }
         if (methodName == "setTimeout")
         {
-            auto t_it = argsList->find(flutter::EncodableValue("time"));
+            auto t_it = argsList->find(EncodableValue("time"));
             int t = 10000;
             if (t_it != argsList->end())
             {
                 t = std::get<int>(t_it->second);
             }
             player_.setTimeout(t);
-            result->Success(flutter::EncodableValue(1));
+            result->Success(EncodableValue(1));
         }
         if (methodName == "getState")
         {
             State t = player_.state();
-            result->Success(flutter::EncodableValue(static_cast<int>(t)));
+            result->Success(EncodableValue(static_cast<int>(t)));
         }
         if (methodName == "getStatus")
         {
             MediaStatus t = player_.mediaStatus();
-            result->Success(flutter::EncodableValue(static_cast<int>(t)));
+            result->Success(EncodableValue(static_cast<int>(t)));
         }
         if (methodName == "snapshot")
         {
 
             Player::SnapshotRequest req{};
-            //player_.snapshot(&req, nullptr);
+            // player_.snapshot(&req, nullptr);
             player_.snapshot(&req, [](Player::SnapshotRequest *r, double t)
                              {
                                 std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(
                                     std::chrono::system_clock::now().time_since_epoch()
                                 );
                                  return "snapshots/" + std::to_string(ms.count()) + "-snapshot.jpg"; });
-            result->Success(flutter::EncodableValue("done"));
+            result->Success(EncodableValue("done"));
         }
         if (methodName == "setUserAgent")
         {
-            auto v_it = argsList->find(flutter::EncodableValue("ua"));
+            auto v_it = argsList->find(EncodableValue("ua"));
             string v = "FVP";
             if (v_it != argsList->end())
             {
                 v = std::get<string>(v_it->second);
             }
             player_.setProperty("user-agent", v);
-            result->Success(flutter::EncodableValue(1));
+            result->Success(EncodableValue(1));
         }
         else
         {
