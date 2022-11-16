@@ -68,6 +68,11 @@ abstract class FvpPlatform extends PlatformInterface {
     throw UnimplementedError('snapshot() has not been implemented.');
   }
 
+//get volume
+  Future<double> volume() {
+    throw UnimplementedError('volume() has not been implemented.');
+  }
+
   Future<int> setUserAgent(String? ua) {
     throw UnimplementedError('setUserAgent() has not been implemented.');
   }

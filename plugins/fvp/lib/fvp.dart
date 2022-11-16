@@ -69,6 +69,10 @@ class Fvp {
     return FvpPlatform.instance.snapshot();
   }
 
+  Future<double> volume() {
+    return FvpPlatform.instance.volume();
+  }
+
   Future<int> setUserAgent(String? ua) {
     return FvpPlatform.instance.setUserAgent(ua);
   }

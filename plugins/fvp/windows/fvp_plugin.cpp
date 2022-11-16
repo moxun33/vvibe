@@ -337,6 +337,10 @@ namespace fvp
             }
             player_.setProperty("user-agent", v);
             result->Success(EncodableValue(1));
+        }if (methodName == "volume")
+        {
+            float t = player_.volume();
+            result->Success(EncodableValue((float)(t)));
         }
         else
         {

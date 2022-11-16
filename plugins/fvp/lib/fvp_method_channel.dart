@@ -92,6 +92,11 @@ class MethodChannelFvp extends FvpPlatform {
   }
 
   @override
+  Future<double> volume() {
+    return FvpPlatform.instance.volume();
+  }
+
+  @override
   Future<int> setUserAgent(String? ua) async {
     return (await methodChannel
         .invokeMethod('setUserAgent', {'ua': ua ?? 'VVibe ZTE'}) as int);
