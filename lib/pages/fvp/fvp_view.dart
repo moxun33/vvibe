@@ -38,9 +38,12 @@ class FvpPage extends GetView<FvpController> {
           Expanded(
               child: Container(
                   child: controller.textureId != null
-                      ? Texture(
-                          textureId: controller.textureId!,
-                          filterQuality: FilterQuality.high,
+                      ? AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Texture(
+                            textureId: controller.textureId!,
+                            filterQuality: FilterQuality.high,
+                          ),
                         )
                       : SizedBox(),
                   color: Colors.black,

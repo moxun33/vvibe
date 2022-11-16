@@ -6,7 +6,6 @@ class FvpController extends GetxController {
   final count = 0.obs;
   final _fvpPlugin = Fvp();
   int? textureId;
-  int? _textureId;
 
   @override
   void onInit() {
@@ -54,6 +53,18 @@ class FvpController extends GetxController {
     });
     _fvpPlugin.onEvent((Map<String, dynamic> data) {
       print("******接收到event改变 ${data}");
+      switch (data['category']) {
+        case 'reader.buffering':
+          final percent = data['error'].toInt();
+          if (percent < 100) {
+            EasyLoading.show(status: '缓冲 $percent%');
+          } else {
+            EasyLoading.dismiss();
+          }
+          break;
+        default:
+          break;
+      }
     });
     EasyLoading.dismiss();
   }

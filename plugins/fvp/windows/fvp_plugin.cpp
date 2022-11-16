@@ -145,7 +145,7 @@ namespace fvp
             player_.setBackgroundColor(0, 0, 0, -1);
             player_.setProperty("user-agent", "FVP ZTE");
             //SetGlobalOption("videoout.clear_on_stop", 1);
-            //  player_.setBufferRange(4000, INT64_MAX);
+            player_.setBufferRange(1000, 10000);
             player_.onEvent([](const MediaEvent &e)
                             {
                                 std::cout << "----**** media event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
