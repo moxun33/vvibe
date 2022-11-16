@@ -24,20 +24,28 @@ class FvpPage extends GetView<FvpController> {
               ),
               TextButton(
                   child: Text('播放'),
-                  onPressed: () => controller.setMedia(_urlController.text)),
+                  onPressed: () => controller.play(_urlController.text)),
               ElevatedButton(
                   child: Text('暂停/播放'),
-                  onPressed: () => controller.playOrPause())
+                  onPressed: () => controller.playOrPause()),
+              TextButton(
+                  child: Text('停止'),
+                  onPressed: () {
+                    controller.stop();
+                  }),
             ],
           ),
           Expanded(
-            child: controller.textureId == null
-                ? Text('初始化中')
-                : Texture(
-                    textureId: controller.textureId!,
-                    filterQuality: FilterQuality.high,
-                  ),
-          ),
+              child: Container(
+                  child: controller.textureId != null
+                      ? Texture(
+                          textureId: controller.textureId!,
+                          filterQuality: FilterQuality.high,
+                        )
+                      : SizedBox(),
+                  color: Colors.black,
+                  width: getDeviceWidth(context),
+                  height: getDeviceHeight(context))),
         ],
       )));
     }));

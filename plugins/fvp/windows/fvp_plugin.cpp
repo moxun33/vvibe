@@ -136,14 +136,16 @@ namespace fvp
             texture_id_ = texture_registrar_->RegisterTexture(fltex_.get());
             result->Success(flutter::EncodableValue(texture_id_));
 
-            player_.setLoop(-1);
+        //    player_.setLoop(-1);
             player_.setDecoders(MediaType::Video, {"MFT:d3d=11", "D3D11", "FFmpeg"});
             D3D11RenderAPI ra{};
             ra.rtv = tex_.Get();
             player_.setRenderAPI(&ra);
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
-            player_.setBackgroundColor(1, 1, 1, -1);
+            player_.setBackgroundColor(0, 0, 0, -1);
             player_.setProperty("user-agent", "FVP ZTE");
+            //SetGlobalOption("videoout.clear_on_stop", 1);
+            //  player_.setBufferRange(4000, INT64_MAX);
             player_.onEvent([](const MediaEvent &e)
                             {
                                 std::cout << "----**** media event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
@@ -163,12 +165,22 @@ namespace fvp
                                         return true; });
             player_.onStateChanged([&](State s)
                                    {
-                                    printf("state changed to %d ", s);
+                                   // printf("state changed to %d ", s);
                                  channel->InvokeMethod("onStateChanged",std::make_unique<flutter::EncodableValue>(EncodableValue(static_cast<int>(s)))); });
             player_.setRenderCallback([&](void *)
                                       {
                                         player_.renderVideo();
                                         texture_registrar_->MarkTextureFrameAvailable(texture_id_); });
+        }
+        if (methodName == "stop")
+        {
+            //停止播放
+            player_.setNextMedia(nullptr,-1);
+            player_.set(State::Stopped);
+            player_.waitFor(State::Stopped);
+            player_.setMedia(nullptr);
+        
+            result->Success(EncodableValue(1));
         }
         if (methodName == "setMedia")
         {
@@ -179,16 +191,21 @@ namespace fvp
             {
                 url = std::get<std::string>(url_it->second);
             }
-            int res = 1;
-            player_.setNextMedia(nullptr, -1);
+             
+            player_.setNextMedia(nullptr,-1);
             player_.set(State::Stopped);
             player_.waitFor(State::Stopped);
+
             player_.setMedia(nullptr);
             player_.setMedia(url.c_str());
             player_.set(State::Playing);
             player_.waitFor(State::Playing);
+
             // player_.setActiveTracks(MediaType::Video,std::set(0));
-            result->Success(EncodableValue(res));
+           // auto &c = player_.mediaInfo().video[0].codec;
+            // player_.setVideoSurfaceSize(c.width, c.height);
+           // player_.resizeSurface(c.width, c.height);
+            result->Success(EncodableValue(1));
         }
         if (methodName == "getMediaInfo")
         {
@@ -337,7 +354,8 @@ namespace fvp
             }
             player_.setProperty("user-agent", v);
             result->Success(EncodableValue(1));
-        }if (methodName == "volume")
+        }
+        if (methodName == "volume")
         {
             float t = player_.volume();
             result->Success(EncodableValue((float)(t)));

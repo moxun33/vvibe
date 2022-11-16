@@ -6,6 +6,7 @@ class FvpController extends GetxController {
   final count = 0.obs;
   final _fvpPlugin = Fvp();
   int? textureId;
+  int? _textureId;
 
   @override
   void onInit() {
@@ -22,14 +23,29 @@ class FvpController extends GetxController {
 
 // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initFvp() async {
+    await updateTexture();
+    play(
+        'https://cn-jlcc-cu-03-08.bilivideo.com/live-bvc/352605/live_415611_4082642/index.m3u8');
+  }
+
+  Future<int> updateTexture() async {
+    if (textureId != null) {
+      await stop();
+    }
     int ttId = await _fvpPlugin.createTexture();
 
     print('textureId: $ttId');
 
     textureId = ttId;
+
     update();
-    _fvpPlugin.setMedia(
-        'https://cn-jlcc-cu-03-08.bilivideo.com/live-bvc/352605/live_415611_4082642/index.m3u8');
+    return ttId;
+  }
+
+  void play(url) async {
+    EasyLoading.show(status: '正在加载');
+    updateTexture();
+    await _fvpPlugin.setMedia(url);
     _fvpPlugin.onStateChanged((String state) {
       print("-------------------接收到state改变 $state");
     });
@@ -39,11 +55,6 @@ class FvpController extends GetxController {
     _fvpPlugin.onEvent((Map<String, dynamic> data) {
       print("******接收到event改变 ${data}");
     });
-  }
-
-  void setMedia(String url) async {
-    EasyLoading.show(status: '正在加载');
-    await _fvpPlugin.setMedia(url);
     EasyLoading.dismiss();
   }
 
@@ -52,11 +63,16 @@ class FvpController extends GetxController {
     getMediaInfo();
   }
 
+  Future<int> stop() async {
+    textureId = null;
+    update();
+    return _fvpPlugin.stop();
+  }
+
   void getMediaInfo() async {
     final res = await _fvpPlugin.getMediaInfo();
-    print(res);
-
-    //  _fvpPlugin.snapshot();
+    print('当前视频的mediainfo $res');
+    _fvpPlugin.snapshot();
   }
 
   increment() => count.value++;

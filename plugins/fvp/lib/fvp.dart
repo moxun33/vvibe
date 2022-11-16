@@ -12,7 +12,7 @@ class Fvp {
   }
 
   Future<int> setMedia(String url) {
-    return FvpPlatform.instance.setMedia(url);
+    return FvpPlatform.instance.setMedia(url.trim());
   }
 
   Future<int> playOrPause() {
@@ -71,6 +71,10 @@ class Fvp {
 
   Future<double> volume() {
     return FvpPlatform.instance.volume();
+  }
+
+  Future<int> stop() {
+    return FvpPlatform.instance.stop();
   }
 
   Future<int> setUserAgent(String? ua) {

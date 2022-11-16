@@ -92,8 +92,13 @@ class MethodChannelFvp extends FvpPlatform {
   }
 
   @override
-  Future<double> volume() {
-    return FvpPlatform.instance.volume();
+  Future<double> volume() async {
+    return (await methodChannel.invokeMethod('volumme')) as double;
+  }
+
+  @override
+  Future<int> stop() async {
+    return (await methodChannel.invokeMethod('stop')) as int;
   }
 
   @override
