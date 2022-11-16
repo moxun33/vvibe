@@ -11,10 +11,6 @@ abstract class FvpPlatform extends PlatformInterface {
 
   static FvpPlatform _instance = MethodChannelFvp();
 
-  Future<void> methodCallHandler(MethodCall call) {
-    throw UnimplementedError('methodCallHandler() has not been implemented.');
-  }
-
   /// The default instance of [FvpPlatform] to use.
   ///
   /// Defaults to [MethodChannelFvp].
@@ -74,5 +70,14 @@ abstract class FvpPlatform extends PlatformInterface {
 
   Future<int> setUserAgent(String? ua) {
     throw UnimplementedError('setUserAgent() has not been implemented.');
+  }
+
+  void onStateChanged(void Function(String state)? cb) {
+    throw UnimplementedError('onStateChanged() has not been implemented.');
+  }
+
+  void onMediaStatusChanged(void Function(String status)? cb) {
+    throw UnimplementedError(
+        'onMediaStatusChanged() has not been implemented.');
   }
 }

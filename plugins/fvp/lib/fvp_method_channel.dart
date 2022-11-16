@@ -5,16 +5,15 @@ import 'fvp_platform_interface.dart';
 
 /// An implementation of [FvpPlatform] that uses method channels.
 class MethodChannelFvp extends FvpPlatform {
-  MethodChannelFvp._() {
-    methodChannel.setMethodCallHandler(methodCallHandler);
+  MethodChannelFvp() {
+    methodChannel.setMethodCallHandler(_methodCallHandler);
   }
+
+  static final MethodChannelFvp _instance = MethodChannelFvp();
 
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('fvp');
-
-  @override
-  Future<void> methodCallHandler(MethodCall call) async {}
 
   @override
   Future<String?> getPlatformVersion() async {
@@ -96,5 +95,41 @@ class MethodChannelFvp extends FvpPlatform {
   Future<int> setUserAgent(String? ua) async {
     return (await methodChannel
         .invokeMethod('setUserAgent', {'ua': ua ?? 'VVibe ZTE'}) as int);
+  }
+
+  Future<void> _methodCallHandler(MethodCall call) async {
+    final args = call.arguments;
+    if (kDebugMode) {
+      print("cb from native method ${call.method}");
+      print("cb from native args ${args.toString()}");
+    }
+
+    switch (call.method) {
+      case "onMediaStatusChanged":
+        mediaStatusChangeCb(args.toString());
+
+        break;
+      case "onStateChanged":
+        stateChangeCb(args.toString());
+
+        break;
+      default:
+    }
+  }
+
+  Function stateChangeCb = () {};
+  Function mediaStatusChangeCb = () {};
+  @override
+  void onStateChanged(void Function(String state)? cb) {
+    if (cb != null) {
+      stateChangeCb = cb;
+    }
+  }
+
+  @override
+  void onMediaStatusChanged(void Function(String status)? cb) {
+    if (cb != null) {
+      mediaStatusChangeCb = cb;
+    }
   }
 }

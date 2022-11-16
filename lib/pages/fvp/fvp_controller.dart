@@ -30,6 +30,12 @@ class FvpController extends GetxController {
     update();
     _fvpPlugin.setMedia(
         'https://cn-jlcc-cu-03-08.bilivideo.com/live-bvc/352605/live_415611_4082642/index.m3u8');
+    _fvpPlugin.onStateChanged((String state) {
+      print("-------------------接收到state改变 $state");
+    });
+    _fvpPlugin.onMediaStatusChanged((String status) {
+      print("-------============接收到media改变 $status");
+    });
   }
 
   void setMedia(String url) async {

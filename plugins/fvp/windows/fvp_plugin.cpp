@@ -151,13 +151,13 @@ namespace fvp
             player_.onMediaStatusChanged([](MediaStatus s)
                                          {
                                         //MediaStatus s = player.mediaStatus();
-                                        printf("************Media status: %#x, loading: %d, buffering: %d, prepared: %d, EOF: %d**********\n", s, s&MediaStatus::Loading, s&MediaStatus::Buffering, s&MediaStatus::Prepared, s&MediaStatus::End);
+                                        printf("************Media status: %d, loading: %d, buffering: %d, prepared: %d, EOF: %d**********\n", s, s&MediaStatus::Loading, s&MediaStatus::Buffering, s&MediaStatus::Prepared, s&MediaStatus::End);
                                          
                                         channel->InvokeMethod("onMediaStatusChanged", std::make_unique<flutter::EncodableValue>(EncodableValue(static_cast<int>(s))));
                                         return true; });
             player_.onStateChanged([&](State s)
                                    {
-                                    printf("state changed to %d, status: %d\n", s, player_.mediaStatus());
+                                    printf("state changed to %d ", s);
                                  channel->InvokeMethod("onStateChanged",std::make_unique<flutter::EncodableValue>(EncodableValue(static_cast<int>(s)))); });
             player_.setRenderCallback([&](void *)
                                       {

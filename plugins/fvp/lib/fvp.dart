@@ -72,4 +72,12 @@ class Fvp {
   Future<int> setUserAgent(String? ua) {
     return FvpPlatform.instance.setUserAgent(ua);
   }
+
+  void onStateChanged(void Function(String state)? cb) {
+    return FvpPlatform.instance.onStateChanged(cb);
+  }
+
+  void onMediaStatusChanged(void Function(String status)? cb) {
+    return FvpPlatform.instance.onMediaStatusChanged(cb);
+  }
 }
