@@ -99,10 +99,10 @@ class MethodChannelFvp extends FvpPlatform {
 
   Future<void> _methodCallHandler(MethodCall call) async {
     final args = call.arguments;
-    if (kDebugMode) {
+    /*   if (kDebugMode) {
       print("cb from native method ${call.method}");
       print("cb from native args ${args.toString()}");
-    }
+    } */
 
     switch (call.method) {
       case "onMediaStatusChanged":
@@ -113,12 +113,18 @@ class MethodChannelFvp extends FvpPlatform {
         stateChangeCb(args.toString());
 
         break;
+      case "onEvent":
+        eventCb(Map<String, dynamic>.from(args));
+
+        break;
       default:
+        break;
     }
   }
 
   Function stateChangeCb = () {};
   Function mediaStatusChangeCb = () {};
+  Function eventCb = () {};
   @override
   void onStateChanged(void Function(String state)? cb) {
     if (cb != null) {
@@ -130,6 +136,13 @@ class MethodChannelFvp extends FvpPlatform {
   void onMediaStatusChanged(void Function(String status)? cb) {
     if (cb != null) {
       mediaStatusChangeCb = cb;
+    }
+  }
+
+  @override
+  void onEvent(void Function(Map<String, dynamic> data)? cb) {
+    if (cb != null) {
+      eventCb = cb;
     }
   }
 }

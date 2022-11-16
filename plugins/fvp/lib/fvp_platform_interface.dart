@@ -80,4 +80,9 @@ abstract class FvpPlatform extends PlatformInterface {
     throw UnimplementedError(
         'onMediaStatusChanged() has not been implemented.');
   }
+
+  void onEvent(void Function(Map<String, dynamic> data)? cb) {
+    throw UnimplementedError(
+        'onMediaStatusChanged() has not been implemented.');
+  }
 }

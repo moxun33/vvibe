@@ -34,7 +34,10 @@ class FvpController extends GetxController {
       print("-------------------接收到state改变 $state");
     });
     _fvpPlugin.onMediaStatusChanged((String status) {
-      print("-------============接收到media改变 $status");
+      print("============接收到media改变 $status");
+    });
+    _fvpPlugin.onEvent((Map<String, dynamic> data) {
+      print("******接收到event改变 ${data}");
     });
   }
 
@@ -52,8 +55,7 @@ class FvpController extends GetxController {
   void getMediaInfo() async {
     final res = await _fvpPlugin.getMediaInfo();
     print(res);
-    final state = await _fvpPlugin.getState();
-    print("state $state");
+
     //  _fvpPlugin.snapshot();
   }
 

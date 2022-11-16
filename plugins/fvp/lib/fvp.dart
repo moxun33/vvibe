@@ -80,4 +80,8 @@ class Fvp {
   void onMediaStatusChanged(void Function(String status)? cb) {
     return FvpPlatform.instance.onMediaStatusChanged(cb);
   }
+
+  void onEvent(void Function(Map<String, dynamic> data)? cb) {
+    return FvpPlatform.instance.onEvent(cb);
+  }
 }

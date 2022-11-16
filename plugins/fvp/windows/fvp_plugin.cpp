@@ -146,7 +146,13 @@ namespace fvp
             player_.setProperty("user-agent", "FVP ZTE");
             player_.onEvent([](const MediaEvent &e)
                             {
-                                std::cout << "event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
+                                std::cout << "----**** media event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
+                                EncodableMap data = EncodableMap();
+                                data[EncodableValue("category")] = EncodableValue(e.category);
+                                data[EncodableValue("error")] = EncodableValue((int)e.error);
+                                data[EncodableValue("detail")] = EncodableValue(e.detail);
+                                /* data[EncodableValue("decoder")] = EncodableValue(EncodableMap{EncodableValue("stream"),EncodableValue(e.decoder.stream)}); */
+                                channel->InvokeMethod("onEvent", std::make_unique<flutter::EncodableValue>(data));
                                 return false; });
             player_.onMediaStatusChanged([](MediaStatus s)
                                          {
