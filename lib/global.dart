@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:dart_vlc/dart_vlc.dart';
+//import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -35,7 +35,7 @@ class Global {
       setWindowMaxSize(const Size(3840, 2160));
       setWindowMinSize(const Size(1280, 720));
     }
-    await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
+    // await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化

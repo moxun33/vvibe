@@ -36,13 +36,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.9.0"
-  audio_video_progress_bar:
-    dependency: transitive
-    description:
-      name: audio_video_progress_bar
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.10.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -162,22 +155,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.2.3"
-  dart_vlc:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "7ecd7235763b88faf0334e85b0bf0161f1ceee5d"
-      url: "https://github.com/alexmercerind/dart_vlc.git"
-    source: git
-    version: "0.3.0"
-  dart_vlc_ffi:
-    dependency: transitive
-    description:
-      name: dart_vlc_ffi
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.1.8"
   dio:
     dependency: "direct main"
     description:
@@ -274,13 +251,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.10.0"
-  flutter_native_view:
-    dependency: transitive
-    description:
-      name: flutter_native_view
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.2"
   flutter_rust_bridge:
     dependency: "direct main"
     description:
@@ -585,13 +555,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.27.5"
-  screen_retriever:
-    dependency: transitive
-    description:
-      name: screen_retriever
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.1.2"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -856,13 +819,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.6.1"
-  window_manager:
-    dependency: transitive
-    description:
-      name: window_manager
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.2.7"
   window_size:
     dependency: "direct main"
     description:

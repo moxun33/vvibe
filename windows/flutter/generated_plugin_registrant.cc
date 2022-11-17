@@ -6,30 +6,18 @@
 
 #include "generated_plugin_registrant.h"
 
-#include <dart_vlc/dart_vlc_plugin.h>
-#include <flutter_native_view/flutter_native_view_plugin.h>
 #include <fvp/fvp_plugin_c_api.h>
 #include <native_context_menu/native_context_menu_plugin.h>
-#include <screen_retriever/screen_retriever_plugin.h>
 #include <url_launcher_windows/url_launcher_windows.h>
-#include <window_manager/window_manager_plugin.h>
 #include <window_size/window_size_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
-  DartVlcPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("DartVlcPlugin"));
-  FlutterNativeViewPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FlutterNativeViewPlugin"));
   FvpPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FvpPluginCApi"));
   NativeContextMenuPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("NativeContextMenuPlugin"));
-  ScreenRetrieverPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("ScreenRetrieverPlugin"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
-  WindowManagerPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("WindowManagerPlugin"));
   WindowSizePluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("WindowSizePlugin"));
 }

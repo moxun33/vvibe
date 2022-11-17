@@ -58,10 +58,10 @@ dependencies:
   fvp:
     path: ./plugins/fvp
 
-  dart_vlc:
-    git:
-      url: https://github.com/alexmercerind/dart_vlc.git
-      ref: master
+ # dart_vlc:
+ #   git:
+ #     url: https://github.com/alexmercerind/dart_vlc.git
+ #     ref: master
 
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5

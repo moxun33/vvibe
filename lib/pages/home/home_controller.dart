@@ -7,13 +7,13 @@
  * @Description: 
  * @qmj
  */
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
-import 'package:dart_vlc/dart_vlc.dart';
+//import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
@@ -21,8 +21,6 @@ import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/services.dart';
-
-import 'home_model.dart';
 
 class HomeController extends GetxController {
   Fvp player = Fvp();
