@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-11-17 10:11:32
+ * @LastEditTime: 2022-11-17 11:10:07
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -152,8 +152,7 @@ class HomeController extends GetxController {
   }
 
   void startPlay(PlayListItem item, {bool? first}) async {
-    EasyLoading.show(status: '正在加载');
-    updateTexture();
+    await updateTexture();
     stopDanmakuSocket();
     if (!(item.url != null && item.url!.isNotEmpty)) {
       EasyLoading.showError('播放地址错误');
@@ -161,6 +160,7 @@ class HomeController extends GetxController {
 
       return;
     }
+    EasyLoading.show(status: '正在加载');
     await player.setMedia(item.url!);
 
     playingUrl = item;
@@ -174,13 +174,18 @@ class HomeController extends GetxController {
     });
     player.onEvent((Map<String, dynamic> data) {
       print("******接收到event改变 ${data}");
+      final value = data['error'].toInt();
       switch (data['category']) {
         case 'reader.buffering':
-          final percent = data['error'].toInt();
-          if (percent < 100) {
-            EasyLoading.show(status: '缓冲 $percent%');
+          if (value < 100) {
+            EasyLoading.show(status: '缓冲 $value%');
           } else {
             EasyLoading.dismiss();
+          }
+          break;
+        case 'render.video':
+          if (value > 0) {
+            startDanmakuSocket(item);
           }
           break;
         default:

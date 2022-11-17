@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-11-17 10:44:52
+ * @LastEditTime: 2022-11-17 10:59:10
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -52,18 +52,19 @@ class HomePage extends GetView<HomeController> {
                         bullets: [],
                         child: controller.textureId != null
                             ? Container(
-                                color: Colors.black,
+                                color: Colors.black87,
                                 child: FvpVideoFrame(
                                   toggleDanmaku:
                                       controller.toggleDanmakuVisible,
                                   playingUrl: controller.playingUrl,
-                                  videoWidget: AspectRatio(
+                                  videoWidget: Center(
+                                      child: AspectRatio(
                                     aspectRatio: 16 / 9,
                                     child: Texture(
                                       textureId: controller.textureId!,
                                       filterQuality: FilterQuality.high,
                                     ),
-                                  ),
+                                  )),
                                   fvp: controller.player,
                                   togglePlayList: controller.togglePlayList,
                                   stopPlayer: controller.stopPlayer,
@@ -80,7 +81,7 @@ class HomePage extends GetView<HomeController> {
                                       crossAxisAlignment:
                                           WrapCrossAlignment.center,
                                       spacing: 50,
-                                      children: [
+                                      /*          children: [
                                         SizedBox(
                                             width: 200,
                                             child:
@@ -89,7 +90,7 @@ class HomePage extends GetView<HomeController> {
                                             style: TextStyle(
                                                 color: Colors.purple[300],
                                                 fontSize: 40))
-                                      ],
+                                      ], */
                                     ),
                                   ),
                                 ),
