@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-11-17 11:10:07
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-11-17 21:45:41
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -186,6 +186,7 @@ class HomeController extends GetxController {
         case 'render.video':
           if (value > 0) {
             startDanmakuSocket(item);
+            updateWindowTitle(item);
           }
           break;
         default:
@@ -213,7 +214,16 @@ class HomeController extends GetxController {
     startPlay(item);
   }
 
-  void updateWindowTitle() {}
+  void updateWindowTitle(PlayListItem item) async {
+    final info = await player.getMediaInfo();
+    if (info == null) return;
+
+    final ratio = info['video']['codec']['width'].toString() +
+        'x' +
+        info['video']['codec']['height'].toString();
+    final title = '${item.name} [${ratio}]';
+    setWindowTitle(title);
+  }
 
   //获取当前弹幕区域尺寸
   Size getDanmakuSize() => Size(
