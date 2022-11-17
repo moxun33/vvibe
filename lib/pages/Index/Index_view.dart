@@ -17,7 +17,7 @@ class IndexPage extends GetView<IndexController> {
               ? SplashPage()
               : Global.isOfflineLogin
                   ? HomePage()
-                  : FvpPage(),
+                  : LoginPage() /* FvpPage() */,
         ));
   }
 }

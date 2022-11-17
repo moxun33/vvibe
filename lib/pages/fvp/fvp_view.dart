@@ -38,17 +38,17 @@ class FvpPage extends GetView<FvpController> {
           Expanded(
               child: Container(
                   child: controller.textureId != null
-                      ? AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Texture(
-                            textureId: controller.textureId!,
-                            filterQuality: FilterQuality.high,
+                      ? Center(
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Texture(
+                              textureId: controller.textureId!,
+                              filterQuality: FilterQuality.high,
+                            ),
                           ),
                         )
                       : SizedBox(),
-                  color: Colors.black,
-                  width: getDeviceWidth(context),
-                  height: getDeviceHeight(context))),
+                  color: Colors.black)),
         ],
       )));
     }));

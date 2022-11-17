@@ -1,6 +1,7 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:fvp/fvp.dart';
+import 'package:vvibe/pages/home/home_model.dart';
 
 class FvpController extends GetxController {
   final count = 0.obs;
@@ -83,7 +84,7 @@ class FvpController extends GetxController {
   void getMediaInfo() async {
     final res = await _fvpPlugin.getMediaInfo();
     print('当前视频的mediainfo $res');
-    _fvpPlugin.snapshot();
+    // _fvpPlugin.snapshot();
   }
 
   increment() => count.value++;

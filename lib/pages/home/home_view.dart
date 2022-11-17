@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 18:07:25
+ * @LastEditTime: 2022-11-17 10:13:53
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -10,15 +10,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/player/fvp_videoframe.dart';
 import 'package:vvibe/global.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:vvibe/components/player/videoframe.dart';
+import 'package:vvibe/components/player/vlc_videoframe.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
 
-import '../../components/player/player_context_menu.dart';
+import 'package:vvibe/components/player/player_context_menu.dart';
 
 class HomePage extends GetView<HomeController> {
   HomePage({Key? key}) : super(key: key);
@@ -50,22 +51,24 @@ class HomePage extends GetView<HomeController> {
                         massiveMode: true,
                         speedCorrectionInMilliseconds: 10000,
                         bullets: [],
-                        child: controller.player != null
-                            ? LiveVideoFrame(
-                                toggleDanmaku: controller.toggleDanmakuVisible,
-                                playingUrl: controller.playingUrl,
-                                videoWidget: Global.useNativeView
-                                    ? NativeVideo(
-                                        player: controller.player!,
-                                        showControls: false,
-                                      )
-                                    : Video(
-                                        player: controller.player,
-                                        showControls: false),
-                                player: controller.player,
-                                togglePlayList: controller.togglePlayList,
-                                stopPlayer: controller.stopPlayer,
-                              )
+                        child: controller.textureId != null
+                            ? Container(
+                                color: Colors.black,
+                                child: FvpVideoFrame(
+                                  toggleDanmaku:
+                                      controller.toggleDanmakuVisible,
+                                  playingUrl: controller.playingUrl,
+                                  videoWidget: AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: Texture(
+                                      textureId: controller.textureId!,
+                                      filterQuality: FilterQuality.high,
+                                    ),
+                                  ),
+                                  fvp: controller.player,
+                                  togglePlayList: controller.togglePlayList,
+                                  stopPlayer: controller.stopPlayer,
+                                ))
                             : GestureDetector(
                                 onTap: () {
                                   controller.togglePlayList();

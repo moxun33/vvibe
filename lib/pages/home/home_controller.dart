@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-11-13 18:23:11
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-11-17 10:11:32
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/common/values/values.dart';
@@ -21,8 +22,12 @@ import 'package:vvibe/utils/local_storage.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/services.dart';
 
+import 'home_model.dart';
+
 class HomeController extends GetxController {
-  Player? player;
+  Fvp player = Fvp();
+
+  int? textureId; //fvp播放时的渲染id
   bool playListShowed = false;
   int playerId = 0;
 
@@ -129,23 +134,28 @@ class HomeController extends GetxController {
     hyDanmakuService?.displose();
   }
 
-  void initPlayer() {
-    playerId = playerId + 1;
-    player = Player(
-        id: playerId,
-        commandlineArguments: [
-          '--http-reconnect',
-          '--sout-livehttp-caching',
-        ],
-        registerTexture: !Global.useNativeView);
+  void initPlayer() async {
+    await updateTexture();
     update();
   }
 
-  void startPlay(PlayListItem item, {bool? first}) {
-    if (player == null) {
-      initPlayer();
+  Future<int> updateTexture() async {
+    if (textureId != null) {
+      await stopPlayer();
     }
-    player?.pause();
+    int ttId = await player.createTexture();
+
+    print('textureId: $ttId');
+
+    textureId = ttId;
+
+    update();
+    return ttId;
+  }
+
+  void startPlay(PlayListItem item, {bool? first}) async {
+    EasyLoading.show(status: '正在加载');
+    updateTexture();
     stopDanmakuSocket();
     if (!(item.url != null && item.url!.isNotEmpty)) {
       EasyLoading.showError('播放地址错误');
@@ -153,96 +163,51 @@ class HomeController extends GetxController {
 
       return;
     }
-    EasyLoading.show(status: '正在打开');
+    await player.setMedia(item.url!);
 
     playingUrl = item;
     update();
     LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
-
-    MediaSource media = Media.network(
-      item.url,
-      parse: true,
-      timeout: Duration(seconds: 10),
-    );
-    player?.open(media, autoStart: true);
-    player?.setUserAgent('Windows ZTE');
-    onCurrentStream();
-    onPlaybackStream();
-    onPlayError();
-    onVideoDemensionStream();
-    onProgressStream();
-    player?.playOrPause();
+    player.onStateChanged((String state) {
+      print("-------------------接收到state改变 $state");
+    });
+    player.onMediaStatusChanged((String status) {
+      print("============接收到media改变 $status");
+    });
+    player.onEvent((Map<String, dynamic> data) {
+      print("******接收到event改变 ${data}");
+      switch (data['category']) {
+        case 'reader.buffering':
+          final percent = data['error'].toInt();
+          if (percent < 100) {
+            EasyLoading.show(status: '缓冲 $percent%');
+          } else {
+            EasyLoading.dismiss();
+          }
+          break;
+        default:
+          break;
+      }
+    });
+    EasyLoading.dismiss();
   }
 
   //停止播放、销毁实例
-  void stopPlayer({bool dispose = false}) {
+  Future<int> stopPlayer({bool dispose = false}) async {
     EasyLoading.dismiss();
-    player?.dispose();
-    player = null;
+    textureId = null;
     playingUrl = null;
     stopDanmakuSocket();
     barrageWallController.disable();
     update();
     setWindowTitle('vvibe');
+    return player.stop();
   }
 
   //播放url改变
   void onPlayUrlChange(PlayListItem item) {
     if (item.url == null) return;
     startPlay(item);
-  }
-
-  void onCurrentStream() {
-    player?.currentStream.listen((CurrentState state) {
-      debugPrint(' current stream ${jsonEncode(playingUrl)}');
-    });
-  }
-
-  void onPlaybackStream() {
-    player?.playbackStream.listen((PlaybackState state) {
-      debugPrint(' playback stream ${state.isPlaying}');
-    });
-  }
-
-  void onProgressStream() {
-    player?.bufferingProgressStream.listen((double e) {
-      final percent = e.toInt();
-
-      if (percent >= 100) {
-        EasyLoading.dismiss();
-        if (playingUrl != null) {
-          startDanmakuSocket(playingUrl!);
-        }
-      } else {
-        print('缓冲进度 $percent% ');
-        EasyLoading.dismiss();
-        EasyLoading.show(status: "缓冲 ${percent}%");
-      }
-    });
-  }
-
-  void onPlayError() {
-    player?.errorStream.listen((e) {
-      EasyLoading.dismiss();
-      EasyLoading.showError('播放失败了', duration: Duration(seconds: 10));
-
-      debugPrint('播放异常： $e ');
-      debugPrint('播放器错误： ${player?.error} ');
-    });
-  }
-
-  void onVideoDemensionStream() {
-    final name = player?.current.media?.metas['title'] ??
-        playingUrl?.name ??
-        playingUrl?.url ??
-        'vvibe';
-    player?.videoDimensionsStream.listen((videoDimensions) {
-      final ratio = videoDimensions.width.toString() +
-          'x' +
-          videoDimensions.height.toString();
-      final title = '${name} [${ratio}]';
-      setWindowTitle(title);
-    });
   }
 
   void updateWindowTitle() {}

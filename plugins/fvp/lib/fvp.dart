@@ -1,6 +1,9 @@
 import 'dart:ffi';
 
+import 'package:fvp/fvp_utils.dart';
+
 import 'fvp_platform_interface.dart';
+export 'fvp_utils.dart';
 
 class Fvp {
   Future<String?> getPlatformVersion() {
@@ -24,7 +27,7 @@ class Fvp {
     return FvpPlatform.instance.getMediaInfo();
   }
 
-  Future<int> setValume(double v) {
+  Future<int> setVolume(double v) {
     return FvpPlatform.instance.setVolume(v);
   }
 
@@ -43,7 +46,7 @@ class Fvp {
     Playing = Running, /// start/resume to play
     Paused,
 }; */
-  Future<int> getState() {
+  Future<int> getState() async {
     return FvpPlatform.instance.getState();
   }
 

@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:dart_vlc/dart_vlc.dart';
+import 'package:fvp/fvp.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/ffi_util.dart';
 
-class LiveVideoFrame extends StatefulWidget {
-  LiveVideoFrame(
+class FvpVideoFrame extends StatefulWidget {
+  FvpVideoFrame(
       {Key? key,
       required this.videoWidget,
-      required this.player,
+      required this.fvp,
       //required this.isFullscreen,
       required this.togglePlayList,
       required this.toggleDanmaku,
@@ -17,7 +16,7 @@ class LiveVideoFrame extends StatefulWidget {
       : super(key: key);
 
   final Widget videoWidget;
-  final Player? player;
+  final Fvp fvp;
   //final bool isFullscreen;
   final Function togglePlayList;
   final Function toggleDanmaku;
@@ -25,34 +24,48 @@ class LiveVideoFrame extends StatefulWidget {
   PlayListItem? playingUrl;
 
   @override
-  State<LiveVideoFrame> createState() => _LiveVideoFrameState();
+  State<FvpVideoFrame> createState() => _FvpVideoFrameState();
 }
 
-class _LiveVideoFrameState extends State<LiveVideoFrame>
+class _FvpVideoFrameState extends State<FvpVideoFrame>
     with SingleTickerProviderStateMixin {
-  Player? get player => widget.player;
-
   bool _hideControls = true;
   bool showDanmaku = true;
   bool _displayTapped = false;
   Timer? _hideTimer;
+  bool isPlaying = false;
+  Fvp get _fvp => widget.fvp;
+  int? textureId;
 
-  late StreamSubscription<PlaybackState>? playPauseStream;
+  //late StreamSubscription<FvpPlayState>? playPauseStream;
   late AnimationController playPauseController;
 
   @override
   void initState() {
     super.initState();
+    init();
+  }
+
+  void init() async {
     playPauseController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
-    playPauseStream = player?.playbackStream
-        .listen((event) => setPlaybackMode(event.isPlaying));
-    if (player?.playback.isPlaying == true) playPauseController.forward();
+    /*  playPauseStream = player?.playbackStream
+        .listen((event) => setPlaybackMode(event.isPlaying)); */
+    int state = await _fvp.getState();
+    if (FvpPlayState.playing == state) playPauseController.forward();
+  }
+
+  Future<int> stop() async {
+    setState(() {
+      textureId = null;
+    });
+    widget.stopPlayer();
+    return _fvp.stop();
   }
 
   @override
   void dispose() {
-    playPauseStream?.cancel();
+    // playPauseStream?.cancel();
     playPauseController.dispose();
     super.dispose();
   }
@@ -66,24 +79,22 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
     setState(() {});
   }
 
-  void playOrPuase() {
-    if (player?.playback.isPlaying == true) {
-      player?.pause();
+  void playOrPuase() async {
+    int state = await _fvp.getState();
+    if (FvpPlayState.playing == state) {
       playPauseController.reverse();
     } else {
-      player?.play();
-
       playPauseController.forward();
     }
+    setState(() {
+      isPlaying = FvpPlayState.playing == state;
+    });
+    _fvp.playOrPause();
   }
 
   void _getMetaInfo() async {
-    if (widget.playingUrl != null &&
-        widget.playingUrl!.url != null &&
-        player?.playback.isPlaying == true) {
-      final info = await FfiUtil().getMediaInfo(widget.playingUrl!.url!);
-      print(info);
-    }
+    final info = await _fvp.getMediaInfo();
+    print(info);
   }
 
   void _toggleDanmakuShow() {
@@ -97,7 +108,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          if (player?.playback.isPlaying == true) {
+          if (isPlaying == true) {
             if (_displayTapped) {
               setState(() => _hideControls = true);
             } else {
@@ -148,9 +159,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                   color: Colors.white,
                                   splashRadius: 12,
                                   iconSize: 28,
-                                  tooltip: player?.playback.isPlaying == true
-                                      ? '暂停'
-                                      : '播放',
+                                  tooltip: isPlaying == true ? '暂停' : '播放',
                                   icon: AnimatedIcon(
                                       icon: AnimatedIcons.play_pause,
                                       progress: playPauseController),
@@ -175,11 +184,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                                 color: Colors.white,
                                 icon: Icon(Icons.stop_sharp),
                                 onPressed: () {
-                                  if (player?.playback.isPlaying == true) {
-                                    player?.pause();
-                                    playPauseController.reverse();
-                                  }
-                                  widget.stopPlayer();
+                                  stop();
                                 },
                               ),
                               SizedBox(
@@ -216,7 +221,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
                         right: 80,
                         bottom: 10,
                         child: VolumeControl(
-                          player: player,
+                          player: _fvp,
                           thumbColor: Colors.white70,
                         ),
                       ),
@@ -264,7 +269,7 @@ class _LiveVideoFrameState extends State<LiveVideoFrame>
 }
 
 class VolumeControl extends StatefulWidget {
-  final Player? player;
+  final Fvp? player;
   final Color? thumbColor;
 
   const VolumeControl({
@@ -282,7 +287,7 @@ class _VolumeControlState extends State<VolumeControl> {
   bool _showVolume = false;
   double unmutedVolume = 0.5;
 
-  Player? get player => widget.player;
+  Fvp? get player => widget.player;
 
   @override
   Widget build(BuildContext context) {
@@ -314,13 +319,11 @@ class _VolumeControlState extends State<VolumeControl> {
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
-                        label: (player?.general.volume ?? 1 * 100)
-                            .toInt()
-                            .toString(),
+                        label: (1 * 100).toInt().toString(),
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
-                        value: player?.general.volume ?? 1.0,
+                        value: 1.0,
                         onChanged: (volume) {
                           player?.setVolume(volume);
                           setState(() {});
@@ -351,9 +354,9 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   IconData getIcon() {
-    if ((player?.general.volume ?? 0) > .5) {
+    if ((volume ?? 0) > .5) {
       return Icons.volume_up_sharp;
-    } else if ((player?.general.volume ?? 0) > 0) {
+    } else if ((volume ?? 0) > 0) {
       return Icons.volume_down_sharp;
     } else {
       return Icons.volume_off_sharp;
@@ -361,8 +364,8 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   void muteUnmute() {
-    if ((player?.general.volume ?? 0) > 0) {
-      unmutedVolume = player?.general.volume ?? 1.0;
+    if ((volume ?? 0) > 0) {
+      unmutedVolume = volume ?? 1.0;
       player?.setVolume(0);
     } else {
       player?.setVolume(unmutedVolume);
