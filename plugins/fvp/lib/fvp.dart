@@ -1,4 +1,4 @@
-import 'dart:ffi';
+//import 'dart:ffi';
 
 import 'package:fvp/fvp_utils.dart';
 
@@ -6,6 +6,9 @@ import 'fvp_platform_interface.dart';
 export 'fvp_utils.dart';
 
 class Fvp {
+  static const dynamic state = FvpPlayState;
+  static const dynamic status = FvpMediaStatus;
+
   Future<String?> getPlatformVersion() {
     return FvpPlatform.instance.getPlatformVersion();
   }

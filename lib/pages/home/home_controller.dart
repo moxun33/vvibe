@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-17 21:45:41
+ * @LastEditTime: 2022-11-18 16:18:33
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -35,6 +35,7 @@ class HomeController extends GetxController {
   BilibiliDanmakuService? blDanmakuService;
   HuyaDanmakuService? hyDanmakuService;
   bool danmakuManualShow = true;
+  String tip = ''; //左上角的文字提示
   @override
   void onInit() {
     super.onInit();
@@ -160,7 +161,9 @@ class HomeController extends GetxController {
 
       return;
     }
-    EasyLoading.show(status: '正在加载');
+    tip = '正在打开';
+    update();
+
     await player.setMedia(item.url!);
 
     playingUrl = item;
@@ -170,18 +173,19 @@ class HomeController extends GetxController {
       print("-------------------接收到state改变 $state");
     });
     player.onMediaStatusChanged((String status) {
-      print("============接收到media改变 $status");
+      print("============接收到media status改变 $status");
+      if (status == '-2147483648') {
+        tip = '播放失败';
+        update();
+      }
     });
     player.onEvent((Map<String, dynamic> data) {
       print("******接收到event改变 ${data}");
       final value = data['error'].toInt();
       switch (data['category']) {
         case 'reader.buffering':
-          if (value < 100) {
-            EasyLoading.show(status: '缓冲 $value%');
-          } else {
-            EasyLoading.dismiss();
-          }
+          tip = value < 100 ? '缓冲 $value%' : '';
+          update();
           break;
         case 'render.video':
           if (value > 0) {
@@ -193,7 +197,6 @@ class HomeController extends GetxController {
           break;
       }
     });
-    EasyLoading.dismiss();
   }
 
   //停止播放、销毁实例

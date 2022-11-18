@@ -292,8 +292,10 @@ class _PlUrlTileState extends State<PlUrlTile>
       });
       return;
     }
-    debugPrint('$urlStatus 检测url ${widget.index} ${url.name}');
+
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
+    debugPrint(
+        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应状态$status');
     if (mounted) {
       setState(() {
         loading = false;

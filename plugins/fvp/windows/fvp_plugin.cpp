@@ -143,9 +143,9 @@ namespace fvp
             player_.setRenderAPI(&ra);
             player_.setVideoSurfaceSize(desc.Width, desc.Height);
             player_.setBackgroundColor(0, 0, 0, -1);
-            player_.setProperty("user-agent", "FVP ZTE");
+            player_.setProperty("user-agent", "Windows FVP ZTE");
             //SetGlobalOption("videoout.clear_on_stop", 1);
-            player_.setBufferRange(1000, 10000);
+            player_.setBufferRange(1000, 20000);
             player_.onEvent([](const MediaEvent &e)
                             {
                                 std::cout << "----**** media event: " << e.category << ", error: " <<e.error << ", detail: " <<e.detail << std::endl;
@@ -347,7 +347,7 @@ namespace fvp
         if (methodName == "setUserAgent")
         {
             auto v_it = argsList->find(EncodableValue("ua"));
-            string v = "FVP";
+            string v = "Windows FVP ZTE";
             if (v_it != argsList->end())
             {
                 v = std::get<string>(v_it->second);
