@@ -56,12 +56,10 @@ dependencies:
 
   html: ^0.15.0
   fvp:
-    path: ./plugins/fvp
-
- # dart_vlc:
- #   git:
- #     url: https://github.com/alexmercerind/dart_vlc.git
- #     ref: master
+    git:
+      url: https://github.com/moxun33/fvp.git
+      ref: master
+  # path: ../fvp
 
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5
@@ -88,8 +86,6 @@ dev_dependencies:
   ffigen: ^6.0.1
   freezed: ^2.1.0+1
 
-dependency_overrides:
-  ffi: ^2.0.0
 
 flutter_icons:
   android: "launcher_icon"

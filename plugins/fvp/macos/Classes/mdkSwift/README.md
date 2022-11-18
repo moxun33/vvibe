@@ -1,2 +1,0 @@
-# swiftMDK
-libmdk swift binding

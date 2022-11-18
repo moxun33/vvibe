@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-18 19:05:21
+ * @LastEditTime: 2022-11-18 20:02:51
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -117,7 +117,7 @@ class HomePage extends GetView<HomeController> {
               color: Colors.transparent,
               child: Text(
                 controller.tip,
-                style: TextStyle(color: Colors.amber),
+                style: const TextStyle(color: Colors.amber),
               ),
             )
           ],
