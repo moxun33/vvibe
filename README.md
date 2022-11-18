@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-18 19:27:23
+ * @LastEditTime: 2022-11-18 19:40:38
  * @FilePath: \vvibe\README.md
  * @Description: 
  * @qmj
@@ -45,7 +45,9 @@
 
 - 启动项目
   
-> 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/)
+>  项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/)
+
+> 若`mdk-sdk`自动下载失败，手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)解压至`plugin/fvp/windows`目录
 
 ## 截图
 
