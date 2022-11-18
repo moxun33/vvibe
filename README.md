@@ -1,8 +1,8 @@
 <!--
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 16:47:36
+ * @LastEditors: moxun33
+ * @LastEditTime: 2022-11-18 19:27:23
  * @FilePath: \vvibe\README.md
  * @Description: 
  * @qmj
@@ -21,6 +21,7 @@
 [![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
 
 > 自用的视频直播观看软件
+
 
 ## 功能
 
@@ -61,11 +62,10 @@
 - build
 ``flutter build apk --no-sound-null-safety``
 
-2、由于``dart_vlc``的``ffi``版本与``flutter-rust_bridge``的``ffi``版本冲突，目前强制使用``ffi 2.x``版本
 
-3、本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
+2、本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
 
-4、直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
+3、直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 
 ## 声明
 
@@ -73,7 +73,14 @@
 - 相关资源的版权归原公司所有。
 - 测试数据来源于互联网公开内容，没有收集任何私有和有权限的信息（个人信息等），由此引发的任何法律纠纷与本人无关。
 
-## 致谢
+## 鸣谢
 
-- [dart_vlc](https://github.com/alexmercerind/dart_vlc)
+- [mdk-sdk](https://github.com/wang-bin/mdk-sdk)
+- [fvp](https://github.com/wang-bin/fvp)
 - [ice_live_viewer](https://github.com/iiijam/ice_live_viewer)
+
+## 备注
+
+- 使用[mdk-sdk](https://github.com/wang-bin/mdk-sdk)开发flutter插件进行视频播放，相对于``dart-vlc``性能大幅提升，产物大小大幅降低
+  
+- 视频播放器`fvp`插件的`API`持续开发中
