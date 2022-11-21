@@ -24,6 +24,8 @@ class HuyaDanmakuService {
   int totleTime = 0;
 
   void connect() async {
+    debugPrint("虎牙登录弹幕");
+
     _channel = IOWebSocketChannel.connect("wss://cdnws.api.huya.com");
 
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {

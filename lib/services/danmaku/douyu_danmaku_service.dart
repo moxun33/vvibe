@@ -53,7 +53,7 @@ class DouyuDnamakuService {
   }
 
   void login() {
-    debugPrint("斗鱼login");
+    debugPrint("斗鱼 登录弹幕");
     String roomID = roomId.toString();
     String login =
         "type@=loginreq/room_id@=$roomID/dfl@=sn@A=105@Sss@A=1/username@=61609154/uid@=61609154/ver@=20190610/aver@=218101901/ct@=0/";

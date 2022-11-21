@@ -26,6 +26,7 @@ class BilibiliDanmakuService {
 
   //开始连接
   void connect() {
+    debugPrint('b站登录弹幕');
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       //sendXinTiaoBao();
@@ -133,7 +134,7 @@ class BilibiliDanmakuService {
         break;
       case 3:
         int people = readInt(list, headerLen, 4);
-        debugPrint("B站房间人气: $people");
+        //debugPrint("B站房间人气: $people");
         break;
       default:
     }

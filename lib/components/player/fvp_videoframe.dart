@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fvp/fvp.dart';
 import 'package:vvibe/models/playlist_item.dart';
 
+// ignore: must_be_immutable
 class FvpVideoFrame extends StatefulWidget {
   FvpVideoFrame(
       {Key? key,

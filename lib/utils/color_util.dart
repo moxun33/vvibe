@@ -1,8 +1,8 @@
 /*
  * @Author: moxun33
  * @Date: 2022-09-09 21:59:47
- * @LastEditors: moxun33
- * @LastEditTime: 2022-09-14 21:01:45
+ * @LastEditors: Moxx
+ * @LastEditTime: 2022-11-21 15:07:51
  * @FilePath: \vvibe\lib\utils\color_util.dart
  * @Description: 
  * @qmj
@@ -28,7 +28,8 @@ class ColorUtil {
     final buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
     buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
+    return Color(
+        int.parse(buffer.toString().replaceAll('0x00', '0xff'), radix: 16));
   }
 
 //十进制转颜色
