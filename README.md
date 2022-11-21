@@ -1,19 +1,10 @@
-<!--
- * @Author: Moxx
- * @Date: 2022-09-13 14:05:05
- * @LastEditors: moxun33
- * @LastEditTime: 2022-11-18 20:27:45
- * @FilePath: \vvibe\README.md
- * @Description: 
- * @qmj
--->
 # vvibe
 
 <img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png?token=GHSAT0AAAAAABRX4K3QRU76NHLPZDLZ2JWSYY67OQA">
 
 ![img](https://img.shields.io/badge/language-dart-blue.svg?color=00ACC1)
 ![img](https://img.shields.io/badge/flutter-00B0FF?logo=flutter)
-![img](https://img.shields.io/github/downloads/moxun33/vvibe/total)
+[![img](https://img.shields.io/github/downloads/moxun33/vvibe/total)](https://github.com/moxun33/vvibe/releases)
 [![img](https://img.shields.io/github/v/release/moxun33/vvibe?display_name=tag&include_prereleases)](https://github.com/moxun33/vvibe/releases)
 ![img](https://img.shields.io/github/license/moxun33/vvibe)
 ![img](https://img.shields.io/github/stars/moxun33/vvibe)
@@ -21,7 +12,6 @@
 [![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
 
 > 自用的视频直播观看软件
-
 
 ## 功能
 
@@ -47,7 +37,6 @@
   
 >  项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/)
 
- 
 ## 截图
 
 ![img](https://raw.githubusercontent.com/moxun33/vvibe/main/screenshots/player.png)
@@ -62,7 +51,6 @@
 ``flutter run --no-sound-null-safety``
 - build
 ``flutter build apk --no-sound-null-safety``
-
 
 2、本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
 
