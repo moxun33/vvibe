@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 16:07:15
+ * @LastEditTime: 2022-11-21 14:50:12
  * @FilePath: \vvibe\lib\components\player\player_context_menu.dart
  * @Description: 
  * @qmj
@@ -58,11 +58,11 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
             });
         break;
       case '关于应用':
-        showDialog(
+        /*  showDialog(
             context: context,
             builder: (context) {
               return AboutDialog();
-            });
+            }); */
         break;
 
       default:

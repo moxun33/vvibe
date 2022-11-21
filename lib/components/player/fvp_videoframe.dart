@@ -283,9 +283,9 @@ class VolumeControl extends StatefulWidget {
 }
 
 class _VolumeControlState extends State<VolumeControl> {
-  double volume = 0.5;
+  double volume = 1.0;
   bool _showVolume = false;
-  double unmutedVolume = 0.5;
+  double unmutedVolume = 1.0;
 
   Fvp? get player => widget.player;
 
@@ -319,14 +319,16 @@ class _VolumeControlState extends State<VolumeControl> {
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
-                        label: (1 * 100).toInt().toString(),
+                        label: (volume * 1 * 100).toString(),
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
-                        value: 1.0,
-                        onChanged: (volume) {
-                          player?.setVolume(volume);
-                          setState(() {});
+                        value: volume,
+                        onChanged: (v) {
+                          player?.setVolume(v);
+                          setState(() {
+                            volume = v;
+                          });
                         },
                       ),
                     ),
@@ -354,9 +356,9 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   IconData getIcon() {
-    if ((volume ?? 0) > .5) {
+    if (volume > .5) {
       return Icons.volume_up_sharp;
-    } else if ((volume ?? 0) > 0) {
+    } else if (volume > 0) {
       return Icons.volume_down_sharp;
     } else {
       return Icons.volume_off_sharp;
@@ -364,8 +366,8 @@ class _VolumeControlState extends State<VolumeControl> {
   }
 
   void muteUnmute() {
-    if ((volume ?? 0) > 0) {
-      unmutedVolume = volume ?? 1.0;
+    if (volume > 0) {
+      unmutedVolume = volume;
       player?.setVolume(0);
     } else {
       player?.setVolume(unmutedVolume);
