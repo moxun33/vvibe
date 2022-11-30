@@ -62,7 +62,7 @@
 - 相关资源的版权归原公司所有。
 - 测试数据来源于互联网公开内容，没有收集任何私有和有权限的信息（个人信息等），由此引发的任何法律纠纷与本人无关。
 
-## 鸣谢
+## 致谢
 
 - [mdk-sdk](https://github.com/wang-bin/mdk-sdk)
 - [fvp](https://github.com/wang-bin/fvp)
