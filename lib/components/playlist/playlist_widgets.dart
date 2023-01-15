@@ -334,8 +334,16 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '403禁止',
         );
-      case 500:
       case 400:
+        return Tooltip(
+          child: Icon(
+            Icons.airplanemode_active_outlined,
+            size: 10,
+            color: Colors.pink[100],
+          ),
+          message: '参数有误',
+        );
+      case 500:
         return Tooltip(
           child: Icon(
             Icons.close,
