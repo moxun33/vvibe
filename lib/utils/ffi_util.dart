@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-15 15:59:57
- * @LastEditors: Moxx
- * @LastEditTime: 2022-11-15 17:06:51
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-01-15 16:46:33
  * @FilePath: \vvibe\lib\utils\ffi_util.dart
  * @Description: 
  * @qmj
@@ -21,7 +21,7 @@ const _base = 'native';
 // but rather directly **linked** against the binary.
 final _dylib = Platform.isWindows ? '$_base.dll' : 'lib$_base.so';
 
-final Native api = NativeImpl(Platform.isIOS || Platform.isMacOS
+final RustNative api = RustNativeImpl(Platform.isIOS || Platform.isMacOS
     ? DynamicLibrary.executable()
     : DynamicLibrary.open(_dylib));
 
