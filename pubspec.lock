@@ -225,14 +225,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.1"
-  ffigen:
-    dependency: "direct dev"
-    description:
-      name: ffigen
-      sha256: ec6a2439159d27c871d92862fb9f3012ef19d9ec4b0fa383c69c8553b2dd2ac5
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "6.1.2"
   file:
     dependency: transitive
     description:

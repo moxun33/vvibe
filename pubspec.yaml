@@ -85,7 +85,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ffigen: ^6.0.1
+  #ffigen: ^6.0.1
   freezed: ^2.1.0+1
 
 
