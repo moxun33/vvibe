@@ -339,9 +339,9 @@ class _PlUrlTileState extends State<PlUrlTile>
           child: Icon(
             Icons.airplanemode_active_outlined,
             size: 10,
-            color: Colors.pink[100],
+            color: Colors.cyan[100],
           ),
-          message: '参数有误',
+          message: '检测被拒，可播放',
         );
       case 500:
         return Tooltip(

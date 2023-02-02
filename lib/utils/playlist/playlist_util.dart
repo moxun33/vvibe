@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-01-15 15:08:08
+ * @LastEditTime: 2023-02-02 17:07:08
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -214,20 +214,23 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.hasAbsolutePath ?? false;
   }
 
-  Future<int?> checkUrlAccessible(String url, {bool isolate = false}) async {
+  Future<int?> checkUrlAccessible(String url,
+      {bool isolate = false, bool reqGet = false}) async {
     try {
       final inst = Dio(new BaseOptions(
           connectTimeout: 3000, headers: {'User-Agent': 'VVibe Windows ZTE'}));
-      final req = inst.get;
+      final req = inst.head;
       dynamic resp;
       if (isolate) {
         resp = await compute(req, url);
       } else {
         resp = await req(url);
       }
-      // debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
-
+      //debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
       return resp.statusCode;
+      /* return resp.statusCode != 200 && !reqGet
+          ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
+          : resp.statusCode; */
     } on DioError catch (e) {
       final num = e.response?.statusCode ?? 500;
 

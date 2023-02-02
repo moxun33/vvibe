@@ -34,7 +34,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   bool showDanmaku = true;
   bool _displayTapped = false;
   Timer? _hideTimer;
-  bool isPlaying = false;
+  bool isPlaying = true;
   Fvp get _fvp => widget.fvp;
   int? textureId;
 
@@ -82,14 +82,17 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
 
   void playOrPuase() async {
     int state = await _fvp.getState();
+    bool toPause = FvpPlayState.paused == state;
     if (FvpPlayState.playing == state) {
       playPauseController.reverse();
     } else {
       playPauseController.forward();
     }
     setState(() {
-      isPlaying = FvpPlayState.playing == state;
+      isPlaying = toPause;
     });
+    print(
+        ' ${FvpPlayState.playing} ${state} ${FvpPlayState.playing == state} fvp state');
     _fvp.playOrPause();
   }
 
@@ -160,7 +163,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   color: Colors.white,
                                   splashRadius: 12,
                                   iconSize: 28,
-                                  tooltip: isPlaying == true ? '暂停' : '播放',
+                                  tooltip: isPlaying == true ? '正在播放' : '已暂停',
                                   icon: AnimatedIcon(
                                       icon: AnimatedIcons.play_pause,
                                       progress: playPauseController),
@@ -169,14 +172,14 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   },
                                 ),
                               ),
-                              IconButton(
+                              /*  IconButton(
                                 tooltip: '重新加载',
                                 color: Colors.white,
                                 icon: Icon(Icons.rotate_right_outlined),
                                 onPressed: () {
                                   playOrPuase();
                                 },
-                              ),
+                              ), */
                               SizedBox(
                                 width: 20,
                               ),
