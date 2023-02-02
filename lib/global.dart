@@ -80,7 +80,7 @@ class Global {
         width: 40,
         child: Spinning(),
       );
-    EpgUtil().downloadEpgDataIsolate();
+    // EpgUtil().downloadEpgDataIsolate();
     return genTheme();
   }
 
