@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-11-21 15:09:07
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-02-02 20:03:56
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -54,18 +54,22 @@ class HomeController extends GetxController {
   }
 
 //发送弹幕到屏幕
-  void sendDanmakuBullet(LiveDanmakuItem? data) {
+  void sendDanmakuBullet(LiveDanmakuItem? data) async {
     if (!danmakuManualShow) return;
     if (data?.msg != null && !barrageWallController.isEnabled) {
       barrageWallController.enable();
     }
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     barrageWallController.send([
       new Bullet(
           child: Tooltip(
         message: data?.name ?? '',
         child: Text(
           data?.msg ?? '',
-          style: TextStyle(color: data?.color ?? Colors.white, fontSize: 20),
+          style: TextStyle(
+              color: data?.color ?? Colors.white,
+              fontSize:
+                  settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20),
         ),
       ))
     ]);

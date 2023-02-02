@@ -1,5 +1,6 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
+import 'package:vvibe/components/player/settings/player_settings.dart';
 
 import 'package:vvibe/components/player/settings/playlist_subscription.dart';
 
@@ -51,10 +52,7 @@ class _SettingTabBarViewState extends State<SettingTabBarView>
           flex: 1,
           child: TabBarView(
             controller: _tabController,
-            children: [
-              PlaylistSubscription(),
-              Center(child: Text(" ")),
-            ],
+            children: [PlaylistSubscription(), PlayerSettings()],
           ),
         )
       ],
