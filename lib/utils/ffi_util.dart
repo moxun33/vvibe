@@ -2,45 +2,17 @@
  * @Author: Moxx
  * @Date: 2022-09-15 15:59:57
  * @LastEditors: moxun33
- * @LastEditTime: 2023-01-15 16:46:33
+ * @LastEditTime: 2023-02-02 17:44:43
  * @FilePath: \vvibe\lib\utils\ffi_util.dart
  * @Description: 
  * @qmj
  */
-import 'dart:ffi';
-
-import 'dart:io';
-import 'package:vvibe/bridge_generated.dart';
-
-// Re-export the bridge so it is only necessary to import this file.
-export 'package:vvibe/bridge_generated.dart';
-
-const _base = 'native';
-
-// On MacOS, the dynamic library is not bundled with the binary,
-// but rather directly **linked** against the binary.
-final _dylib = Platform.isWindows ? '$_base.dll' : 'lib$_base.so';
-
-final RustNative api = RustNativeImpl(Platform.isIOS || Platform.isMacOS
-    ? DynamicLibrary.executable()
-    : DynamicLibrary.open(_dylib));
 
 class FfiUtil {
-  static FfiUtil _instance = new FfiUtil._();
-  factory FfiUtil() => _instance;
-
-  FfiUtil._();
-
   Future<String?> getIpInfo(String ip) async {
-    String addr =
+    return '';
+    /* String addr =
         await api.getIpInfo(ip: ip, dbPath: File('assets/ip2region.xdb').path);
-    return addr.replaceAll('0|', '');
-  }
-
-//获取url的媒体元数据
-  Future<String?> getMediaInfo(String url) async {
-    String info =
-        await api.getMediaInfo(url: url, ffprobeDir: Directory('assets').path);
-    return info;
+    return addr.replaceAll('0|', ''); */
   }
 }
