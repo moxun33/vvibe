@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-02 19:58:20
+ * @LastEditTime: 2023-02-02 23:29:44
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -12,7 +12,6 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/common/values/storage.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';

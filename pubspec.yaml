@@ -78,6 +78,7 @@ dependencies:
   native_context_menu: ^0.2.2+5
   # dio cache
   dio_cache_interceptor: ^3.3.1
+  archive: ^3.3.6
   #extended_list: ^3.0.0
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
   #desktop_multi_window: ^0.2.0

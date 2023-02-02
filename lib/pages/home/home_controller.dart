@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-02 20:03:56
+ * @LastEditTime: 2023-02-02 21:37:41
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -19,6 +19,7 @@ import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/services.dart';
 
@@ -51,6 +52,7 @@ class HomeController extends GetxController {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
+    //EpgUtil().downloadEpgDataIsolate();
   }
 
 //发送弹幕到屏幕
@@ -168,7 +170,10 @@ class HomeController extends GetxController {
     }
     tip = '正在打开';
     update();
-
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    if (settings != null) {
+      await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
+    }
     await player.setMedia(item.url!);
 
     playingUrl = item;
