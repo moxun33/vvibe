@@ -23,7 +23,9 @@ class _EpgAlertDialogState extends State<EpgAlertDialog> {
       content: SizedBox(
         width: 1000,
         height: Get.size.height,
-        child: EpgDateTabsView(),
+        child: EpgDateTabsView(
+          urlItem: widget.urlItem,
+        ),
       ),
     );
   }

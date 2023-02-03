@@ -1,8 +1,13 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
+import 'package:vvibe/components/player/epg/epg_channel_date.dart';
+import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 
 class EpgDateTabsView extends StatefulWidget {
+  const EpgDateTabsView({Key? key, required this.urlItem}) : super(key: key);
+
+  final PlayListItem urlItem;
   @override
   _EpgDateTabsViewState createState() => _EpgDateTabsViewState();
 }
@@ -48,7 +53,12 @@ class _EpgDateTabsViewState extends State<EpgDateTabsView>
           flex: 1,
           child: TabBarView(
             controller: _tabController,
-            children: tabs.map((e) => Text(e['label'] ?? '')).toList(),
+            children: tabs
+                .map((e) => EpgChannelDate(
+                      urlItem: widget.urlItem,
+                      date: e['value']!,
+                    ))
+                .toList(),
           ),
         )
       ],

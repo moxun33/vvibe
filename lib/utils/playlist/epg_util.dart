@@ -61,7 +61,7 @@ class EpgUtil {
   }
 
 //根据tv-name和date获取节目单
-  Future<ChannelEpg> getChannelEpg(channel, {String? date}) async {
+  Future<ChannelEpg?> getChannelEpg(channel, {String? date}) async {
     try {
       Dio dio = Dio();
       final params = {'ch': channel, 'date': date ?? getToday()};
@@ -70,11 +70,11 @@ class EpgUtil {
         return ChannelEpg.fromJson(resp.data);
       } else {
         print('加载节目单失败 $params');
-        return ChannelEpg.fromJson({});
+        return null;
       }
     } catch (e) {
       print('加载epg异常 $e');
-      return ChannelEpg.fromJson({});
+      return null;
     }
   }
 /* 
