@@ -1,12 +1,15 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-14 09:24:10
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-02-03 16:41:02
  * @FilePath: \vvibe\lib\main.dart
  * @Description: 
  * @qmj
  */
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
@@ -15,9 +18,24 @@ import 'package:vvibe/pages/Index/Index_view.dart';
 import 'package:vvibe/pages/Index/index_binding.dart';
 import 'package:vvibe/router/app_pages.dart';
 import 'package:get/get.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:vvibe/window/live_sniff_win.dart';
 
-void main() async {
-  Global.init().then((theme) => runApp(MyApp(theme: theme)));
+void main(List<String> args) async {
+  if (args.firstOrNull == 'multi_window') {
+    final windowId = int.parse(args[1]);
+    final argument = args[2].isEmpty
+        ? const {}
+        : jsonDecode(args[2]) as Map<String, dynamic>;
+    print(argument);
+    Global.init(shouldSetSize: false).then((theme) => runApp(LiveSniffWin(
+          theme: theme,
+          windowController: WindowController.fromWindowId(windowId),
+          args: argument,
+        )));
+  } else {
+    Global.init().then((theme) => runApp(MyApp(theme: theme)));
+  }
 }
 
 class MyApp extends StatelessWidget {

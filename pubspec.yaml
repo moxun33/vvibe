@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.3.0+1
+version: 0.4.0+1
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -50,26 +50,28 @@ dependencies:
   cached_network_image: ^3.0.0
 
   # webview
-  webview_flutter: ^2.0.8
+  #webview_flutter: ^2.0.8
 
-  flutter_cache_manager: ^3.1.0
-
+  #flutter_cache_manager: ^3.1.0
+  web_socket_channel: ^2.2.0
+  #url_launcher: ^6.1.5
   html: ^0.15.0
   fvp:
     git:
       url: https://github.com/moxun33/fvp.git
       ref: master
   # path: ../fvp
-
-  web_socket_channel: ^2.2.0
-  url_launcher: ^6.1.5
-  #window-size
+  #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
+  desktop_multi_window:
+    git:
+      url: https://github.com/MixinNetwork/flutter-plugins
+      path: packages/desktop_multi_window
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
   ffi: ^2.0.0
-  flutter_rust_bridge: ^1.41.3
+  #flutter_rust_bridge: ^1.41.3
   collection: ^1.16.0
   dropdown_button2: ^1.7.2
   flutter_barrage: ^0.5.1
@@ -78,10 +80,9 @@ dependencies:
   native_context_menu: ^0.2.2+5
   # dio cache
   dio_cache_interceptor: ^3.3.1
-  archive: ^3.3.6
-  #extended_list: ^3.0.0
-  #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
-  #desktop_multi_window: ^0.2.0
+  #archive: ^3.3.6
+
+
 
 dev_dependencies:
   flutter_test:

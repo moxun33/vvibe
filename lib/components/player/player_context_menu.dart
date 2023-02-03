@@ -1,12 +1,15 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
- * @LastEditors: Moxx
- * @LastEditTime: 2022-11-21 14:50:12
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-02-03 18:06:07
  * @FilePath: \vvibe\lib\components\player\player_context_menu.dart
  * @Description: 
  * @qmj
  */
+import 'dart:convert';
+
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/components/player/settings/open_url_dialog.dart';
@@ -30,6 +33,17 @@ class PlayerContextMenu extends StatefulWidget {
 }
 
 class _PlayerContextMenuState extends State<PlayerContextMenu> {
+  void _showNewWin(String key, {String? title}) async {
+    final window = await DesktopMultiWindow.createWindow(jsonEncode({
+      'key': key,
+    }));
+    window
+      ..setTitle(title ?? 'VVibe')
+      ..setFrame(const Offset(0, 0) & const Size(1280, 720))
+      ..center()
+      ..show();
+  }
+
   void _onItemSelect(BuildContext context, MenuItem item) {
     final title = item.title;
     switch (title) {
@@ -46,7 +60,11 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
         if (widget.playListShowed) return;
         widget.showPlaylist();
         break;
-      case 'scanVerify':
+      case '扫描直播源':
+        _showNewWin('sniff', title: 'VVibe 直播源扫描');
+
+        break;
+      case '检测直播源':
         EasyLoading.showInfo('TODO');
 
         break;
@@ -80,7 +98,8 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
       menuItems: [
         MenuItem(title: '打开链接'),
         MenuItem(title: '播放列表'),
-        MenuItem(title: '扫源验证'),
+        MenuItem(title: '扫描直播源'),
+        MenuItem(title: '检测直播源'),
         MenuItem(title: '应用设置'),
         MenuItem(title: '关于应用'),
       ],

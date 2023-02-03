@@ -79,5 +79,6 @@
         "xtr1common": "cpp",
         "xutility": "cpp"
     },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false
 }
