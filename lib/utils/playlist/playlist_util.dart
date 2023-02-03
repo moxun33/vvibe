@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-02 23:29:44
+ * @LastEditTime: 2023-02-03 16:08:30
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -83,8 +83,10 @@ class PlaylistUtil {
   }
 
   final dioCacheOptions = CacheOptions(
-      // A default store is required for interceptor.
-      store: MemCacheStore());
+    // A default store is required for interceptor.
+    store: MemCacheStore(),
+    maxStale: const Duration(hours: 10),
+  );
 //根据url解析远程txt或m3u内容
   Future<List<PlayListItem>> parsePlaylistSubUrl(String url) async {
     final client = Dio()
