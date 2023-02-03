@@ -1,11 +1,11 @@
 //epg管理
 
 import 'dart:io';
-import 'package:archive/archive_io.dart';
 
 import 'package:dio/dio.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/models/channel_epg.dart';
+import 'package:vvibe/utils/utils.dart';
 
 class EpgUtil {
   static EpgUtil _instance = new EpgUtil._();
@@ -21,6 +21,63 @@ class EpgUtil {
     return dir;
   }
 
+  Future<String> getEpgUrl() async {
+    String url = DEF_EPG_URL;
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    if (settings != null) {
+      url = settings['egp'] ?? DEF_EPG_URL;
+    }
+    return url;
+  }
+
+  String getToday() {
+    DateTime now = DateTime.now();
+    return getDate(now);
+  }
+
+  String getDate(DateTime dt) {
+    final m = dt.month < 10 ? '0${dt.month}' : dt.month;
+    final d = dt.day < 10 ? '0${dt.day}' : dt.day;
+    return '${dt.year}-${m}-${d}';
+  }
+
+  String subDate(DateTime dt, days) {
+    return getDate(dt.subtract(Duration(days: days ?? 1)));
+  }
+
+//生成7天日期
+  List<String> genWeekDays() {
+    DateTime now = DateTime.now();
+    return [
+      subDate(now, 7),
+      subDate(now, 6),
+      subDate(now, 5),
+      subDate(now, 4),
+      subDate(now, 3),
+      subDate(now, 2),
+      subDate(now, 1),
+      getDate(now)
+    ];
+  }
+
+//根据tv-name和date获取节目单
+  Future<ChannelEpg> getChannelEpg(channel, {String? date}) async {
+    try {
+      Dio dio = Dio();
+      final params = {'ch': channel, 'date': date ?? getToday()};
+      final resp = await dio.get(await getEpgUrl(), queryParameters: params);
+      if (resp.statusCode == 200) {
+        return ChannelEpg.fromJson(resp.data);
+      } else {
+        print('加载节目单失败 $params');
+        return ChannelEpg.fromJson({});
+      }
+    } catch (e) {
+      print('加载epg异常 $e');
+      return ChannelEpg.fromJson({});
+    }
+  }
+/* 
 //  - 下载文件
   static void downloadFile(String downLoadUrl, String savePath,
       void Function(bool result) func) async {
@@ -54,17 +111,17 @@ class EpgUtil {
     return '${(await createDir()).path}/epg.xml.tgz';
   }
 
-//解压epg压缩包, 读取xml内容
+//TODO:解压epg压缩包, 读取xml内容
   Future<dynamic> unzipEpg() async {
     final savePath = await getZipPath();
 
     extractFileToDisk(savePath, (await createDir()).path);
   }
 
-  //解析xml
+  //TODO:解析xml
   Future<dynamic> parseXml(String xml) async {}
 
-  //获取epg,然后缓存
+  //TODO:获取epg,然后缓存
   Future<dynamic> downloadEpgData() async {
     String url = DEF_EPG_URL;
     /*  final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
@@ -87,5 +144,5 @@ class EpgUtil {
       final resp = await client.get(url);
       print(resp.data);
     }
-  }
+  } */
 }

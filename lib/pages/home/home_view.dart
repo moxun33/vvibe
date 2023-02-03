@@ -58,6 +58,8 @@ class HomePage extends GetView<HomeController> {
                                     child: FvpVideoFrame(
                                       toggleDanmaku:
                                           controller.toggleDanmakuVisible,
+                                      toggleEpgDialog:
+                                          controller.toggleEpgDialog,
                                       playingUrl: controller.playingUrl,
                                       videoWidget: Center(
                                           child: AspectRatio(

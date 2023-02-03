@@ -13,6 +13,7 @@ class FvpVideoFrame extends StatefulWidget {
       required this.togglePlayList,
       required this.toggleDanmaku,
       required this.stopPlayer,
+      required this.toggleEpgDialog,
       this.playingUrl})
       : super(key: key);
 
@@ -22,6 +23,7 @@ class FvpVideoFrame extends StatefulWidget {
   final Function togglePlayList;
   final Function toggleDanmaku;
   final Function stopPlayer;
+  final Function toggleEpgDialog;
   PlayListItem? playingUrl;
 
   @override
@@ -106,6 +108,10 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
       showDanmaku = !showDanmaku;
     });
     widget.toggleDanmaku();
+  }
+
+  void _toggleEpgDialog() {
+    widget.toggleEpgDialog();
   }
 
   @override
@@ -222,11 +228,23 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                             ],
                           )),
                       Positioned(
-                        right: 80,
+                        right: 150,
                         bottom: 10,
                         child: VolumeControl(
                           player: _fvp,
                           thumbColor: Colors.white70,
+                        ),
+                      ),
+                      Positioned(
+                        right: 80,
+                        bottom: 10,
+                        child: IconButton(
+                          tooltip: '节目单',
+                          color: Colors.white,
+                          icon: Icon(Icons.event_repeat_sharp),
+                          onPressed: () {
+                            _toggleEpgDialog();
+                          },
                         ),
                       ),
                       Positioned(

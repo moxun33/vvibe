@@ -1,22 +1,18 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
-import 'package:vvibe/components/player/settings/player_settings.dart';
+import 'package:vvibe/utils/playlist/epg_util.dart';
 
-import 'package:vvibe/components/player/settings/playlist_subscription.dart';
-
-class SettingsTabsView extends StatefulWidget {
+class EpgDateTabsView extends StatefulWidget {
   @override
-  _SettingsTabsViewState createState() => _SettingsTabsViewState();
+  _EpgDateTabsViewState createState() => _EpgDateTabsViewState();
 }
 
-class _SettingsTabsViewState extends State<SettingsTabsView>
+class _EpgDateTabsViewState extends State<EpgDateTabsView>
     with TickerProviderStateMixin {
-  final tabs = [
-    {'value': 'subscribe', 'label': '订阅'},
-    {'value': 'player', 'label': '播放器'}
-  ];
+  final tabs = EpgUtil().genWeekDays().map((e) => {'value': e, 'label': e});
   late TabController _tabController = TabController(
     length: tabs.length,
+    initialIndex: tabs.length - 1,
     vsync: this,
   );
   @override
@@ -30,7 +26,7 @@ class _SettingsTabsViewState extends State<SettingsTabsView>
   }
 
   Widget _buildTabBar() => TabBar(
-        onTap: (tab) => print(tab),
+        onTap: (tab) => {},
         labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         unselectedLabelStyle: TextStyle(fontSize: 16),
         isScrollable: true,
@@ -52,7 +48,7 @@ class _SettingsTabsViewState extends State<SettingsTabsView>
           flex: 1,
           child: TabBarView(
             controller: _tabController,
-            children: [PlaylistSubscription(), PlayerSettings()],
+            children: tabs.map((e) => Text(e['label'] ?? '')).toList(),
           ),
         )
       ],

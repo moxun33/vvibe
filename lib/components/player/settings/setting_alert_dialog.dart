@@ -21,7 +21,7 @@ class _SettingAlertDialogState extends State<SettingAlertDialog> {
       content: SizedBox(
         width: 1000,
         height: Get.size.height,
-        child: SettingTabBarView(),
+        child: SettingsTabsView(),
       ),
     );
   }

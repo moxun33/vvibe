@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-02 21:37:41
+ * @LastEditTime: 2023-02-03 13:40:36
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -15,6 +15,7 @@ import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
 //import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -52,7 +53,7 @@ class HomeController extends GetxController {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-    //EpgUtil().downloadEpgDataIsolate();
+    EpgUtil().getChannelEpg('CCTV1');
   }
 
 //发送弹幕到屏幕
@@ -86,6 +87,12 @@ class HomeController extends GetxController {
       barrageWallController.enable();
       danmakuManualShow = true;
     }
+  }
+
+  //显示、隐藏节目单
+  void toggleEpgDialog() {
+    if (playingUrl == null) return;
+    Get.dialog(EpgAlertDialog(urlItem: playingUrl!));
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
