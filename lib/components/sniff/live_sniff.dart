@@ -141,7 +141,7 @@ class _LiveSniffState extends State<LiveSniff> {
                 decoration: InputDecoration(label: Text('超时(ms)')),
                 controller: _toNumCtl,
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(2),
+                  LengthLimitingTextInputFormatter(10),
                   FilteringTextInputFormatter.digitsOnly
                 ],
                 keyboardType: TextInputType.number,
