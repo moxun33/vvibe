@@ -20,6 +20,13 @@ class _LiveSniffState extends State<LiveSniff> {
     super.initState();
     _batchNumCtl.text = '5';
     _toNumCtl.text = '1000';
+    _urlTextCtl.text = 'http://113.64.147.[1-255]:808/hls/[1-100]/index.m3u8';
+  }
+
+//开始扫描
+  void _start() async {
+    String urlText = _urlTextCtl.text;
+    if (urlText.isEmpty) return;
   }
 
   TableRow _genTableRow(List<Widget> children) {
@@ -32,7 +39,8 @@ class _LiveSniffState extends State<LiveSniff> {
     );
   }
 
-  Widget _genCell(String text, {isHeader = false}) {
+  Widget _genCell(String text,
+      {isHeader = false, isLink = false, isStatus = false}) {
     return Padding(
         padding: const EdgeInsets.all(10),
         child: Text(
@@ -69,7 +77,7 @@ class _LiveSniffState extends State<LiveSniff> {
                 controller: _urlTextCtl,
                 decoration: InputDecoration(
                     hintText:
-                        'URL模板，如 http://113.64.147.100:808/hls/[1-100]/index.m3u8'),
+                        '模板，如 http://113.64.[1-255].[1-25]:808/hls/[1-200]/index.m3u8'),
               ),
             ),
             Container(
@@ -144,7 +152,9 @@ class _LiveSniffState extends State<LiveSniff> {
             ),
             FilledButton(
               child: Text('扫描'),
-              onPressed: () {},
+              onPressed: () {
+                _start();
+              },
             ),
             SizedBox(
               width: 20,
@@ -175,7 +185,7 @@ class _LiveSniffState extends State<LiveSniff> {
                 Icons.question_mark_outlined,
                 color: Colors.orangeAccent,
               ),
-              message: '支持IPV6。支持3组变量，变量用[]表示。数字变量位数自动前面补0',
+              message: '支持IPV6。支持3组变量，变量用[]表示。',
             )
           ],
         ),
