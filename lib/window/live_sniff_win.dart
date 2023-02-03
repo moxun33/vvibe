@@ -22,6 +22,11 @@ class LiveSniffWin extends StatefulWidget {
 
 class _LiveSniffWinState extends State<LiveSniffWin> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: LiveSniff(),

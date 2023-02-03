@@ -80,5 +80,6 @@
         "xutility": "cpp"
     },
     "cmake.configureOnOpen": false,
-    "editor.suggest.snippetsPreventQuickSuggestions": false
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "aiXcoder.showTrayIcon": true
 }

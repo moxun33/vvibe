@@ -85,7 +85,7 @@ class HomePage extends GetView<HomeController> {
                                           crossAxisAlignment:
                                               WrapCrossAlignment.center,
                                           spacing: 50,
-                                          /*          children: [
+                                                    children: [
                                         SizedBox(
                                             width: 200,
                                             child:
@@ -94,7 +94,7 @@ class HomePage extends GetView<HomeController> {
                                             style: TextStyle(
                                                 color: Colors.purple[300],
                                                 fontSize: 40))
-                                      ], */
+                                      ], 
                                         ),
                                       ),
                                     ),
