@@ -6,12 +6,45 @@ import 'package:dio/dio.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/utils/utils.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+
+// Global options
+final _epgCacheoptions = CacheOptions(
+  // A default store is required for interceptor.
+  store: MemCacheStore(),
+
+  // All subsequent fields are optional.
+
+  // Default.
+  policy: CachePolicy.request,
+  // Returns a cached response on error but for statuses 401 & 403.
+  // Also allows to return a cached response on network errors (e.g. offline usage).
+  // Defaults to [null].
+  hitCacheOnErrorExcept: [401, 403],
+  // Overrides any HTTP directive to delete entry past this duration.
+  // Useful only when origin server has no cache config or custom behaviour is desired.
+  // Defaults to [null].
+  maxStale: const Duration(days: 1),
+  // Default. Allows 3 cache sets and ease cleanup.
+  priority: CachePriority.normal,
+  // Default. Body and headers encryption with your own algorithm.
+  cipher: null,
+  // Default. Key builder to retrieve requests.
+  keyBuilder: CacheOptions.defaultCacheKeyBuilder,
+  // Default. Allows to cache POST requests.
+  // Overriding [keyBuilder] is strongly recommended when [true].
+  allowPostMethod: false,
+);
 
 class EpgUtil {
   static EpgUtil _instance = new EpgUtil._();
   factory EpgUtil() => _instance;
 
   EpgUtil._();
+
+  final client = Dio()
+    ..interceptors.add(DioCacheInterceptor(options: _epgCacheoptions));
+
   //data目录（在应用根目录下）
   Future<Directory> createDir({String dirName = 'data/epg'}) async {
     final dir = Directory(dirName);
@@ -63,9 +96,8 @@ class EpgUtil {
 //根据tv-name和date获取节目单
   Future<ChannelEpg?> getChannelEpg(channel, {String? date}) async {
     try {
-      Dio dio = Dio();
       final params = {'ch': channel, 'date': date ?? getToday()};
-      final resp = await dio.get(await getEpgUrl(), queryParameters: params);
+      final resp = await client.get(await getEpgUrl(), queryParameters: params);
       if (resp.statusCode == 200) {
         return ChannelEpg.fromJson(resp.data);
       } else {
