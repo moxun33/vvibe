@@ -55,7 +55,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
   Widget _setBtn(EpgDatum epg,
       {bool isLive = false, bool played = false, bool toPlay = false}) {
     final canPlayback = true;
-    final text = Text(isLive ? '正在播放' : (toPlay ? '未播放' : '已播放'),
+    final text = Text(isLive ? '正在直播' : (toPlay ? '未播放' : '已播放'),
         style: TextStyle(
             color: isLive
                 ? Colors.purple
