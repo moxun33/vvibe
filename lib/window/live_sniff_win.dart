@@ -1,11 +1,8 @@
 //直播源嗅探窗口
 
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:vvibe/components/sniff/live_sniff.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
-import 'package:vvibe/services/notifications/v_size_changed_layout_notification.dart';
 import 'package:vvibe/window/sub_window.dart';
 
 class LiveSniffWin extends StatefulWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:vvibe/utils/playlist/sniff_util.dart';
 
 class LiveSniff extends StatefulWidget {
   const LiveSniff({Key? key}) : super(key: key);
@@ -27,6 +28,8 @@ class _LiveSniffState extends State<LiveSniff> {
   void _start() async {
     String urlText = _urlTextCtl.text;
     if (urlText.isEmpty) return;
+    final list = SniffUtil().genUrlsByTpl(urlText);
+    if (list.length < 1) return;
   }
 
   TableRow _genTableRow(List<Widget> children) {
@@ -77,7 +80,7 @@ class _LiveSniffState extends State<LiveSniff> {
                 controller: _urlTextCtl,
                 decoration: InputDecoration(
                     hintText:
-                        '模板，如 http://113.64.[1-255].[1-25]:808/hls/[1-200]/index.m3u8'),
+                        '模板，如 http://113.64.[1-255].[1-255]:808/hls/[1-200]/index.m3u8'),
               ),
             ),
             Container(
@@ -185,7 +188,7 @@ class _LiveSniffState extends State<LiveSniff> {
                 Icons.question_mark_outlined,
                 color: Colors.orangeAccent,
               ),
-              message: '支持IPV6。支持3组变量，变量用[]表示。',
+              message: '支持3组数字变量，变量用[]表示。目前仅支持http协议',
             )
           ],
         ),
