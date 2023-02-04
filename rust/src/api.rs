@@ -8,11 +8,14 @@ mod tests {
 }
 
 use serde_json::json;
-
+use xdb::{search_by_ip, searcher_init};
 mod ffprobe;
+
+
+
 pub fn get_ip_info(ip: String, db_path: String) -> String {
-    let searcher = ip2region::Searcher::new(db_path).unwrap();
-    match searcher.search(&ip) {
+    searcher_init(Some(db_path.to_owned()));
+    match search_by_ip(ip.as_str()) {
         Ok(info) => {
             info.to_string()
         }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vvibe/common/values/enum.dart';
+import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 import 'package:vvibe/utils/playlist/sniff_util.dart';
 
@@ -15,7 +16,8 @@ class _LiveSniffState extends State<LiveSniff> {
   final TextEditingController _urlTextCtl = TextEditingController();
   final TextEditingController _batchNumCtl = TextEditingController();
   final TextEditingController _toNumCtl = TextEditingController();
-  bool validOnly = true;
+  bool validOnly = true; //只看有效
+  bool withMeta = false; //是否获取视频媒体信息
   int total = 0; //总数
   int checked = 0; //已检测
   int success = 0; //有效
@@ -42,6 +44,19 @@ class _LiveSniffState extends State<LiveSniff> {
       sniffing = true;
       total = list.length;
     });
+    _checkUrl('http://111.59.189.40:8445/tsfile/live/1000_1.m3u8',
+        withMeta: withMeta);
+  }
+
+//批量扫描
+  void _batchSniff(List<String> urls) {
+    for (var url in urls) {}
+  }
+
+  //检测url
+  Future<dynamic> _checkUrl(String url, {bool withMeta = false}) async {
+    final map = await SniffUtil().checkSniffUrl(url, withMeta: withMeta);
+    print(map);
   }
 
 //取消扫描
@@ -179,11 +194,28 @@ class _LiveSniffState extends State<LiveSniff> {
                   });
                 }),
             Text('只看有效'),
-            SizedBox(
+            Container(
+              margin: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(top: 5),
               width: 100,
+              child: Tooltip(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                          value: withMeta,
+                          onChanged: (v) {
+                            setState(() {
+                              withMeta = v ?? false;
+                            });
+                          }),
+                      Text('媒体信息'),
+                    ],
+                  ),
+                  message: '是否加载媒体信息，速度较慢'),
             ),
-            SizedBox(
+            Container(
               width: 100,
+              margin: const EdgeInsets.only(left: 20),
               child: TextField(
                 decoration: InputDecoration(label: Text('并发数')),
                 controller: _batchNumCtl,
@@ -194,11 +226,9 @@ class _LiveSniffState extends State<LiveSniff> {
                 keyboardType: TextInputType.number,
               ),
             ),
-            SizedBox(
+            Container(
               width: 100,
-            ),
-            SizedBox(
-              width: 100,
+              margin: const EdgeInsets.only(left: 20, right: 50),
               child: TextField(
                 decoration: InputDecoration(label: Text('超时(ms)')),
                 controller: _toNumCtl,

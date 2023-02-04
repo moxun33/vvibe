@@ -1,9 +1,11 @@
 //直播源扫描util
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/models/media_info.dart';
+import 'package:vvibe/utils/ffi_util.dart';
+import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 class SniffUtil {
   static SniffUtil _instance = new SniffUtil._();
@@ -98,5 +100,50 @@ class SniffUtil {
 
     List<String> res = genFinalUrls(tpl);
     return res;
+  }
+
+  final REGEX_IPV4 = new RegExp(r"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}");
+  //提取ipv4
+  String extractIpv4(String url) {
+    final res = REGEX_IPV4.firstMatch(url);
+    if (res != null) {
+      return res.group(0) ?? '';
+    }
+    return '';
+  }
+
+  //扫描检测url
+  Future<Map<String, dynamic>> checkSniffUrl(String url,
+      {bool withMeta = false, timeout = 1000}) async {
+    try {
+      final startTime = DateTime.now();
+      final inst = Dio(new BaseOptions(
+          connectTimeout: timeout, headers: {'User-Agent': DEF_REQ_UA}));
+      final resp = await inst.get(url);
+      MediaInfo? meta = null;
+      String ipInfo = '';
+      DateTime endTime = DateTime.now();
+      final ipv4 = extractIpv4(url);
+      if (withMeta) {
+        meta = await FfiUtil().getMediaInfo(url);
+      }
+      if (ipv4.isNotEmpty) {
+        ipInfo = (await FfiUtil().getIpInfo(ipv4)) ?? '';
+      }
+      print(endTime.difference(startTime).inMilliseconds);
+      return {
+        'statusCode': resp.statusCode,
+        'mediaInfo': meta,
+        'ipInfo': ipInfo,
+        'duration': endTime.difference(startTime).inMilliseconds
+      };
+    } on DioError catch (e) {
+      return {
+        'statusCode': e.type == DioErrorType.connectTimeout ? 504 : 500,
+        'mediaInfo': null,
+        'ipInfo': '',
+        'duration': 0
+      };
+    }
   }
 }

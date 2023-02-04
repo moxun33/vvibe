@@ -35,7 +35,7 @@
 
 
 - 启动项目
- > 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/)
+ > 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) ``rust ``版本大于1.66
  
 
 ## 截图
