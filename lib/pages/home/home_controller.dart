@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-03 18:06:23
+ * @LastEditTime: 2023-02-04 17:25:45
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -19,8 +19,8 @@ import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/local_storage.dart';
-import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/services.dart';
 
@@ -53,7 +53,8 @@ class HomeController extends GetxController {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-    EpgUtil().getChannelEpg('CCTV1');
+    FfiUtil().getMediaInfo(
+        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
   }
 
 //发送弹幕到屏幕

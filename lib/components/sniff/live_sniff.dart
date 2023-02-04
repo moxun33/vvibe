@@ -115,7 +115,7 @@ class _LiveSniffState extends State<LiveSniff> {
       _genCell('频道', isHeader: true),
       _genCell('状态', isHeader: true),
       _genCell('分辨率', isHeader: true),
-      // _genCell('地区/运营商', isHeader: true),
+      _genCell('地区/运营商', isHeader: true),
       _genCell('链接', isHeader: true)
     ]);
   }
