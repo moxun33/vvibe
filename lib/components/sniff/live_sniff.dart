@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 
@@ -22,6 +23,7 @@ class _LiveSniffState extends State<LiveSniff> {
   int checked = 0; //已检测
   int success = 0; //有效
   int timeout = 0; //超时
+  int failed = 0; //无效数量
   bool sniffing = false; //扫描中
   bool canceled = false; //已取消
   List<dynamic> data = []; //表格数据
@@ -43,20 +45,59 @@ class _LiveSniffState extends State<LiveSniff> {
       canceled = false;
       sniffing = true;
       total = list.length;
+      success = 0;
+      timeout = 0;
+      failed = 0;
+      checked = 0;
+      data = [];
     });
-    _checkUrl('http://111.59.189.40:8445/tsfile/live/1000_1.m3u8',
-        withMeta: withMeta);
+    /* _checkUrl('http://111.59.189.40:8445/tsfile/live/1000_1.m3u8',
+        withMeta: withMeta); */
+    await _batchSniff(list);
+    setState(() {
+      sniffing = false;
+    });
+    EasyLoading.showToast('扫描完成');
   }
 
 //批量扫描
-  void _batchSniff(List<String> urls) {
-    for (var url in urls) {}
+  Future<void> _batchSniff(List<String> urls) async {
+    final int size = int.tryParse(_batchNumCtl.text) ?? 1;
+
+    final int batches = (urls.length / size).ceil();
+
+    for (var i = 0; i < batches; i++) {
+      final subUrls = urls.sublist(i * size,
+          i * size + size > urls.length ? urls.length : i * size + size);
+
+      final reqs = subUrls.map((url) => _checkUrl(url,
+          withMeta: withMeta, timeout: int.tryParse(_toNumCtl.text) ?? 1000));
+      if (canceled) {
+        _stop();
+        break;
+      }
+      final values = await Future.wait<dynamic>(reqs);
+
+      final _data = data;
+      _data.addAll(values);
+      print('列表数量 ${_data.length}');
+      setState(() {
+        checked = i * size;
+        success = success +
+            values.where((element) => element['statusCode'] == 200).length;
+        timeout = timeout +
+            values.where((element) => element['statusCode'] == 504).length;
+        // data = _data;
+      });
+    }
   }
 
   //检测url
-  Future<dynamic> _checkUrl(String url, {bool withMeta = false}) async {
-    final map = await SniffUtil().checkSniffUrl(url, withMeta: withMeta);
-    print(map);
+  Future<dynamic> _checkUrl(String url,
+      {bool withMeta = false, int timeout = 1000}) async {
+    final map = await SniffUtil()
+        .checkSniffUrl(url, withMeta: withMeta, timeout: timeout);
+    return map;
   }
 
 //取消扫描
@@ -74,6 +115,7 @@ class _LiveSniffState extends State<LiveSniff> {
       data = [];
       total = 0;
       success = 0;
+      failed = 0;
       timeout = 0;
       checked = 0;
     });
@@ -114,15 +156,22 @@ class _LiveSniffState extends State<LiveSniff> {
 
   Widget _genCell(dynamic text,
       {isHeader = false, isLink = false, isStatus = false}) {
+    final textStyle = TextStyle(fontSize: isHeader ? 16 : 14);
     return Padding(
         padding: const EdgeInsets.all(10),
         child: isStatus
             ? _renderStatus(text as UrlSniffResStatus)
-            : Text(
-                text,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: isHeader ? 16 : 14),
-              ));
+            : (isLink
+                ? SelectableText(
+                    text.toString(),
+                    textAlign: TextAlign.center,
+                    style: textStyle,
+                  )
+                : Text(
+                    text.toString(),
+                    textAlign: TextAlign.center,
+                    style: textStyle,
+                  )));
   }
 
   TableRow _genTableHeader() {
@@ -135,8 +184,24 @@ class _LiveSniffState extends State<LiveSniff> {
     ]);
   }
 
-  List<TableRow> _tableRowList() {
-    return [_genTableHeader()];
+  List<TableRow> _tableRowList(List<dynamic> list) {
+    final rows = [_genTableHeader()];
+    for (var ele in list) {
+      rows.add(_genTableRow([
+        _genCell(
+          list.indexOf(ele) + 1,
+        ),
+        _genCell(ele['status'], isStatus: true),
+        _genCell(
+          '分辨率',
+        ),
+        _genCell(
+          ele['ipInfo'],
+        ),
+        _genCell(ele['url'], isLink: true)
+      ]));
+    }
+    return rows;
   }
 
   @override
@@ -158,27 +223,26 @@ class _LiveSniffState extends State<LiveSniff> {
             Container(
               padding: const EdgeInsets.only(top: 5),
               margin: const EdgeInsets.only(left: 90),
-              width: 60,
+              width: 120,
               child: Text('${checked}/${total}'),
             ),
             Container(
               padding: const EdgeInsets.only(top: 5),
               margin: const EdgeInsets.only(left: 20),
-              width: 60,
+              width: 120,
               child:
                   Text('有效：${success}', style: TextStyle(color: Colors.green)),
             ),
             Container(
               padding: const EdgeInsets.only(top: 5),
               margin: const EdgeInsets.only(left: 20),
-              width: 60,
-              child: Text('无效：${checked > 0 ? total - success - timeout : 0}',
-                  style: TextStyle(color: Colors.red)),
+              width: 120,
+              child: Text('无效：${failed}', style: TextStyle(color: Colors.red)),
             ),
             Container(
               padding: const EdgeInsets.only(top: 5),
               margin: const EdgeInsets.only(left: 20),
-              width: 100,
+              width: 120,
               child: Text('超时：${timeout}'),
             ),
           ],
@@ -217,7 +281,7 @@ class _LiveSniffState extends State<LiveSniff> {
               width: 100,
               margin: const EdgeInsets.only(left: 20),
               child: TextField(
-                decoration: InputDecoration(label: Text('并发数')),
+                decoration: InputDecoration(label: Text('同时连接数')),
                 controller: _batchNumCtl,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(2),
@@ -291,19 +355,23 @@ class _LiveSniffState extends State<LiveSniff> {
             )
           ],
         ),
-        SizedBox(
-          height: 20,
-        ),
-        Table(
-          children: _tableRowList(),
-          columnWidths: {
-            0: FlexColumnWidth(1),
-            1: FlexColumnWidth(1),
-            2: FlexColumnWidth(1),
-            3: FlexColumnWidth(1),
-            4: FlexColumnWidth(3),
-          },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        Expanded(
+          child: Container(
+              margin: const EdgeInsets.only(
+                top: 20,
+              ),
+              child: SingleChildScrollView(
+                  child: Table(
+                children: _tableRowList(data),
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FlexColumnWidth(1),
+                  2: FlexColumnWidth(1),
+                  3: FlexColumnWidth(1),
+                  4: FlexColumnWidth(3),
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              ))),
         )
       ]),
     );

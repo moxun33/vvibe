@@ -2,6 +2,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/utils/ffi_util.dart';
@@ -132,17 +133,24 @@ class SniffUtil {
       }
       print(endTime.difference(startTime).inMilliseconds);
       return {
+        'url': url,
+        'status': UrlSniffResStatus.success,
         'statusCode': resp.statusCode,
         'mediaInfo': meta,
         'ipInfo': ipInfo,
         'duration': endTime.difference(startTime).inMilliseconds
       };
     } on DioError catch (e) {
+      print('$url 扫描错误   ${e.error}');
       return {
+        'status': e.type == DioErrorType.connectTimeout
+            ? UrlSniffResStatus.timeout
+            : UrlSniffResStatus.failed,
         'statusCode': e.type == DioErrorType.connectTimeout ? 504 : 500,
         'mediaInfo': null,
         'ipInfo': '',
-        'duration': 0
+        'duration': 0,
+        'url': url
       };
     }
   }
