@@ -42,7 +42,7 @@ class EpgUtil {
 
   EpgUtil._();
 
-  final client = Dio()
+  final client = Dio(BaseOptions(headers: {'User-Agnet': DEF_REQ_UA}))
     ..interceptors.add(DioCacheInterceptor(options: _epgCacheoptions));
 
   //data目录（在应用根目录下）

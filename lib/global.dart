@@ -29,10 +29,12 @@ class Global {
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 
   /// init
-  static Future<ThemeData> init() async {
+  static Future<ThemeData> init({bool shouldSetSize = true}) async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (shouldSetSize && Platform.isWindows ||
+        Platform.isLinux ||
+        Platform.isMacOS) {
       setWindowMaxSize(const Size(3840, 2160));
       setWindowMinSize(const Size(1280, 720));
     }
