@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/enum.dart';
+import 'package:vvibe/components/sniff/sniff_res_table.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 import 'package:vvibe/utils/playlist/sniff_util.dart';
+import 'package:vvibe/utils/screen_device.dart';
 
 class LiveSniff extends StatefulWidget {
   const LiveSniff({Key? key}) : super(key: key);
@@ -67,8 +69,9 @@ class _LiveSniffState extends State<LiveSniff> {
     final int batches = (urls.length / size).ceil();
 
     for (var i = 0; i < batches; i++) {
-      final subUrls = urls.sublist(i * size,
-          i * size + size > urls.length ? urls.length : i * size + size);
+      final endIndex = i * size + size,
+          subUrls = urls.sublist(
+              i * size, endIndex > urls.length ? urls.length : endIndex);
 
       final reqs = subUrls.map((url) => _checkUrl(url,
           withMeta: withMeta, timeout: int.tryParse(_toNumCtl.text) ?? 1000));
@@ -80,14 +83,14 @@ class _LiveSniffState extends State<LiveSniff> {
 
       final _data = data;
       _data.addAll(values);
-      print('列表数量 ${_data.length}');
+
       setState(() {
-        checked = i * size;
+        checked = endIndex;
         success = success +
             values.where((element) => element['statusCode'] == 200).length;
         timeout = timeout +
             values.where((element) => element['statusCode'] == 504).length;
-        // data = _data;
+        data = _data;
       });
     }
   }
@@ -119,89 +122,6 @@ class _LiveSniffState extends State<LiveSniff> {
       timeout = 0;
       checked = 0;
     });
-  }
-
-  TableRow _genTableRow(List<Widget> children) {
-    return TableRow(
-      decoration: BoxDecoration(
-        border: const Border(bottom: BorderSide(color: Colors.grey)),
-        color: Colors.white,
-      ),
-      children: children,
-    );
-  }
-
-//渲染状态标签
-  Widget _renderStatus(UrlSniffResStatus status) {
-    Color color = Colors.black;
-    String text = '';
-    switch (status) {
-      case UrlSniffResStatus.success:
-        color = Colors.green;
-        text = '有效';
-        break;
-      case UrlSniffResStatus.timeout:
-        color = Colors.orange;
-        text = '超时';
-        break;
-      default:
-        break;
-    }
-    return Text(
-      text,
-      textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 14, color: color),
-    );
-  }
-
-  Widget _genCell(dynamic text,
-      {isHeader = false, isLink = false, isStatus = false}) {
-    final textStyle = TextStyle(fontSize: isHeader ? 16 : 14);
-    return Padding(
-        padding: const EdgeInsets.all(10),
-        child: isStatus
-            ? _renderStatus(text as UrlSniffResStatus)
-            : (isLink
-                ? SelectableText(
-                    text.toString(),
-                    textAlign: TextAlign.center,
-                    style: textStyle,
-                  )
-                : Text(
-                    text.toString(),
-                    textAlign: TextAlign.center,
-                    style: textStyle,
-                  )));
-  }
-
-  TableRow _genTableHeader() {
-    return _genTableRow([
-      _genCell('频道', isHeader: true),
-      _genCell('状态', isHeader: true),
-      _genCell('分辨率', isHeader: true),
-      _genCell('地区/运营商', isHeader: true),
-      _genCell('链接', isHeader: true)
-    ]);
-  }
-
-  List<TableRow> _tableRowList(List<dynamic> list) {
-    final rows = [_genTableHeader()];
-    for (var ele in list) {
-      rows.add(_genTableRow([
-        _genCell(
-          list.indexOf(ele) + 1,
-        ),
-        _genCell(ele['status'], isStatus: true),
-        _genCell(
-          '分辨率',
-        ),
-        _genCell(
-          ele['ipInfo'],
-        ),
-        _genCell(ele['url'], isLink: true)
-      ]));
-    }
-    return rows;
   }
 
   @override
@@ -357,21 +277,11 @@ class _LiveSniffState extends State<LiveSniff> {
         ),
         Expanded(
           child: Container(
+              width: getDeviceWidth(context),
               margin: const EdgeInsets.only(
                 top: 20,
               ),
-              child: SingleChildScrollView(
-                  child: Table(
-                children: _tableRowList(data),
-                columnWidths: {
-                  0: FlexColumnWidth(1),
-                  1: FlexColumnWidth(1),
-                  2: FlexColumnWidth(1),
-                  3: FlexColumnWidth(1),
-                  4: FlexColumnWidth(3),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              ))),
+              child: SniffResTable(data: data, validOnly: false)),
         )
       ]),
     );
