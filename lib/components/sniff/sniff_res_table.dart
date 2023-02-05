@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
+import 'package:vvibe/utils/playlist/sniff_util.dart';
 
 class SniffResTable extends StatelessWidget {
   SniffResTable({Key? key, required this.data, required this.validOnly})
@@ -71,17 +72,6 @@ class SniffResTable extends StatelessWidget {
               .toList()
           : list;
 
-  String _getVideoSize(MediaInfo? info) {
-    if (info != null && info.streams != null) {
-      final videos =
-          info.streams!.where((element) => element.codecType == 'video');
-      return videos.length > 0
-          ? '${videos.first.width}X${videos.first.height}'
-          : '-';
-    }
-    return '-';
-  }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -98,7 +88,7 @@ class SniffResTable extends StatelessWidget {
               return DataRow(cells: [
                 _cell('${e.index.toString()}号'),
                 DataCell(_renderStatus(e.status)),
-                _cell(_getVideoSize(e.mediaInfo)),
+                _cell(SniffUtil().getVideoSize(e.mediaInfo)),
                 _cell(e.ipInfo),
                 _urlCell(e.url),
               ]);

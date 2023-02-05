@@ -1,5 +1,7 @@
 //直播源扫描util
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/enum.dart';
@@ -156,5 +158,34 @@ class SniffUtil {
         'url': url
       });
     }
+  }
+
+  String getVideoSize(MediaInfo? info) {
+    if (info != null && info.streams != null) {
+      final videos =
+          info.streams!.where((element) => element.codecType == 'video');
+      return videos.length > 0
+          ? '${videos.first.width}*${videos.first.height}'
+          : '-';
+    }
+    return '-';
+  }
+
+  //导出直播源为txt
+  exportTxtFile(List<UrlSniffRes> list, {withInvalid = false}) async {
+    final List<UrlSniffRes> data = !withInvalid
+        ? list
+            .where((element) => element.status == UrlSniffResStatus.success)
+            .toList()
+        : list;
+    final Directory dir = await PlaylistUtil().getPlayListDir();
+    final file =
+        File('${dir.path}/直播源扫描报告${DateTime.now().millisecondsSinceEpoch}.txt');
+    String contents = '${DateTime.now().toString()}\n#报告由VVibe制作\n== 有效源 ==\n';
+    for (var ele in data) {
+      contents = contents +
+          '${ele.index}号[${getVideoSize(ele.mediaInfo)}],${ele.url}\n';
+    }
+    return file.writeAsString(contents);
   }
 }

@@ -95,6 +95,8 @@ class _LiveSniffState extends State<LiveSniff> {
             values.where((element) => element.statusCode == 200).length;
         timeout = timeout +
             values.where((element) => element.statusCode == 504).length;
+        failed = failed +
+            values.where((element) => element.statusCode == 500).length;
         data = _data;
       });
     }
@@ -106,6 +108,11 @@ class _LiveSniffState extends State<LiveSniff> {
     final res = await SniffUtil()
         .checkSniffUrl(url, withMeta: withMeta, timeout: timeout, index: index);
     return res;
+  }
+
+//导出有效源
+  _export() async {
+    await SniffUtil().exportTxtFile(data);
   }
 
 //取消扫描
@@ -245,7 +252,11 @@ class _LiveSniffState extends State<LiveSniff> {
             ),
             ElevatedButton(
               child: Text('导出'),
-              onPressed: null,
+              onPressed: canceled || (checked >= total)
+                  ? () {
+                      _export();
+                    }
+                  : null,
             ),
             SizedBox(
               width: 20,
