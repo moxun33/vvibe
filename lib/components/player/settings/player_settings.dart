@@ -25,10 +25,10 @@ class _PlayerSettingsState extends State<PlayerSettings> {
 
   void _initData() async {
     final v = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+
     if (v != null) {
-      print(v);
-      _uaTextCtl.text = v['header'];
-      _epgUrlTextCtl.text = v['epg'];
+      _uaTextCtl.text = v['header'] ?? '';
+      _epgUrlTextCtl.text = v['epg'] ?? '';
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
     }
   }
