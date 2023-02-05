@@ -1,7 +1,5 @@
 //播放列表面板宽度
 
-import 'package:flutter/material.dart';
-
 const PLAYLIST_BAR_WIDTH = 220.0;
 
 //默认请求头
@@ -12,3 +10,8 @@ const DEF_EPG_URL = 'http://epg.51zmt.top:8000/api/diyp/';
 
 //默认弹幕字体大小
 const DEF_DM_FONT_SIZE = 20;
+
+const bool IS_PROD_ENV = bool.fromEnvironment("dart.vm.product");
+
+//assets目录
+final ASSETS_DIR = IS_PROD_ENV ? 'data/flutter_assets/assets' : 'assets';

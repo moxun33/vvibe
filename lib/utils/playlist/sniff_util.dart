@@ -135,7 +135,7 @@ class SniffUtil {
       if (ipv4.isNotEmpty) {
         ipInfo = (await FfiUtil().getIpInfo(ipv4)) ?? '';
       }
-      print(endTime.difference(startTime).inMilliseconds);
+      //print(endTime.difference(startTime).inMilliseconds);
       return UrlSniffRes.fromJson({
         'url': url,
         'index': index,

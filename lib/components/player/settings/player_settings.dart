@@ -1,7 +1,6 @@
 //播放器的设置弹窗
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/utils/utils.dart';
 

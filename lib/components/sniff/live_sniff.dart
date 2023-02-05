@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/components/sniff/sniff_res_table.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
-import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 import 'package:vvibe/utils/playlist/sniff_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
@@ -35,7 +33,7 @@ class _LiveSniffState extends State<LiveSniff> {
     super.initState();
     _batchNumCtl.text = '5';
     _toNumCtl.text = '3000';
-    _urlTextCtl.text = 'http://113.64.147.[1-10]:808/hls/[1-11]/index.m3u8';
+    _urlTextCtl.text = 'http://27.47.71.203:8811/hls/[1-4]/index.m3u8';
   }
 
 //开始扫描
@@ -54,8 +52,7 @@ class _LiveSniffState extends State<LiveSniff> {
       checked = 0;
       data = [];
     });
-    /* _checkUrl('http://111.59.189.40:8445/tsfile/live/1000_1.m3u8',
-        withMeta: withMeta); */
+
     await _batchSniff(list);
     setState(() {
       sniffing = false;
@@ -150,8 +147,7 @@ class _LiveSniffState extends State<LiveSniff> {
               child: TextField(
                 controller: _urlTextCtl,
                 decoration: InputDecoration(
-                    hintText:
-                        '模板，如 http://113.64.[1-255].[1-255]:808/hls/[1-200]/index.m3u8'),
+                    hintText: '模板，如 http://127.0.0.0/hls/[1-20]/index.m3u8'),
               ),
             ),
             Container(

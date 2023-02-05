@@ -18,6 +18,12 @@
 //! }
 //! ```
 
+
+use std::process::Command;
+use std::os::windows::process::CommandExt;
+
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+const DETACHED_PROCESS: u32 = 0x00000008;
 /// Execute ffprobe with default settings and return the extracted data.
 ///
 /// See [`ffprobe_config`] if you need to customize settings.
@@ -43,10 +49,9 @@ pub fn ffprobe_config(
 ) -> Result<FfProbe, FfProbeError> {
     let path = path.as_ref();
  
-    let mut cmd = std::process::Command::new(std::path::Path::new(&ffprobe_dir));
+    let mut cmd = Command::new(std::path::Path::new(&ffprobe_dir));
     //println!("{}", cmd.status().unwrap());
-    //cmd.current_dir(std::path::Path::new(&ffprobe_dir));
-
+    cmd.creation_flags(DETACHED_PROCESS);
     
     // Default args.
     cmd.args(&[
