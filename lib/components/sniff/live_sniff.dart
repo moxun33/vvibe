@@ -21,7 +21,7 @@ class _LiveSniffState extends State<LiveSniff> {
   final TextEditingController _batchNumCtl = TextEditingController();
   final TextEditingController _toNumCtl = TextEditingController();
   bool validOnly = true; //只看有效
-  bool withMeta = false; //是否获取视频媒体信息
+  bool withMeta = true; //是否获取视频媒体信息
   int total = 0; //总数
   int checked = 0; //已检测
   int success = 0; //有效
@@ -113,6 +113,7 @@ class _LiveSniffState extends State<LiveSniff> {
 //导出有效源
   _export() async {
     await SniffUtil().exportTxtFile(data);
+    EasyLoading.showSuccess('导出完成');
   }
 
 //取消扫描

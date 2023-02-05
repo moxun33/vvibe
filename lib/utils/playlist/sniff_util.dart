@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shortid/shortid.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/media_info.dart';
@@ -123,7 +124,7 @@ class SniffUtil {
       final startTime = DateTime.now();
       final inst = Dio(new BaseOptions(
           connectTimeout: timeout, headers: {'User-Agent': DEF_REQ_UA}));
-      final resp = await inst.get(url);
+      final resp = await inst.head(url);
       MediaInfo? meta = null;
       String ipInfo = '';
       DateTime endTime = DateTime.now();
@@ -179,13 +180,18 @@ class SniffUtil {
             .toList()
         : list;
     final Directory dir = await PlaylistUtil().getPlayListDir();
-    final file =
-        File('${dir.path}/直播源扫描报告${DateTime.now().millisecondsSinceEpoch}.txt');
+    final ipAddr = list.first.ipInfo?.split('|') ?? [],
+        ts = shortid.generate(), //DateTime.now().millisecondsSinceEpoch,
+        nameSuffix = list.length > 0 && ipAddr.length > 1
+            ? ipAddr.sublist(ipAddr.length - 2).join('') + ts
+            : '直播源扫描' + ts;
+    final file = File('${dir.path}/${nameSuffix}.txt');
     String contents = '${DateTime.now().toString()}\n#报告由VVibe制作\n== 有效源 ==\n';
     for (var ele in data) {
       contents = contents +
           '${ele.index}号[${getVideoSize(ele.mediaInfo)}],${ele.url}\n';
     }
+
     return file.writeAsString(contents);
   }
 }

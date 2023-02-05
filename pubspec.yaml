@@ -80,6 +80,7 @@ dependencies:
   native_context_menu: ^0.2.2+5
   # dio cache
   dio_cache_interceptor: ^3.3.1
+  shortid: ^0.1.2
   #archive: ^3.3.6
 
 

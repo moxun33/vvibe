@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-04 23:24:37
+ * @LastEditTime: 2023-02-05 16:23:10
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -44,16 +44,20 @@ class PlaylistUtil {
 
   //获取本地播放列表文件列表
   Future<List<String>> getPlayListFiles({bool basename = false}) async {
-    final Directory dir = await getPlayListDir();
-    final dirList = await dir.list().toList();
-    final List<String> list = [];
-    for (var v in dirList) {
-      if (v.path.endsWith(".txt") || v.path.endsWith(".m3u")) {
-        final path = v.path.replaceAll('\\', '/');
-        list.add(basename ? path.split('/').last : path);
+    try {
+      final Directory dir = await getPlayListDir();
+      final dirList = await dir.list().toList();
+      final List<String> list = [];
+      for (var v in dirList) {
+        if (v.path.endsWith(".txt") || v.path.endsWith(".m3u")) {
+          final path = v.path.replaceAll('\\', '/');
+          list.add(basename ? path.split('/').last : path);
+        }
       }
+      return list;
+    } catch (e) {
+      return [];
     }
-    return list;
   }
 
   //解析【本地】文件的播放列表内容
@@ -109,7 +113,11 @@ class PlaylistUtil {
 
 //读取文件文本行内容
   Future<List<String>> readFileLines(String filePath) async {
-    return File(filePath).readAsLines();
+    try {
+      return File(filePath).readAsLines();
+    } catch (e) {
+      return [];
+    }
   }
 
 //解析text的分组 [{'group':'name','index':0}]
