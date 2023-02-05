@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vvibe/common/values/enum.dart';
+import 'package:vvibe/models/media_info.dart';
+import 'package:vvibe/models/url_sniff_res.dart';
 
 class SniffResTable extends StatelessWidget {
   SniffResTable({Key? key, required this.data, required this.validOnly})
       : super(key: key);
-  List<dynamic> data = [];
+  List<UrlSniffRes> data = [];
   bool validOnly = false;
 //渲染状态标签
-  Widget _renderStatus(UrlSniffResStatus status) {
+  Widget _renderStatus(UrlSniffResStatus? status) {
     Color color = Colors.black;
     String text = '';
     switch (status) {
@@ -16,10 +19,12 @@ class SniffResTable extends StatelessWidget {
         text = '有效';
         break;
       case UrlSniffResStatus.timeout:
-        color = Colors.orange;
+        color = Colors.black;
         text = '超时';
         break;
       default:
+        color = Colors.red;
+        text = '无效';
         break;
     }
     return Text(
@@ -38,33 +43,64 @@ class SniffResTable extends StatelessWidget {
   }
 
   DataCell _cell(String? text) {
-    return DataCell(Text(text ?? ''));
+    return DataCell(
+      Text(text ?? ''),
+    );
   }
 
-  List<dynamic> _getData(list, validOnly) => validOnly
-      ? list
-          .where((element) => element['status'] == UrlSniffResStatus.success)
-          .toList()
-      : list;
+  DataCell _urlCell(String? text) {
+    return DataCell(Row(
+      children: [
+        SelectableText(text ?? ''),
+        IconButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: text ?? ''));
+            },
+            icon: Icon(
+              Icons.copy,
+              size: 14,
+            ))
+      ],
+    ));
+  }
+
+  List<UrlSniffRes> _getData(List<UrlSniffRes> list, bool _validOnly) =>
+      _validOnly != false
+          ? list
+              .where((element) => element.status == UrlSniffResStatus.success)
+              .toList()
+          : list;
+
+  String _getVideoSize(MediaInfo? info) {
+    if (info != null && info.streams != null) {
+      final videos =
+          info.streams!.where((element) => element.codecType == 'video');
+      return videos.length > 0
+          ? '${videos.first.width}X${videos.first.height}'
+          : '-';
+    }
+    return '-';
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: DataTable(
+            dataRowHeight: 30,
             columns: [
-          _columnHeader('频道'),
-          _columnHeader('状态'),
-          _columnHeader('分辨率'),
-          _columnHeader('地区/运营商'),
-          _columnHeader('链接'),
-        ],
-            rows: _getData(data, validOnly).map((e) {
+              _columnHeader('频道'),
+              _columnHeader('状态'),
+              _columnHeader('分辨率'),
+              _columnHeader('地区/运营商'),
+              _columnHeader('链接'),
+            ],
+            rows: _getData(data, validOnly).map((UrlSniffRes e) {
               return DataRow(cells: [
-                _cell(e['']),
-                DataCell(_renderStatus(e['status'])),
-                _cell(e['']),
-                _cell(e['ipInfo']),
-                _cell(e['url']),
+                _cell('${e.index.toString()}号'),
+                DataCell(_renderStatus(e.status)),
+                _cell(_getVideoSize(e.mediaInfo)),
+                _cell(e.ipInfo),
+                _urlCell(e.url),
               ]);
             }).toList()));
   }

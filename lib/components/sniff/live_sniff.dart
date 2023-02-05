@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/components/sniff/sniff_res_table.dart';
+import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 import 'package:vvibe/utils/playlist/sniff_util.dart';
@@ -28,12 +29,12 @@ class _LiveSniffState extends State<LiveSniff> {
   int failed = 0; //无效数量
   bool sniffing = false; //扫描中
   bool canceled = false; //已取消
-  List<dynamic> data = []; //表格数据
+  List<UrlSniffRes> data = []; //表格数据
   @override
   void initState() {
     super.initState();
     _batchNumCtl.text = '5';
-    _toNumCtl.text = '1000';
+    _toNumCtl.text = '3000';
     _urlTextCtl.text = 'http://113.64.147.[1-10]:808/hls/[1-11]/index.m3u8';
   }
 
@@ -59,7 +60,9 @@ class _LiveSniffState extends State<LiveSniff> {
     setState(() {
       sniffing = false;
     });
-    EasyLoading.showToast('扫描完成');
+    if (!canceled) {
+      EasyLoading.showToast('扫描完成');
+    }
   }
 
 //批量扫描
@@ -74,33 +77,35 @@ class _LiveSniffState extends State<LiveSniff> {
               i * size, endIndex > urls.length ? urls.length : endIndex);
 
       final reqs = subUrls.map((url) => _checkUrl(url,
-          withMeta: withMeta, timeout: int.tryParse(_toNumCtl.text) ?? 1000));
+          withMeta: withMeta,
+          timeout: int.tryParse(_toNumCtl.text) ?? 1000,
+          index: urls.indexOf(url)));
       if (canceled) {
         _stop();
         break;
       }
-      final values = await Future.wait<dynamic>(reqs);
+      final List<UrlSniffRes> values = await Future.wait(reqs);
 
       final _data = data;
       _data.addAll(values);
 
       setState(() {
-        checked = endIndex;
+        checked = endIndex > urls.length ? urls.length : endIndex;
         success = success +
-            values.where((element) => element['statusCode'] == 200).length;
+            values.where((element) => element.statusCode == 200).length;
         timeout = timeout +
-            values.where((element) => element['statusCode'] == 504).length;
+            values.where((element) => element.statusCode == 504).length;
         data = _data;
       });
     }
   }
 
   //检测url
-  Future<dynamic> _checkUrl(String url,
-      {bool withMeta = false, int timeout = 1000}) async {
-    final map = await SniffUtil()
-        .checkSniffUrl(url, withMeta: withMeta, timeout: timeout);
-    return map;
+  Future<UrlSniffRes> _checkUrl(String url,
+      {bool withMeta = false, int timeout = 3000, int index = 0}) async {
+    final res = await SniffUtil()
+        .checkSniffUrl(url, withMeta: withMeta, timeout: timeout, index: index);
+    return res;
   }
 
 //取消扫描
@@ -114,6 +119,7 @@ class _LiveSniffState extends State<LiveSniff> {
 //清空
   _clear() {
     setState(() {
+      checked = 0;
       canceled = false;
       data = [];
       total = 0;
@@ -281,7 +287,7 @@ class _LiveSniffState extends State<LiveSniff> {
               margin: const EdgeInsets.only(
                 top: 20,
               ),
-              child: SniffResTable(data: data, validOnly: false)),
+              child: SniffResTable(data: data, validOnly: validOnly)),
         )
       ]),
     );
