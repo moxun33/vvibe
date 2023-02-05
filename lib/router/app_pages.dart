@@ -6,6 +6,7 @@ import 'package:vvibe/pages/login/login_view.dart';
 import 'package:vvibe/pages/notfound/notfound_view.dart';
 import 'package:vvibe/pages/proxy/proxy_view.dart';
 import 'package:get/get.dart';
+import 'package:vvibe/window/window_widgets.dart';
 part 'app_routes.dart';
 
 class AppPages {
@@ -18,23 +19,23 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.Login,
-      page: () => LoginPage(),
+      page: () => WindowScaffold(LoginPage()),
       binding: LoginBinding(),
     ),
     GetPage(
       name: AppRoutes.Home,
-      page: () => HomePage(),
+      page: () => WindowScaffold(HomePage()),
       binding: HomeBinding(),
     ),
   ];
 
   static final unknownRoute = GetPage(
     name: AppRoutes.NotFound,
-    page: () => NotfoundPage(),
+    page: () => WindowScaffold(NotfoundPage()),
   );
 
   static final proxyRoute = GetPage(
     name: AppRoutes.Proxy,
-    page: () => ProxyPage(),
+    page: () => WindowScaffold(ProxyPage()),
   );
 }

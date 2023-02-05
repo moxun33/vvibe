@@ -66,10 +66,10 @@ dependencies:
     git:
       url: https://github.com/MixinNetwork/flutter-plugins
       path: packages/desktop_multi_window
-  window_size:
-    git:
-      url: https://github.com/google/flutter-desktop-embedding
-      path: plugins/window_size
+#  window_size:
+#    git:
+#      url: https://github.com/google/flutter-desktop-embedding
+#      path: plugins/window_size
   ffi: ^2.0.0
   flutter_rust_bridge: 1.41.3
   collection: ^1.16.0
@@ -81,6 +81,7 @@ dependencies:
   # dio cache
   dio_cache_interceptor: ^3.3.1
   shortid: ^0.1.2
+  bitsdojo_window: ^0.1.5
   #archive: ^3.3.6
 
 

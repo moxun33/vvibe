@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:vvibe/services/notifications/v_size_changed_layout_notification.dart';
+import 'package:vvibe/window/window_widgets.dart';
 
 class SubWindow extends StatefulWidget {
   const SubWindow(
@@ -34,7 +35,7 @@ class _SubWindowState extends State<SubWindow> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: NotificationListener<VSizeChangedLayoutNotification>(
+      home: WindowScaffold(NotificationListener<VSizeChangedLayoutNotification>(
           onNotification: (VSizeChangedLayoutNotification notification) {
             if (notification.size.width < 1200 ||
                 notification.size.height < 700) {
@@ -48,7 +49,7 @@ class _SubWindowState extends State<SubWindow> {
               child: Container(
             child: widget.child,
             constraints: BoxConstraints(minWidth: 1200, minHeight: 700),
-          ))),
+          )))),
       title: widget.title,
       theme: widget.theme,
       debugShowCheckedModeBanner: false,

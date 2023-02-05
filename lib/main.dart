@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-03 16:41:02
+ * @LastEditTime: 2023-02-05 22:12:59
  * @FilePath: \vvibe\lib\main.dart
  * @Description: 
  * @qmj
@@ -19,6 +19,7 @@ import 'package:vvibe/pages/Index/index_binding.dart';
 import 'package:vvibe/router/app_pages.dart';
 import 'package:get/get.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/live_sniff_win.dart';
 
 void main(List<String> args) async {
@@ -28,13 +29,19 @@ void main(List<String> args) async {
         ? const {}
         : jsonDecode(args[2]) as Map<String, dynamic>;
     print(argument);
-    Global.init(shouldSetSize: false).then((theme) => runApp(LiveSniffWin(
-          theme: theme,
-          windowController: WindowController.fromWindowId(windowId),
-          args: argument,
-        )));
+    Global.init(shouldSetSize: false).then((theme) {
+      runApp(LiveSniffWin(
+        theme: theme,
+        windowController: WindowController.fromWindowId(windowId),
+        args: argument,
+      ));
+      // VWindow().initWindow();
+    });
   } else {
-    Global.init().then((theme) => runApp(MyApp(theme: theme)));
+    Global.init().then((theme) {
+      runApp(MyApp(theme: theme));
+      VWindow().initWindow();
+    });
   }
 }
 

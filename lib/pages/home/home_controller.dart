@@ -13,18 +13,14 @@ import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
-//import 'package:dart_vlc/dart_vlc.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
-import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/local_storage.dart';
-import 'package:vvibe/utils/playlist/sniff_util.dart';
-import 'package:window_size/window_size.dart';
 import 'package:vvibe/services/services.dart';
+import 'package:vvibe/window/window.dart';
 
 class HomeController extends GetxController {
   Fvp player = Fvp();
@@ -228,7 +224,7 @@ class HomeController extends GetxController {
     stopDanmakuSocket();
     barrageWallController.disable();
     update();
-    setWindowTitle('vvibe');
+    VWindow().setWindowTitle('vvibe');
     return player.stop();
   }
 
@@ -246,7 +242,7 @@ class HomeController extends GetxController {
         'x' +
         info['video']['codec']['height'].toString();
     final title = '${item.name} [${ratio}]';
-    setWindowTitle(title);
+    VWindow().setWindowTitle(title);
   }
 
   //获取当前弹幕区域尺寸
@@ -275,7 +271,7 @@ class HomeController extends GetxController {
   @override
   void dispose() {
     stopPlayer(dispose: Global.isRelease);
-    setWindowTitle('vvibe');
+    VWindow().setWindowTitle('vvibe');
 
     super.dispose();
   }

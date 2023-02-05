@@ -9,7 +9,6 @@ import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
 
 import 'package:vvibe/utils/utils.dart';
-import 'package:window_size/window_size.dart';
 
 /// 全局配置
 class Global {
@@ -34,10 +33,7 @@ class Global {
     WidgetsFlutterBinding.ensureInitialized();
     if (shouldSetSize && Platform.isWindows ||
         Platform.isLinux ||
-        Platform.isMacOS) {
-      setWindowMaxSize(const Size(3840, 2160));
-      setWindowMinSize(const Size(1280, 720));
-    }
+        Platform.isMacOS) {}
     // await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
     // Ruquest 模块初始化
     Request();
