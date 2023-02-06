@@ -42,9 +42,10 @@
 
 ## 截图
 
-![img](https://raw.githubusercontent.com/moxun33/vvibe/main/screenshots/player.png)
+![img](docs/player.png)
 
-![img](https://raw.githubusercontent.com/moxun33/vvibe/main/screenshots/settings.png)
+![img](docs/settings.png)
+![img](docs/urls-sniffing.png)
 
 ## 注意
 
