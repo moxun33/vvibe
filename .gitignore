@@ -50,6 +50,6 @@ target/
 
 flutter_rust_bridge_codegen.exe
 ./playlist/
-./docs/*
+
 snapshots/*
 ./data/
