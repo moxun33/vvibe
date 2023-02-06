@@ -82,5 +82,6 @@
     "cmake.configureOnOpen": false,
     "editor.suggest.snippetsPreventQuickSuggestions": false,
     "aiXcoder.showTrayIcon": true,
-    "cmake.sourceDirectory": "${workspaceFolder}/build/windows/_deps/corrosion-src"
+    "cmake.sourceDirectory": "${workspaceFolder}/build/windows/_deps/corrosion-src",
+    "git.ignoreLimitWarning": true
 }

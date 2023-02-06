@@ -8,7 +8,7 @@ class SplashPage extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: new BoxDecoration(
-          color: Colors.black87,
+          color: Colors.black,
         ),
         child: Center(
           child: SizedBox(

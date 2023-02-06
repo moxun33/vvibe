@@ -11,17 +11,19 @@ class WindowButtons extends StatefulWidget {
 
 class _WindowButtonsState extends State<WindowButtons> {
   final buttonColors = WindowButtonColors(
-      iconNormal: Colors.white,
-      mouseOver: Colors.purple,
-      mouseDown: Colors.purple[400],
-      iconMouseOver: Colors.white,
-      iconMouseDown: Colors.white);
+    //  iconNormal: Colors.white,
+    mouseOver: Colors.purple,
+    mouseDown: Colors.purple[400],
+    /* iconMouseOver: Colors.white ,*/
+    /* iconMouseDown: Colors.white */
+  );
 
   final closeButtonColors = WindowButtonColors(
-      mouseOver: const Color(0xFFD32F2F),
-      mouseDown: const Color(0xFFB71C1C),
-      iconNormal: Colors.white,
-      iconMouseOver: Colors.purple[100]);
+    mouseOver: const Color(0xFFD32F2F),
+    mouseDown: const Color(0xFFB71C1C),
+    //  iconNormal: Colors.white,
+    /* iconMouseOver: Colors.purple[100] */
+  );
   void maximizeOrRestore() {
     setState(() {
       appWindow.maximizeOrRestore();
@@ -53,8 +55,8 @@ class _WindowButtonsState extends State<WindowButtons> {
 }
 
 class WindowTitle extends StatefulWidget {
-  const WindowTitle({Key? key}) : super(key: key);
-
+  WindowTitle({Key? key, this.title}) : super(key: key);
+  String? title;
   @override
   _WindowTitleState createState() => _WindowTitleState();
 }
@@ -64,6 +66,7 @@ class _WindowTitleState extends State<WindowTitle> {
   @override
   void initState() {
     super.initState();
+    title = widget.title ?? 'VVibe';
     eventBus.on("set-window-title", (arg) {
       // do something
       setState(() {
@@ -74,16 +77,17 @@ class _WindowTitleState extends State<WindowTitle> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: TextStyle(color: Colors.white));
+    return Text(title, style: TextStyle(color: Colors.black));
   }
 }
 
 //顶部操作栏
-Widget WindowTitleBar() {
+Widget WindowTitleBar({String title = 'VVibe'}) {
   return WindowTitleBarBox(
     child: MoveWindow(
         child: Container(
-      color: Color.fromRGBO(40, 40, 40, 1),
+      height: 30,
+      // color: Color.fromRGBO(40, 40, 40, 1),
       child: Flex(
         direction: Axis.horizontal,
         children: [
@@ -99,7 +103,7 @@ Widget WindowTitleBar() {
                       height: 15,
                       width: 20,
                     ),
-                    WindowTitle()
+                    WindowTitle(title: title)
                   ],
                 )),
           ),
@@ -111,13 +115,13 @@ Widget WindowTitleBar() {
 }
 
 //统一窗口包裹器
-Widget WindowScaffold(Widget child) {
+Widget WindowScaffold(Widget child, {String title = 'VVibe'}) {
   return Scaffold(
     body: WindowBorder(
         color: Colors.transparent,
         width: 0,
         child: Column(
-          children: [WindowTitleBar(), Expanded(child: child)],
+          children: [WindowTitleBar(title: title), Expanded(child: child)],
         )),
   );
 }

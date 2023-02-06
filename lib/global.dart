@@ -31,10 +31,7 @@ class Global {
   static Future<ThemeData> init({bool shouldSetSize = true}) async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
-    if (shouldSetSize && Platform.isWindows ||
-        Platform.isLinux ||
-        Platform.isMacOS) {}
-    // await DartVLC.initialize(useFlutterNativeView: Global.useNativeView);
+
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化

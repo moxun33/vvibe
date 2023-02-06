@@ -15,7 +15,7 @@ class AppPages {
   static final routes = [
     GetPage(
       name: AppRoutes.Index,
-      page: () => IndexPage(),
+      page: () => WindowScaffold(IndexPage()),
     ),
     GetPage(
       name: AppRoutes.Login,

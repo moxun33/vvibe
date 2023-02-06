@@ -35,7 +35,9 @@ class _SubWindowState extends State<SubWindow> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: WindowScaffold(NotificationListener<VSizeChangedLayoutNotification>(
+      home: widget.child,
+      title: widget.title,
+      /*  WindowScaffold(NotificationListener<VSizeChangedLayoutNotification>(
           onNotification: (VSizeChangedLayoutNotification notification) {
             if (notification.size.width < 1200 ||
                 notification.size.height < 700) {
@@ -49,8 +51,7 @@ class _SubWindowState extends State<SubWindow> {
               child: Container(
             child: widget.child,
             constraints: BoxConstraints(minWidth: 1200, minHeight: 700),
-          )))),
-      title: widget.title,
+          )))), */
       theme: widget.theme,
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),

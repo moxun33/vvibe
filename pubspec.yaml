@@ -62,9 +62,10 @@ dependencies:
       ref: master
   # path: ../fvp
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
-  desktop_multi_window:
+  desktop_multi_window: 
+    #path: E:\source-code\flutter-src\flutter-plugins\packages\desktop_multi_window
     git:
-      url: https://github.com/MixinNetwork/flutter-plugins
+      url: https://github.com/moxun33/flutter-plugins
       path: packages/desktop_multi_window
 #  window_size:
 #    git:
