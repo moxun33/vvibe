@@ -4,7 +4,7 @@ name: Build-test
 
 # Controls when the workflow will run
 on:
-  push:
+  #push:
 
 
   # Allows you to run this workflow manually from the Actions tab
@@ -48,6 +48,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          cache: true
 
       - name: Build Windows App
         run: |

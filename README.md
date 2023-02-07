@@ -30,20 +30,20 @@
 ## 开发
 
 - 拉取项目，安装依赖
-- 
-- (可选) FFI Code Gen ，运行
+- 安装配置``ffmpeg``(已测试版本为``4.4.1``,其他版本未测试_和``LLVM``。[下载ffmpeg](https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.zip),解压后，设置环境变量``FFMPEG_DIR``为ffmpeg解压目录。更多信息，请参考[这里](https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building))
+
+- (可选) FFI Code Gen ，首次运行
 
 ``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart ``
 
 
 - 启动项目
- > 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 且``rust ``版本大于1.66
+ > 提醒：项目中使用了 ``flutter_rust_bridge``，可自行搭建``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 且``rust ``版本大于1.66
  
 
 ## 截图
 
 ![img](docs/player.png)
-
 ![img](docs/settings.png)
 ![img](docs/urls-sniffing.png)
 
@@ -56,7 +56,11 @@
 - build
 ``flutter build apk --no-sound-null-safety``
 
-2、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误时，参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置
+2、项目使用了[rust-ffmpeg](https://github.com/meh/rust-ffmpeg)，需要提前配置编译环境 
+
+
+4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误时，参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。一般设置好``FFMPEG_DIR``不会出现该错误。
+
 
 ## 声明
 
@@ -77,5 +81,5 @@
 -直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 - 使用[mdk-sdk](https://github.com/wang-bin/mdk-sdk)开发flutter插件进行视频播放，相对于``dart-vlc``性能大幅提升，产物大小大幅降低
 - 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
-  
 - 视频播放器`fvp`插件的`API`持续开发中
+- ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
