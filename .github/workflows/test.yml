@@ -34,7 +34,7 @@ jobs:
           Write-Output "::set-env name=LIBCLANG_PATH::${VCINSTALLDIR}\VC\Tools\LLVM\x64\bin"
           Invoke-WebRequest "${env:FFMPEG_URL}" -OutFile "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip"
           Expand-Archive -Path "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip" -DestinationPath .
-          # Write-Output "::set-env name=FFMPEG_DIR::${pwd}\ffmpeg-${env:FFMPEG_VERSION}-win64-dev"
+          Write-Output "::set-env name=FFMPEG_DIR::${pwd}\ffmpeg-${env:FFMPEG_VERSION}-win64-dev"
 
 
       - name: Set up Rust
