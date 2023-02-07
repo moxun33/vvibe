@@ -44,7 +44,9 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt, clippy  
-
+      - name: Copy ffmpeg dll to cargo dir
+        run: |
+          cp ffmpeg/bin/*.dll C:\Users\runneradmin\.cargo\bin
 
       - uses: subosito/flutter-action@v2
         with:

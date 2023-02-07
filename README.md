@@ -22,6 +22,7 @@
 - 打开单个网络链接
 - 播放器基本设置
 - 直播源扫描和导出
+- 扫源时获取IPV4地址信息和媒体信息
   
 ## 多平台
 
@@ -31,15 +32,10 @@
 
 - 拉取项目，安装依赖
 - 安装配置``ffmpeg``(已测试版本为``4.4.1``,其他版本未测试_和``LLVM``。[下载ffmpeg](https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.zip),解压后，设置环境变量``FFMPEG_DIR``为ffmpeg解压目录。更多信息，请参考[这里](https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building))
-
-- (可选) FFI Code Gen ，首次运行
-
-``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart ``
-
+- 搭建``rust``环境(``rust ``版本大于1.66)，参考[rustup](https://www.rust-lang.org/zh-CN/tools/install)。 Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录, 否则``rust-ffmpeg``可能出错。
+- 首次运行 ``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart ``
 
 - 启动项目
- > 提醒：项目中使用了 ``flutter_rust_bridge``，可自行搭建``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 且``rust ``版本大于1.66
- 
 
 ## 截图
 
@@ -58,8 +54,9 @@
 
 2、项目使用了[rust-ffmpeg](https://github.com/meh/rust-ffmpeg)，需要提前配置编译环境 
 
+3、关于``flutter_rust_bridge``，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 
 
-4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误时，参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。一般设置好``FFMPEG_DIR``不会出现该错误。
+4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误或扫源时无法获取媒体信息(Windows平台中显示无法加载``native.dll``)，Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录。具体参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。 。
 
 
 ## 声明
