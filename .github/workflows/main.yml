@@ -25,6 +25,12 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "10.0"
+      - uses: FedericoCarboni/setup-ffmpeg@v2
+      
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
