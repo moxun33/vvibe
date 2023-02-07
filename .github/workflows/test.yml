@@ -1,0 +1,77 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build-test
+
+# Controls when the workflow will run
+on:
+  push:
+    tags:
+      - "v*"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  # APP name
+  APP_NAME: vvibe
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-windows:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+    env:
+      FFMPEG_URL: https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.7z
+      FFMPEG_VERSION: 4.4.1
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          $VCINSTALLDIR = $(& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath)
+          Write-Output "::set-env name=LIBCLANG_PATH::${VCINSTALLDIR}\VC\Tools\LLVM\x64\bin"
+          Invoke-WebRequest "${env:FFMPEG_URL}" -OutFile "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip"
+          Expand-Archive -Path "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip" -DestinationPath .
+          Write-Output "::set-env name=FFMPEG_DIR::${pwd}\ffmpeg-${env:FFMPEG_VERSION}-win64-dev"
+
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy  
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Build Windows App
+        run: |
+          flutter config --enable-windows-desktop
+          flutter pub get
+          flutter build windows
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: "zip"
+          filename: vvibe-${{github.ref_name}}-windows.zip
+          directory: build/windows/runner/Release
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{github.ref_name}}
+          draft: true
+          prerelease: true
+          token: ${{ secrets.GH_TOKEN }}
+          files: |
+            build/windows/runner/Release/vvibe-${{github.ref_name}}-windows.zip
+
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-windows
+          path: build/windows/runner/Release/vvibe-${{github.ref_name}}-windows.zip

@@ -49,10 +49,10 @@ jobs:
       - name: copy ffmpeg lib to cargo
         run: |
           ls
-          mv ffmpeg-release-full/*.dll C:\Users\runneradmin\.cargo\bin
+          cp ffmpeg-release-full/*.dll C:\Users\runneradmin\.cargo\bin
           cd C:\Users\runneradmin\.cargo\bin
-          ls
-          
+
+
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
