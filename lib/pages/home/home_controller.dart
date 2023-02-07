@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-04 21:20:44
+ * @LastEditTime: 2023-02-07 13:21:17
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -18,6 +18,7 @@ import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/services/services.dart';
 import 'package:vvibe/window/window.dart';
@@ -51,10 +52,13 @@ class HomeController extends GetxController {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-    //  _tt();
+    //_tt();
   }
 
-  _tt() async {}
+  _tt() async {
+    FfiUtil().getMediaInfo(
+        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
+  }
 
 //发送弹幕到屏幕
   void sendDanmakuBullet(LiveDanmakuItem? data) async {

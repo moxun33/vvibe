@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-15 15:59:57
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-05 17:23:36
+ * @LastEditTime: 2023-02-07 13:24:10
  * @FilePath: \vvibe\lib\utils\ffi_util.dart
  * @Description: 
  * @qmj
@@ -14,6 +14,7 @@ import 'dart:io';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/bridge_generated.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/models/ffprobe_info.dart';
 import 'package:vvibe/models/media_info.dart';
 
 // Re-export the bridge so it is only necessary to import this file.
@@ -49,14 +50,15 @@ class FfiUtil {
   }
 
 //获取url的媒体元数据
-  Future<MediaInfo?> getMediaInfo(String url) async {
+  Future<FFprobeInfo?> getMediaInfo(String url) async {
     try {
-      String raw = await api.getMediaInfo(
-          url: url, ffprobeDir: '${Directory(ASSETS_DIR).path}/ffprobe.exe');
-      MediaInfo info = MediaInfo.fromJson(jsonDecode(raw));
+      //'${Directory(ASSETS_DIR).path}/ffprobe.exe'
+      String raw = await api.getMediaInfo(url: url, ffprobeDir: '');
+      FFprobeInfo info = FFprobeInfo.fromJson(jsonDecode(raw));
       return info;
     } catch (e) {
-      EasyLoading.showError(e.toString());
+      //EasyLoading.showError(e.toString());
+      print('媒体信息获取失败$url ${e.toString()}');
       return null;
     }
   }

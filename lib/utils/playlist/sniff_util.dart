@@ -7,6 +7,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shortid/shortid.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/models/ffprobe_info.dart';
 import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/ffi_util.dart';
@@ -125,7 +126,7 @@ class SniffUtil {
       final inst = Dio(new BaseOptions(
           connectTimeout: timeout, headers: {'User-Agent': DEF_REQ_UA}));
       final resp = await inst.head(url);
-      MediaInfo? meta = null;
+      FFprobeInfo? meta = null;
       String ipInfo = '';
       DateTime endTime = DateTime.now();
       final ipv4 = extractIpv4(url);
@@ -161,12 +162,13 @@ class SniffUtil {
     }
   }
 
-  String getVideoSize(MediaInfo? info) {
+  String getVideoSize(FFprobeInfo? info) {
     if (info != null && info.streams != null) {
-      final videos =
-          info.streams!.where((element) => element.codecType == 'video');
-      return videos.length > 0
-          ? '${videos.first.width}*${videos.first.height}'
+      final videoIndex = info.best?.video ?? -1;
+      if (videoIndex < 0) return '-';
+      final stream = info.streams?[videoIndex];
+      return videoIndex >= 0
+          ? '${stream?.content?.video?.width}*${stream?.content?.video?.height}'
           : '-';
     }
     return '-';
