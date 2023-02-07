@@ -23,18 +23,18 @@ jobs:
     env:
       FFMPEG_URL: https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.7z
       FFMPEG_VERSION: 4.4.1
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - run: echo "NOW=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
           $VCINSTALLDIR = $(& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath)
           Write-Output "::set-env name=LIBCLANG_PATH::${VCINSTALLDIR}\VC\Tools\LLVM\x64\bin"
           Invoke-WebRequest "${env:FFMPEG_URL}" -OutFile "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip"
           Expand-Archive -Path "ffmpeg-${env:FFMPEG_VERSION}-win64-dev.zip" -DestinationPath .
-          Write-Output "::set-env name=FFMPEG_DIR::${pwd}\ffmpeg-${env:FFMPEG_VERSION}-win64-dev"
+          # Write-Output "::set-env name=FFMPEG_DIR::${pwd}\ffmpeg-${env:FFMPEG_VERSION}-win64-dev"
 
 
       - name: Set up Rust
