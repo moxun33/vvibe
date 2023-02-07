@@ -37,7 +37,7 @@
 
 
 - 启动项目
- > 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) ``rust ``版本大于1.66
+ > 提醒：项目中使用了 ``flutter_rust_bridge``，可能需要用到``rust``环境，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 且``rust ``版本大于1.66
  
 
 ## 截图
@@ -47,7 +47,7 @@
 ![img](docs/settings.png)
 ![img](docs/urls-sniffing.png)
 
-## 注意
+## 注意事项
 
 1、有些包不支持 safety模式。解决方案：``--no-sound-null-safety``
 
@@ -56,9 +56,7 @@
 - build
 ``flutter build apk --no-sound-null-safety``
 
-2、本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
-
-3、直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
+2、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误时，参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置
 
 ## 声明
 
@@ -74,6 +72,9 @@
 
 ## 备注
 
+-本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
+
+-直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 - 使用[mdk-sdk](https://github.com/wang-bin/mdk-sdk)开发flutter插件进行视频播放，相对于``dart-vlc``性能大幅提升，产物大小大幅降低
 - 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
   

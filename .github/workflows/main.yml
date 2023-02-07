@@ -20,7 +20,9 @@ jobs:
   build-windows:
     # The type of runner that the job will run on
     runs-on: windows-latest
-
+    env:
+      ffmpeg_url: https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.7z
+   
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -29,8 +31,28 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: "10.0"
-      - uses: FedericoCarboni/setup-ffmpeg@v2
-      
+      - name: download ffmpeg builds 
+        run: |
+          curl -L ${{env.ffmpeg_url}} -o ffmpeg-release-full.7z
+          mkdir ffmpeg-release-full || true
+          7z e ffmpeg-release-full.7z -offmpeg-release-full "**/bin/*.dll"
+          
+      - name: Install Rustup using win.rustup.rs
+        run: |
+          # Disable the download progress bar which can cause perf issues
+          $ProgressPreference = "SilentlyContinue"
+          Invoke-WebRequest https://win.rustup.rs/ -OutFile rustup-init.exe
+          .\rustup-init.exe -y --default-host=x86_64-pc-windows-msvc --default-toolchain=none
+          del rustup-init.exe
+        shell: powershell
+
+      - name: copy ffmpeg lib to cargo
+        run: |
+          ls
+          mv ffmpeg-release-full/*.dll C:\Users\runneradmin\.cargo\bin
+          cd C:\Users\runneradmin\.cargo\bin
+          ls
+          
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
