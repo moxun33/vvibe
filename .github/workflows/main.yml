@@ -21,8 +21,8 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
     env:
-      ffmpeg_url: https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.7z
-   
+      FFMPEG_DOWNLOAD_URL: https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.7z
+      FFMPEG_VERSION: 4.4.1 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
