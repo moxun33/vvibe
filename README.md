@@ -30,9 +30,9 @@
 
 ## 开发
 
-- 拉取项目，安装依赖
-- 安装配置``ffmpeg``(已测试版本为``4.4.1``,其他版本未测试_和``LLVM``。[下载ffmpeg](https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.zip),解压后，设置环境变量``FFMPEG_DIR``为ffmpeg解压目录。更多信息，请参考[这里](https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building))
+- 安装``ffmpeg``(已测试版本为``4.4.1``,其他版本未测试)和``LLVM``(可通过Visual Studio安装)。[下载ffmpeg](https://github.com/GyanD/codexffmpeg/releases/download/4.4.1/ffmpeg-4.4.1-full_build-shared.zip)， 解压后，设置环境变量``FFMPEG_DIR``为ffmpeg解压目录。更多信息，请参考[这里](https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building)。
 - 搭建``rust``环境(``rust ``版本大于1.66)，参考[rustup](https://www.rust-lang.org/zh-CN/tools/install)。 Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录, 否则``rust-ffmpeg``可能出错。
+- 拉取项目代码，运行``flutter pub get``安装依赖
 - 首次运行 ``flutter_rust_bridge_codegen  --rust-input rust/src/api.rs  --dart-output lib/bridge_generated.dart ``
 
 - 启动项目
@@ -56,7 +56,7 @@
 
 3、关于``flutter_rust_bridge``，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 
 
-4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误或扫源时无法获取媒体信息(Windows平台中显示无法加载``native.dll``)，Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录。具体参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。 。
+4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误或扫源时无法获取媒体信息(Windows平台中显示无法加载``native.dll``)，Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录。具体参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。 
 
 
 ## 声明
@@ -70,13 +70,16 @@
 - [mdk-sdk](https://github.com/wang-bin/mdk-sdk)
 - [fvp](https://github.com/wang-bin/fvp)
 - [ice_live_viewer](https://github.com/iiijam/ice_live_viewer)
+- [rust-ffmpeg](https://github.com/meh/rust-ffmpeg)
 
 ## 备注
 
--本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
+- 本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
 
--直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
+- 直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 - 使用[mdk-sdk](https://github.com/wang-bin/mdk-sdk)开发flutter插件进行视频播放，相对于``dart-vlc``性能大幅提升，产物大小大幅降低
 - 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
 - 视频播放器`fvp`插件的`API`持续开发中
 - ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
+ 
+- 项目还使用或借鉴了未列出的其他项目，同样在此感谢。
