@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
 import 'package:vvibe/components/components.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/models/playlist_item.dart';
