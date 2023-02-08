@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:vvibe/components/components.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -98,6 +99,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
         played = st.isBefore(now),
         toPlay = et.isAfter(now);
     return Container(
+      padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Flex(direction: Axis.horizontal, children: [
         Expanded(
             child: Row(
@@ -124,8 +126,9 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
           child: _setBtn(epg, isLive: isLive, played: played, toPlay: toPlay),
         ),
       ]),
-      decoration:
-          BoxDecoration(color: isLive ? Colors.grey[100] : Colors.transparent),
+      decoration: BoxDecoration(
+          color: isLive ? Colors.grey[100] : Colors.transparent,
+          border: Border(bottom: BorderSide(width: 0.5, color: Colors.grey))),
     );
   }
 

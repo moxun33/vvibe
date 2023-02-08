@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-08 22:19:22
+ * @LastEditTime: 2023-02-08 22:51:49
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -106,7 +106,7 @@ class HomeController extends GetxController {
         ? '${url}&playseek=${playseek}'
         : '${url}${url.endsWith('?') ? '' : '?'}playseek=${playseek}';
     _urlItem['url'] = _url;
-    startPlay(PlayListItem.fromJson(_urlItem));
+    startPlay(PlayListItem.fromJson(_urlItem), playback: true);
   }
 
   //显示、隐藏节目单
@@ -189,7 +189,7 @@ class HomeController extends GetxController {
     return ttId;
   }
 
-  void startPlay(PlayListItem item, {bool? first}) async {
+  void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     await updateTexture();
     stopDanmakuSocket();
     if (!(item.url != null && item.url!.isNotEmpty)) {
@@ -206,9 +206,12 @@ class HomeController extends GetxController {
     }
     await player.setMedia(item.url!);
 
-    playingUrl = item;
-    update();
-    LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
+    if (!playback) {
+      playingUrl = item;
+      update();
+      LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
+    }
+
     player.onStateChanged((String state) {
       print("-------------------接收到state改变 $state");
     });
