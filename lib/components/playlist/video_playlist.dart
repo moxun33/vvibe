@@ -62,13 +62,23 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     });
   }
 
+  bool _containSelectedFile(List<Map<String, dynamic>> files) {
+    if (selectedFilename == null) return true;
+    final map = jsonDecode(selectedFilename!);
+    return files.map((e) => e['name']).contains(map['name']);
+  }
+
   void updatePlaylistFiles() async {
     try {
       final files = await PlaylistUtil().getPlayListFiles(basename: true);
       final urls = await PlaylistUtil().getSubUrls();
       urls.addAll(files.map((e) => {'name': e}));
+
       setState(() {
         playFiles = urls;
+        if (!_containSelectedFile(urls)) {
+          selectedFilename = null;
+        }
       });
     } catch (e) {}
   }
