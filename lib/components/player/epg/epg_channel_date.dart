@@ -8,10 +8,14 @@ import 'package:vvibe/utils/utils.dart';
 
 class EpgChannelDate extends StatefulWidget {
   const EpgChannelDate(
-      {Key? key, required this.urlItem, required String this.date})
+      {Key? key,
+      required this.urlItem,
+      required String this.date,
+      required this.doPlayback})
       : super(key: key);
   final PlayListItem urlItem;
   final String date;
+  final Function doPlayback;
   @override
   _EpgChannelDateState createState() => _EpgChannelDateState();
 }
@@ -50,16 +54,35 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
         int.parse(hm[0]), int.parse(hm[1]));
   }
 
+  String _toSeekTime(String time) {
+    return widget.date.replaceAll('-', '') + time.replaceAll(':', '') + '00';
+  }
+
+  bool canUrlPlayback() {
+    final url = widget.urlItem.url;
+    if (url == null) return false;
+    return url.indexOf('PLTV') > -1 || url.indexOf('TVOD') > -1;
+  }
+
+  String getPlayseek(EpgDatum epg) {
+    return _toSeekTime(epg.start) + '-' + _toSeekTime(epg.end);
+  }
+
   Widget _setBtn(EpgDatum epg,
       {bool isLive = false, bool played = false, bool toPlay = false}) {
-    final canPlayback = true;
-    final text = Text(isLive ? '正在直播' : (toPlay ? '未播放' : '已播放'),
+    final canPlayback = canUrlPlayback();
+    final text = Text(
+        isLive ? '正在直播' : (toPlay ? '未播放' : (canPlayback ? '回看' : '已播放')),
         style: TextStyle(
             color: isLive
                 ? Colors.purple
                 : (toPlay ? Colors.grey[600] : Colors.blue[300])));
     if (played && !isLive && canPlayback) {
-      return TextButton(onPressed: () {}, child: text);
+      return TextButton(
+          onPressed: () {
+            widget.doPlayback(getPlayseek(epg));
+          },
+          child: text);
     }
     return Padding(
       padding: const EdgeInsets.only(left: 28),

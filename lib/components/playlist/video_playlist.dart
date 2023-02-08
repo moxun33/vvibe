@@ -63,12 +63,14 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
   void updatePlaylistFiles() async {
-    final files = await PlaylistUtil().getPlayListFiles(basename: true);
-    final urls = await PlaylistUtil().getSubUrls();
-    urls.addAll(files.map((e) => {'name': e}));
-    setState(() {
-      playFiles = urls;
-    });
+    try {
+      final files = await PlaylistUtil().getPlayListFiles(basename: true);
+      final urls = await PlaylistUtil().getSubUrls();
+      urls.addAll(files.map((e) => {'name': e}));
+      setState(() {
+        playFiles = urls;
+      });
+    } catch (e) {}
   }
 
 //切换播放文件或订阅

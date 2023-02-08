@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-07 13:21:17
+ * @LastEditTime: 2023-02-08 22:19:22
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
+import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/ffi_util.dart';
@@ -93,10 +94,28 @@ class HomeController extends GetxController {
     }
   }
 
+//实现回看
+  void doPlayback(String playseek) {
+    if (playingUrl == null) return;
+    final _urlItem = playingUrl!.toJson();
+    var url = playingUrl?.url;
+    if (url == null) return;
+    Uri u = Uri.parse(url);
+    final haveQueries = u.queryParameters.length > 0;
+    final _url = haveQueries
+        ? '${url}&playseek=${playseek}'
+        : '${url}${url.endsWith('?') ? '' : '?'}playseek=${playseek}';
+    _urlItem['url'] = _url;
+    startPlay(PlayListItem.fromJson(_urlItem));
+  }
+
   //显示、隐藏节目单
   void toggleEpgDialog() {
     if (playingUrl == null) return;
-    Get.dialog(EpgAlertDialog(urlItem: playingUrl!));
+    Get.dialog(EpgAlertDialog(
+      urlItem: playingUrl!,
+      doPlayback: doPlayback,
+    ));
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕

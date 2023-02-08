@@ -11,7 +11,7 @@
 ![img](https://img.shields.io/github/issues/moxun33/vvibe)
 [![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
 
-> 自用的视频直播观看软件
+> 好用的视频直播观看软件
 
 ## 功能
 
