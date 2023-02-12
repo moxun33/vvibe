@@ -134,7 +134,8 @@ class DouyuDnamakuService {
             final Map<String, dynamic> ext = {
               'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
             };
-            debugPrint('斗鱼弹幕-->$uid $nickname: $content  $color');
+            debugPrint(
+                '斗鱼弹幕-->$uid $nickname: $content  $color ${msgMap['col']}');
             //  print(msgMap);
             danmaku = LiveDanmakuItem(
                 name: nickname, msg: content, uid: uid, ext: ext, color: color);
