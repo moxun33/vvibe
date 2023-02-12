@@ -103,15 +103,20 @@ class DouyuDnamakuService {
 
 //弹幕颜色
   Color setDanmakuColor(String color) {
-    switch (color) {
-      case '1':
+    int num = int.tryParse(color) ?? 10;
+    switch (num) {
+      case 0:
         return ColorUtil.fromHex('#ff0000');
-      case '4':
+      case 1:
+        return ColorUtil.fromHex('#1e87f0');
+      case 2:
+        return ColorUtil.fromHex('#7ac84b');
+      case 3:
         return ColorUtil.fromHex('#ff7f00');
-      case '5':
+      case 4:
         return ColorUtil.fromHex('#9b39f4');
-      case '6':
-        return ColorUtil.fromHex('#aa3cef');
+      case 5:
+        return ColorUtil.fromHex('#ff69b4');
 
       default:
         return ColorUtil.fromDecimal('');

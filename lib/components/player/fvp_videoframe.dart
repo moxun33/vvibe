@@ -119,8 +119,9 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     widget.toggleEpgDialog();
   }
 
-  void _sendDanmaku() {
-    if (widget.sendDanmaku == null || danmakuCtrl.text.isEmpty) return;
+  void _sendDanmaku({String? value}) {
+    final text = value ?? danmakuCtrl.text;
+    if (widget.sendDanmaku == null || text.isEmpty) return;
     widget.sendDanmaku!(danmakuCtrl.text);
     danmakuCtrl.text = '';
   }
@@ -286,7 +287,8 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                                     color: Colors.grey[500]),
                                               ),
                                               controller: danmakuCtrl,
-                                              onSubmitted: (_) => _sendDanmaku),
+                                              onSubmitted: (v) =>
+                                                  _sendDanmaku(value: v)),
                                         ),
                                         Padding(
                                           padding:
