@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 18:47:35
+ * @LastEditTime: 2023-02-12 21:23:44
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -19,6 +19,7 @@ import 'package:vvibe/components/widgets.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/services.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -33,9 +34,7 @@ class HomeController extends GetxController {
 
   final barrageWallController = BarrageWallController();
   PlayListItem? playingUrl;
-  DouyuDnamakuService? dyDanmakuService;
-  BilibiliDanmakuService? blDanmakuService;
-  HuyaDanmakuService? hyDanmakuService;
+
   bool danmakuManualShow = true;
   String tip = ''; //左上角的文字提示
   Hackchat? hc;
@@ -150,54 +149,17 @@ class HomeController extends GetxController {
 
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
-    stopDanmakuSocket();
+    //stopDanmakuSocket();
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
     }
-    if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
-    final String rid = item.tvgId!;
-    debugPrint('登录弹幕 ${item.group}');
-    switch (item.group) {
-      case '斗鱼':
-      case 'douyu':
-        dyDanmakuService = DouyuDnamakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              renderDanmaku(node);
-            });
-        dyDanmakuService!.connect();
-        break;
-      case 'B站':
-      case 'bilibili':
-        blDanmakuService = BilibiliDanmakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              renderDanmaku(node);
-            });
-        blDanmakuService?.connect();
-        break;
-      case '虎牙':
-      case 'huya':
-        hyDanmakuService = HuyaDanmakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              renderDanmaku(node);
-            });
-        hyDanmakuService?.connect();
-        break;
-      default:
-    }
+    DanmakuService().start(item, renderDanmaku);
   }
 
 //断开所有弹幕连接
   void stopDanmakuSocket() {
     //barrageWallController.disable();
-
-    dyDanmakuService?.dispose();
-
-    blDanmakuService?.displose();
-
-    hyDanmakuService?.displose();
+    DanmakuService().stop();
   }
 
   void initPlayer() async {
@@ -322,13 +284,9 @@ class HomeController extends GetxController {
   }
 
   @override
-  void onClose() {}
-
-  @override
-  void dispose() {
+  void onClose() {
     stopPlayer();
     VWindow().setWindowTitle('vvibe');
     hc?.close();
-    super.dispose();
   }
 }

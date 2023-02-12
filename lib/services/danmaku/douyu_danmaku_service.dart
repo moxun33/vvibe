@@ -12,6 +12,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class DouyuDnamakuService {
@@ -103,7 +104,7 @@ class DouyuDnamakuService {
 
 //弹幕颜色
   Color setDanmakuColor(String color) {
-    int num = int.tryParse(color) ?? 10;
+    int num = (int.tryParse(color) ?? 10) - 1;
     switch (num) {
       case 0:
         return ColorUtil.fromHex('#ff0000');
@@ -163,12 +164,13 @@ class DouyuDnamakuService {
                 name: nickname, msg: content, uid: uid, ext: ext, color: color);
           }
         } catch (e) {
-          debugPrint('斗鱼弹幕解析异常: $e');
+          Logger.error('斗鱼弹幕解析异常: $e');
+          decodedMsgLen = totalLength; //ignore this message data
         }
       }
       return danmaku;
     } catch (e) {
-      debugPrint('斗鱼弹幕解析ERROR: $e');
+      Logger.error('斗鱼弹幕解析ERROR: $e');
     }
   }
 

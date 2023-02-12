@@ -139,6 +139,6 @@ class Hackchat {
 
   _onWarn(Map<String, dynamic> data) {
     final text = data['text'];
-    Logger.warn(text);
+    Logger.warn('hackchat $text');
   }
 }

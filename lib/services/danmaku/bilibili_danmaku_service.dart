@@ -13,6 +13,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class BilibiliDanmakuService {
@@ -141,7 +142,7 @@ class BilibiliDanmakuService {
         default:
       }
     } catch (e) {
-      debugPrint('解析bili弹幕异常 ${e.toString()}');
+      Logger.error('解析bili弹幕异常 ${e.toString()}');
     }
   }
 
