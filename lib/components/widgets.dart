@@ -2,7 +2,7 @@
  * @Author: moxun33
  * @Date: 2022-09-13 21:40:49
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 17:35:37
+ * @LastEditTime: 2023-02-12 22:43:39
  * @FilePath: \vvibe\lib\components\widgets.dart
  * @Description: 一些小组件
  * @qmj
@@ -12,7 +12,7 @@
 import 'package:flutter/material.dart';
 
 class BorderText extends StatelessWidget {
-  BorderText({Key? key, required this.text, fontSize}) : super(key: key);
+  BorderText({Key? key, required this.text, this.fontSize}) : super(key: key);
   String text;
   double? fontSize;
   @override
@@ -24,7 +24,6 @@ class BorderText extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: fontSize ?? 20,
-            letterSpacing: 5,
             fontWeight: FontWeight.bold,
             foreground: Paint()
               ..style = PaintingStyle.stroke
@@ -37,7 +36,6 @@ class BorderText extends StatelessWidget {
           text,
           style: TextStyle(
             fontSize: fontSize ?? 20,
-            letterSpacing: 5,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
