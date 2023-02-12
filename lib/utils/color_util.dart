@@ -34,7 +34,11 @@ class ColorUtil {
 
 //十进制转颜色
   static Color fromDecimal(String? num) {
-    if (!(num != null && num.isNotEmpty)) return ColorUtil.fromHex('FFFFFF');
-    return ColorUtil.fromHex(int.parse(num.toString(), radix: 16).toString());
+    try {
+      if (!(num != null && num.isNotEmpty)) return ColorUtil.fromHex('FFFFFF');
+      return ColorUtil.fromHex(int.parse(num.toString(), radix: 16).toString());
+    } catch (e) {
+      return ColorUtil.fromHex('FFFFFF');
+    }
   }
 }

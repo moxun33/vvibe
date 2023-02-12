@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 16:03:01
+ * @LastEditTime: 2023-02-12 17:35:03
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -13,8 +13,10 @@ import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
+import 'package:vvibe/components/widgets.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -75,9 +77,9 @@ class HomeController extends GetxController {
       'uid': data['userid'].toString(),
       'msg': data['text']
     });
-    danmaku.color = ColorUtil.fromHex('#aaaaaa');
+    danmaku.color = ColorUtil.fromHex('#ffffff');
     danmaku.ext = data;
-    renderDanmaku(danmaku);
+    renderDanmaku(danmaku, isHackchat: true);
   }
 
 //发送弹幕到远程
@@ -87,24 +89,27 @@ class HomeController extends GetxController {
   }
 
 //发送弹幕到屏幕
-  void renderDanmaku(LiveDanmakuItem? data) async {
+  void renderDanmaku(LiveDanmakuItem? data, {isHackchat = false}) async {
     if (!danmakuManualShow) return;
     if (data?.msg != null && !barrageWallController.isEnabled) {
       barrageWallController.enable();
     }
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final fontSize =
+        settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20;
     barrageWallController.send([
       new Bullet(
           child: Tooltip(
         message: data?.name ?? '',
-        child: Text(
-          data?.msg ?? '',
-          style: TextStyle(
-              color: data?.color ?? Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize:
-                  settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20),
-        ),
+        child: isHackchat
+            ? BorderText(text: data?.msg ?? '', fontSize: fontSize)
+            : Text(
+                data?.msg ?? '',
+                style: TextStyle(
+                    color: data?.color ?? Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: fontSize),
+              ),
       ))
     ]);
   }
@@ -269,7 +274,7 @@ class HomeController extends GetxController {
   }
 
   //停止播放、销毁实例
-  Future<int> stopPlayer({bool dispose = false}) async {
+  Future<int> stopPlayer() async {
     EasyLoading.dismiss();
     textureId = null;
     playingUrl = null;
@@ -322,7 +327,7 @@ class HomeController extends GetxController {
 
   @override
   void dispose() {
-    stopPlayer(dispose: Global.isRelease);
+    stopPlayer();
     VWindow().setWindowTitle('vvibe');
     hc?.close();
     super.dispose();

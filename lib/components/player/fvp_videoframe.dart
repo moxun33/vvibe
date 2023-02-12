@@ -278,15 +278,15 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                         SizedBox(
                                           width: 180,
                                           child: TextField(
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                            decoration: InputDecoration(
-                                              hintText: '发个弹幕吧',
-                                              hintStyle: TextStyle(
-                                                  color: Colors.grey[500]),
-                                            ),
-                                            controller: danmakuCtrl,
-                                          ),
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                              decoration: InputDecoration(
+                                                hintText: '发个弹幕吧',
+                                                hintStyle: TextStyle(
+                                                    color: Colors.grey[500]),
+                                              ),
+                                              controller: danmakuCtrl,
+                                              onSubmitted: (_) => _sendDanmaku),
                                         ),
                                         Padding(
                                           padding:
