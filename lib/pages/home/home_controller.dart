@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 14:14:53
+ * @LastEditTime: 2023-02-12 16:03:01
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -101,6 +101,7 @@ class HomeController extends GetxController {
           data?.msg ?? '',
           style: TextStyle(
               color: data?.color ?? Colors.white,
+              fontWeight: FontWeight.bold,
               fontSize:
                   settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20),
         ),

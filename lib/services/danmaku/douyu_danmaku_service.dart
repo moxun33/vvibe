@@ -6,8 +6,7 @@
  */
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
+
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -63,10 +62,10 @@ class DouyuDnamakuService {
     String roomID = roomId.toString();
     String login =
         "type@=loginreq/room_id@=$roomID/dfl@=sn@A=105@Sss@A=1/username@=61609154/uid@=61609154/ver@=20190610/aver@=218101901/ct@=0/";
-    //print(login);
+    // print(login);
     _channel?.sink.add(encode(login));
     String joingroup = "type@=joingroup/rid@=$roomID/gid@=-9999/";
-    //print(joingroup);
+    // print(joingroup);
     _channel?.sink.add(encode(joingroup));
     String heartbeat = 'type@=mrkl/';
     //print(heartbeat);
@@ -102,6 +101,23 @@ class DouyuDnamakuService {
     return msgMap;
   }
 
+//弹幕颜色
+  Color setDanmakuColor(String color) {
+    switch (color) {
+      case '1':
+        return ColorUtil.fromHex('#ff0000');
+      case '4':
+        return ColorUtil.fromHex('#ff7f00');
+      case '5':
+        return ColorUtil.fromHex('#9b39f4');
+      case '6':
+        return ColorUtil.fromHex('#aa3cef');
+
+      default:
+        return ColorUtil.fromDecimal('');
+    }
+  }
+
   //对消息进行解码
   decode(Uint8List list) {
     try {
@@ -126,10 +142,11 @@ class DouyuDnamakuService {
 
           if (byteDatas.startsWith("type@=chatmsg")) {
             final msgMap = parseMsg(byteDatas);
+            //debugPrint(msgMap.toString());
             final nickname = msgMap['nn'] ?? '';
             final uid = msgMap['uid'] ?? '';
             final content = msgMap['txt'] ?? '';
-            final Color color = ColorUtil.fromDecimal(msgMap['col']);
+            final Color color = setDanmakuColor(msgMap['col'] ?? '');
             final String ic = msgMap['ic'] ?? '';
             final Map<String, dynamic> ext = {
               'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"

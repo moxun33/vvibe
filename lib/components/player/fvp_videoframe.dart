@@ -125,17 +125,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     danmakuCtrl.text = '';
   }
 
-  void onDanmakuHover() {
-    print('danmaku hover');
-    _cancelAndRestartTimer();
-  }
-
-  void onDanmakuExit() {
-    print('onDanmakuExit');
-  }
-
   void onTextFocusChange(v) {
-    print('focus $v');
     if (v) {
       _hideTimer?.cancel();
     } else {
@@ -170,7 +160,6 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          print('window tap');
           if (isPlaying == true) {
             if (_displayTapped) {
               setState(() => _hideControls = true);
@@ -183,7 +172,6 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
         },
         child: MouseRegion(
           onHover: (_) {
-            print('widnow hover');
             _cancelAndRestartTimer();
           },
           child: AbsorbPointer(
