@@ -17,6 +17,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.6.0"
+  ansicolor:
+    dependency: transitive
+    description:
+      name: ansicolor
+      sha256: "607f8fa9786f392043f169898923e6c59b4518242b68b8862eb8a8b7d9c30b4a"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.1"
   archive:
     dependency: transitive
     description:
@@ -514,6 +522,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.0"
+  mixin_logger:
+    dependency: "direct main"
+    description:
+      path: "packages/mixin_logger"
+      ref: HEAD
+      resolved-ref: c0c7525906f13eb950b96baaa07750d3f7b1525f
+      url: "https://github.com/moxun33/flutter-plugins"
+    source: git
+    version: "0.0.3"
   native_context_menu:
     dependency: "direct main"
     description:

@@ -7,6 +7,7 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
+import 'package:vvibe/utils/logger.dart';
 
 import 'package:vvibe/utils/utils.dart';
 
@@ -21,9 +22,6 @@ class Global {
   /// 是否离线登录
   static bool isOfflineLogin = true;
 
-  /// vlc是否使用native window
-  static bool useNativeView = false; //Global.isRelease && Platform.isWindows;
-
   /// 是否 release
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
 
@@ -37,6 +35,10 @@ class Global {
     // 本地存储初始化
     await LoacalStorage.init();
 
+    //日志
+    await Logger().init();
+
+    //播放列表截图目录
     await PlaylistUtil().getSnapshotDir();
     // 极光推送初始化
     // await PushManager.setup();

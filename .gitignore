@@ -53,3 +53,4 @@ flutter_rust_bridge_codegen.exe
 
 snapshots/*
 ./data/
+./logs/*

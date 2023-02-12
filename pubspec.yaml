@@ -67,6 +67,10 @@ dependencies:
     git:
       url: https://github.com/moxun33/flutter-plugins
       path: packages/desktop_multi_window
+  mixin_logger: 
+    git:
+      url: https://github.com/moxun33/flutter-plugins
+      path: packages/mixin_logger
 #  window_size:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding

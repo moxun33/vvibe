@@ -1,6 +1,7 @@
 //hack.chat 连接
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class Hackchat {
@@ -75,7 +76,7 @@ class Hackchat {
         }
       },
       onError: (error) {
-        debugPrint('hackchat发生错误 $error');
+        Logger.error('hackchat发生错误 $error');
         if (onError != null) {
           onError!();
         }
@@ -138,5 +139,6 @@ class Hackchat {
 
   _onWarn(Map<String, dynamic> data) {
     final text = data['text'];
+    Logger.warn(text);
   }
 }
