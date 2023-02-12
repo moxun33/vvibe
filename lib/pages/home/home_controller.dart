@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 21:23:44
+ * @LastEditTime: 2023-02-12 22:40:08
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -22,6 +22,7 @@ import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/services.dart';
 import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
 import 'package:vvibe/window/window.dart';
 
@@ -64,9 +65,16 @@ class HomeController extends GetxController {
 
 //hack chat init
   initHackchat() {
-    final _ws = Hackchat(nickname: genRandomStr(), onChat: onHackchatMsg);
+    final _ws = Hackchat(
+        nickname: genRandomStr(),
+        onChat: onHackchatMsg,
+        onClose: onHackchatClose);
     hc = _ws;
     _ws.init();
+  }
+
+  void onHackchatClose() {
+    initHackchat();
   }
 
   onHackchatMsg(Map<String, dynamic> data) {
@@ -83,6 +91,11 @@ class HomeController extends GetxController {
 //发送弹幕到远程
   void sendDanmaku(String text) {
     if (hc == null) return;
+    /* if (hc!.readyState != 1) {
+      Logger.error('${hc!.readyState} hackchat已断开，无法发送消息');
+      initHackchat();
+      return;
+    } */
     hc!.sendMsg(text);
   }
 

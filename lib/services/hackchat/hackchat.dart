@@ -23,9 +23,15 @@ class Hackchat {
   String? _sessionId;
   //初始化
   init() {
-    debugPrint('开始连接hackchat');
+    Logger.info('开始连接hackchat');
     _ws = IOWebSocketChannel.connect('wss://hack.chat/chat-ws',
-        headers: {'Origin': 'https://.hack.chat'});
+        connectTimeout: const Duration(seconds: 30),
+        headers: {
+          'Origin': 'https://.hack.chat',
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
+        });
+    Logger.info('连接hackchat成功');
     startSession();
     _setListener();
   }
@@ -35,26 +41,30 @@ class Hackchat {
   }
 
   startSession() {
-    _sessionId != null
-        ? resumeSession()
-        : send({"cmd": "session", "isBot": false});
+    send({"cmd": "session", "isBot": false});
   }
 
   resumeSession() {
-    if (_sessionId != null) return;
-    debugPrint('恢复Session');
+    if (_sessionId == null) return;
+
     send({"cmd": "session", "isBot": false, 'id': _sessionId});
   }
 
   send(Map<String, dynamic> data) {
-    if (_ws == null) return;
+    try {
+      if (_ws == null) return;
 
-    _ws!.sink.add(jsonEncode(data));
+      _ws!.sink.add(jsonEncode(data));
+    } catch (e) {
+      Logger.error('hackchat sending error:' + e.toString());
+    }
   }
+
+  get readyState => _ws?.innerWebSocket?.readyState;
 
   close() {
     if (_ws == null) return;
-
+    _sessionId = null;
     disconnectUser();
     _ws!.sink.close();
   }
@@ -69,8 +79,9 @@ class Hackchat {
     _ws!.stream.listen(
       _onReceive,
       onDone: () {
-        debugPrint('hackchat连接关闭');
-        _ws!.sink.close();
+        Logger.warn('hackchat连接关闭');
+        close();
+
         if (onClose != null) {
           onClose!();
         }
@@ -112,7 +123,7 @@ class Hackchat {
     if (msgData != null) {
       msgData!(obj);
     }
-    debugPrint("收到hackchat数据:" + msg);
+    Logger.info("收到hackchat数据:" + msg);
   }
 
   _onChatReceive(Map<String, dynamic> data) {

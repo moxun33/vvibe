@@ -53,7 +53,7 @@ dependencies:
   #webview_flutter: ^2.0.8
 
   #flutter_cache_manager: ^3.1.0
-  web_socket_channel: ^2.2.0
+  web_socket_channel: ^2.3.0
   #url_launcher: ^6.1.5
   html: ^0.15.0
   fvp:
