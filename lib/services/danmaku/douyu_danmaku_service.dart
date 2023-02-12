@@ -46,9 +46,15 @@ class DouyuDnamakuService {
   //设置监听
   void setListener() {
     _channel?.stream.listen((msg) {
-      Uint8List list = Uint8List.fromList(msg);
-      final LiveDanmakuItem? danmaku = decode(list);
-      onDanmaku(danmaku);
+      try {
+        Uint8List list = Uint8List.fromList(msg);
+        final LiveDanmakuItem? danmaku = decode(list);
+        if (danmaku != null && danmaku.msg.isNotEmpty) {
+          onDanmaku(danmaku);
+        }
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     });
   }
 
@@ -98,45 +104,49 @@ class DouyuDnamakuService {
 
   //对消息进行解码
   decode(Uint8List list) {
-    //消息总长度
-    int totalLength = list.length;
-    // 当前消息长度
-    int len = 0;
-    int decodedMsgLen = 0;
-    // 单条消息的 buffer
-    Uint8List singleMsgBuffer;
-    Uint8List lenStr;
-    LiveDanmakuItem? danmaku;
-    while (decodedMsgLen < totalLength) {
-      try {
-        lenStr = list.sublist(decodedMsgLen, decodedMsgLen + 4);
-        len = lenStr.buffer.asByteData().getInt32(0, Endian.little) + 4;
-        singleMsgBuffer = list.sublist(decodedMsgLen, decodedMsgLen + len);
-        decodedMsgLen += len;
-        String byteDatas = utf8
-            .decode(singleMsgBuffer.sublist(12, singleMsgBuffer.length - 2));
-        //type@=chatmsg/rid@=4549169/uid@=115902484/nn@=消息内容/txt@=坑/cid@=486d1c603c494315b011110000000000/ic@=avatar_v3@S202208@S788d2957c66f46529a6ec0b8520c3489/level@=33/sahf@=0/col@=5/rg@=4/cst@=1662646767542/bnn@=橙記/bl@=22/brid@=4549169/hc@=eaccdb9a398c4648d7821dca31d4fb97/diaf@=1/hl@=1/ifs@=1/el@=/lk@=/fl@=22/hb@=1232@S/dms@=5/pdg@=29/pdk@=88/ail@=1446@S/ext@=/
+    try {
+      //消息总长度
+      int totalLength = list.length;
+      // 当前消息长度
+      int len = 0;
+      int decodedMsgLen = 0;
+      // 单条消息的 buffer
+      Uint8List singleMsgBuffer;
+      Uint8List lenStr;
+      LiveDanmakuItem? danmaku;
+      while (decodedMsgLen < totalLength) {
+        try {
+          lenStr = list.sublist(decodedMsgLen, decodedMsgLen + 4);
+          len = lenStr.buffer.asByteData().getInt32(0, Endian.little) + 4;
+          singleMsgBuffer = list.sublist(decodedMsgLen, decodedMsgLen + len);
+          decodedMsgLen += len;
+          String byteDatas = utf8
+              .decode(singleMsgBuffer.sublist(12, singleMsgBuffer.length - 2));
+          //type@=chatmsg/rid@=4549169/uid@=115902484/nn@=消息内容/txt@=坑/cid@=486d1c603c494315b011110000000000/ic@=avatar_v3@S202208@S788d2957c66f46529a6ec0b8520c3489/level@=33/sahf@=0/col@=5/rg@=4/cst@=1662646767542/bnn@=橙記/bl@=22/brid@=4549169/hc@=eaccdb9a398c4648d7821dca31d4fb97/diaf@=1/hl@=1/ifs@=1/el@=/lk@=/fl@=22/hb@=1232@S/dms@=5/pdg@=29/pdk@=88/ail@=1446@S/ext@=/
 
-        if (byteDatas.startsWith("type@=chatmsg")) {
-          final msgMap = parseMsg(byteDatas);
-          final nickname = msgMap['nn'] ?? '';
-          final uid = msgMap['uid'] ?? '';
-          final content = msgMap['txt'] ?? '';
-          final Color color = ColorUtil.fromDecimal(msgMap['col']);
-          final String ic = msgMap['ic'] ?? '';
-          final Map<String, dynamic> ext = {
-            'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
-          };
-          debugPrint('斗鱼弹幕-->$uid $nickname: $content  $color');
-          //  print(msgMap);
-          danmaku = LiveDanmakuItem(
-              name: nickname, msg: content, uid: uid, ext: ext, color: color);
+          if (byteDatas.startsWith("type@=chatmsg")) {
+            final msgMap = parseMsg(byteDatas);
+            final nickname = msgMap['nn'] ?? '';
+            final uid = msgMap['uid'] ?? '';
+            final content = msgMap['txt'] ?? '';
+            final Color color = ColorUtil.fromDecimal(msgMap['col']);
+            final String ic = msgMap['ic'] ?? '';
+            final Map<String, dynamic> ext = {
+              'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
+            };
+            debugPrint('斗鱼弹幕-->$uid $nickname: $content  $color');
+            //  print(msgMap);
+            danmaku = LiveDanmakuItem(
+                name: nickname, msg: content, uid: uid, ext: ext, color: color);
+          }
+        } catch (e) {
+          debugPrint('斗鱼弹幕解析异常: $e');
         }
-      } catch (e) {
-        debugPrint('斗鱼弹幕解析异常: $e');
       }
+      return danmaku;
+    } catch (e) {
+      debugPrint('斗鱼弹幕解析ERROR: $e');
     }
-    return danmaku;
   }
 
   //销毁连接

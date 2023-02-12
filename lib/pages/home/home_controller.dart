@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-08 23:00:09
+ * @LastEditTime: 2023-02-12 14:14:53
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -16,12 +16,11 @@ import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/global.dart';
-import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/ffi_util.dart';
-import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/services/services.dart';
+import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/utils.dart';
 import 'package:vvibe/window/window.dart';
 
 class HomeController extends GetxController {
@@ -38,6 +37,7 @@ class HomeController extends GetxController {
   HuyaDanmakuService? hyDanmakuService;
   bool danmakuManualShow = true;
   String tip = ''; //左上角的文字提示
+  Hackchat? hc;
   @override
   void onInit() {
     super.onInit();
@@ -53,6 +53,7 @@ class HomeController extends GetxController {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
+    initHackchat();
     //_tt();
   }
 
@@ -61,8 +62,32 @@ class HomeController extends GetxController {
         'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
   }
 
+//hack chat init
+  initHackchat() {
+    final _ws = Hackchat(nickname: genRandomStr(), onChat: onHackchatMsg);
+    hc = _ws;
+    _ws.init();
+  }
+
+  onHackchatMsg(Map<String, dynamic> data) {
+    final danmaku = LiveDanmakuItem.fromJson({
+      'name': data['nick'],
+      'uid': data['userid'].toString(),
+      'msg': data['text']
+    });
+    danmaku.color = ColorUtil.fromHex('#aaaaaa');
+    danmaku.ext = data;
+    renderDanmaku(danmaku);
+  }
+
+//发送弹幕到远程
+  void sendDanmaku(String text) {
+    if (hc == null) return;
+    hc!.sendMsg(text);
+  }
+
 //发送弹幕到屏幕
-  void sendDanmakuBullet(LiveDanmakuItem? data) async {
+  void renderDanmaku(LiveDanmakuItem? data) async {
     if (!danmakuManualShow) return;
     if (data?.msg != null && !barrageWallController.isEnabled) {
       barrageWallController.enable();
@@ -133,7 +158,7 @@ class HomeController extends GetxController {
         dyDanmakuService = DouyuDnamakuService(
             roomId: rid,
             onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
+              renderDanmaku(node);
             });
         dyDanmakuService!.connect();
         break;
@@ -142,7 +167,7 @@ class HomeController extends GetxController {
         blDanmakuService = BilibiliDanmakuService(
             roomId: rid,
             onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
+              renderDanmaku(node);
             });
         blDanmakuService?.connect();
         break;
@@ -151,7 +176,7 @@ class HomeController extends GetxController {
         hyDanmakuService = HuyaDanmakuService(
             roomId: rid,
             onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
+              renderDanmaku(node);
             });
         hyDanmakuService?.connect();
         break;
@@ -298,7 +323,7 @@ class HomeController extends GetxController {
   void dispose() {
     stopPlayer(dispose: Global.isRelease);
     VWindow().setWindowTitle('vvibe');
-
+    hc?.close();
     super.dispose();
   }
 }

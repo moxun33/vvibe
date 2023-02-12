@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2022-11-18 20:02:51
+ * @LastEditTime: 2023-02-12 14:16:04
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -72,6 +72,7 @@ class HomePage extends GetView<HomeController> {
                                       fvp: controller.player,
                                       togglePlayList: controller.togglePlayList,
                                       stopPlayer: controller.stopPlayer,
+                                      sendDanmaku: controller.sendDanmaku,
                                     ))
                                 : GestureDetector(
                                     onTap: () {
@@ -85,16 +86,16 @@ class HomePage extends GetView<HomeController> {
                                           crossAxisAlignment:
                                               WrapCrossAlignment.center,
                                           spacing: 50,
-                                                    children: [
-                                        SizedBox(
-                                            width: 200,
-                                            child:
-                                                Image.asset('assets/logo.png')),
-                                        Text('这里空空如也😊',
-                                            style: TextStyle(
-                                                color: Colors.purple[300],
-                                                fontSize: 40))
-                                      ], 
+                                          children: [
+                                            SizedBox(
+                                                width: 200,
+                                                child: Image.asset(
+                                                    'assets/logo.png')),
+                                            Text('这里空空如也😊',
+                                                style: TextStyle(
+                                                    color: Colors.purple[300],
+                                                    fontSize: 40))
+                                          ],
                                         ),
                                       ),
                                     ),

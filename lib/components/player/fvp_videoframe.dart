@@ -14,6 +14,7 @@ class FvpVideoFrame extends StatefulWidget {
       required this.toggleDanmaku,
       required this.stopPlayer,
       required this.toggleEpgDialog,
+      this.sendDanmaku,
       this.playingUrl})
       : super(key: key);
 
@@ -24,6 +25,7 @@ class FvpVideoFrame extends StatefulWidget {
   final Function toggleDanmaku;
   final Function stopPlayer;
   final Function toggleEpgDialog;
+  final Function? sendDanmaku;
   PlayListItem? playingUrl;
 
   @override
@@ -40,9 +42,12 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   Fvp get _fvp => widget.fvp;
   int? textureId;
 
+  TextEditingController danmakuCtrl = new TextEditingController();
+
   //late StreamSubscription<FvpPlayState>? playPauseStream;
   late AnimationController playPauseController;
 
+  late FocusNode textFocusNode = new FocusNode();
   @override
   void initState() {
     super.initState();
@@ -70,6 +75,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   void dispose() {
     // playPauseStream?.cancel();
     playPauseController.dispose();
+    textFocusNode.dispose();
     super.dispose();
   }
 
@@ -113,10 +119,58 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     widget.toggleEpgDialog();
   }
 
+  void _sendDanmaku() {
+    if (widget.sendDanmaku == null || danmakuCtrl.text.isEmpty) return;
+    widget.sendDanmaku!(danmakuCtrl.text);
+    danmakuCtrl.text = '';
+  }
+
+  void onDanmakuHover() {
+    print('danmaku hover');
+    _cancelAndRestartTimer();
+  }
+
+  void onDanmakuExit() {
+    print('onDanmakuExit');
+  }
+
+  void onTextFocusChange(v) {
+    print('focus $v');
+    if (v) {
+      _hideTimer?.cancel();
+    } else {
+      _startHideTimer();
+    }
+  }
+
+  void _cancelAndRestartTimer() {
+    _hideTimer?.cancel();
+
+    if (mounted) {
+      _startHideTimer();
+
+      setState(() {
+        _hideControls = false;
+        _displayTapped = true;
+      });
+    }
+  }
+
+  void _startHideTimer() {
+    _hideTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _hideControls = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
+          print('window tap');
           if (isPlaying == true) {
             if (_displayTapped) {
               setState(() => _hideControls = true);
@@ -128,14 +182,17 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
           }
         },
         child: MouseRegion(
-          onHover: (_) => _cancelAndRestartTimer(),
+          onHover: (_) {
+            print('widnow hover');
+            _cancelAndRestartTimer();
+          },
           child: AbsorbPointer(
               absorbing: _hideControls,
               child: Stack(
                 children: [
                   widget.videoWidget,
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 500),
                     opacity: _hideControls ? 0.0 : 1.0,
                     child: Stack(fit: StackFit.expand, children: [
                       //widget.videoWidget,
@@ -222,6 +279,40 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   _toggleDanmakuShow();
                                 },
                               ),
+                              Focus(
+                                  focusNode: textFocusNode,
+                                  onFocusChange: onTextFocusChange,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(left: 150),
+                                    width: 220,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 180,
+                                          child: TextField(
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            decoration: InputDecoration(
+                                              hintText: '发个弹幕吧',
+                                              hintStyle: TextStyle(
+                                                  color: Colors.grey[500]),
+                                            ),
+                                            controller: danmakuCtrl,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 20),
+                                          child: Tooltip(
+                                            message: '发弹幕',
+                                            child: IconButton(
+                                                onPressed: _sendDanmaku,
+                                                icon: Icon(Icons.send_sharp)),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )),
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],
@@ -263,29 +354,6 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                 ],
               )),
         ));
-  }
-
-  void _cancelAndRestartTimer() {
-    _hideTimer?.cancel();
-
-    if (mounted) {
-      _startHideTimer();
-
-      setState(() {
-        _hideControls = false;
-        _displayTapped = true;
-      });
-    }
-  }
-
-  void _startHideTimer() {
-    _hideTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _hideControls = true;
-        });
-      }
-    });
   }
 }
 

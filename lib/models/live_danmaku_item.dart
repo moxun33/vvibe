@@ -28,8 +28,8 @@ class LiveDanmakuItem {
   factory LiveDanmakuItem.fromJson(Map<String, dynamic> json) =>
       LiveDanmakuItem(
         name: json["name"],
-        msg: json["uid"],
-        uid: json["msg"],
+        msg: json["msg"],
+        uid: json["uid"],
       );
 
   Map<String, dynamic> toJson() => {
