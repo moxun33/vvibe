@@ -23,7 +23,7 @@ class Global {
   static bool isOfflineLogin = true;
 
   /// 是否 release
-  static bool get isRelease => bool.fromEnvironment("dart.vm.product");
+  static bool get isRelease => IS_RELEASE;
 
   /// init
   static Future<ThemeData> init({bool shouldSetSize = true}) async {
