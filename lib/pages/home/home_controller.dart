@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 22:49:45
+ * @LastEditTime: 2023-02-13 16:47:36
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -291,8 +291,7 @@ class HomeController extends GetxController {
   void onOpenOneUrl(String url) {
     debugPrint('打开链接 $url');
     if (url.isEmpty) return;
-    final PlayListItem item =
-        PlayListItem.fromJson({'url': url, 'name': 'vvibe'});
+    final item = PlaylistUtil().parseSingleUrl(url);
     startPlay(item);
   }
 

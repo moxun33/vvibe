@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-05 16:23:10
+ * @LastEditTime: 2023-02-13 18:05:28
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -16,7 +16,9 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
+import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/logger.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -91,6 +93,45 @@ class PlaylistUtil {
     store: MemCacheStore(),
     maxStale: const Duration(hours: 10),
   );
+  //判断是否为斗鱼、虎牙、b站的代理url
+  Map<String, bool> isDyHyDlProxyUrl(String url) {
+    final uri = Uri.parse(url),
+        matchDy = uri.path.contains(DanmakuType.douyuProxyUrlReg),
+        matchHy = uri.path.contains(DanmakuType.huyaProxyUrlReg),
+        matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
+
+    return {'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl};
+  }
+  //根据单个打开的url解析
+
+  PlayListItem parseSingleUrl(String url) {
+    String group = '未分组';
+    String tvgId = '';
+    try {
+      final uri = Uri.parse(url),
+          matches = isDyHyDlProxyUrl(url),
+          matchDy = matches['douyu'] == true,
+          matchHy = matches['huya'] == true,
+          matchBl = matches['bilibili'] == true;
+      if (matchDy) group = DanmakuType.douyuCN;
+      if (matchHy) group = DanmakuType.huyaCN;
+      if (matchBl) group = DanmakuType.bilibiliCN;
+      if (matchBl || matchHy || matchDy) {
+        final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
+        if (queryId != null && queryId.isNotEmpty) {
+          tvgId = queryId;
+        } else if (pathSegs.isNotEmpty && int.parse(pathSegs.last) > 0) {
+          tvgId = pathSegs.last;
+        }
+      }
+    } catch (e) {
+      Logger.error('解析 $url 出错 ${e.toString()}');
+    }
+    final PlayListItem item = PlayListItem.fromJson(
+        {'url': url, 'name': 'vvibe', 'group': group, 'tvgId': tvgId});
+    return item;
+  }
+
 //根据url解析远程txt或m3u内容
   Future<List<PlayListItem>> parsePlaylistSubUrl(String url) async {
     final client = Dio()
@@ -191,20 +232,35 @@ class PlaylistUtil {
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
         if (i > 0 && lines[i].startsWith("#EXTINF:")) {
+          PlayListItem tempItem = PlayListItem.fromJson({});
           final info = lines[i],
               url = lines[i + 1],
-              name = info.split(',').last.trim();
-          list.add(PlayListItem(
-              group: getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
-                  defVal: '未分组'),
+              name = info.split(',').last.trim(),
+              group = getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
+                  defVal: ''),
+              tvgId = getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
+              platProxy = isDyHyDlProxyUrl(url);
+
+          if (platProxy['douyu'] == true ||
+              platProxy['huya'] == true ||
+              platProxy['bilibili'] == true) {
+            PlayListItem _temp = parseSingleUrl(url);
+            tempItem.group = _temp.group;
+            tempItem.tvgId = _temp.tvgId;
+             
+          }
+          final item = PlayListItem(
+              group: group.isNotEmpty ? group : (tempItem.group ?? '未分组'),
               tvgName: getTextByReg(info, new RegExp(r'tvg-name="(.*?)"')),
               tvgLogo: getTextByReg(info, new RegExp(r'tvg-logo="(.*?)"')),
               catchup: getTextByReg(info, new RegExp(r'catchup="(.*?)"')),
               catchupSource:
                   getTextByReg(info, new RegExp(r'catchup-source="(.*?)"')),
               name: name,
-              tvgId: getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
-              url: url));
+              tvgId: tvgId.isNotEmpty ? tvgId : tempItem.tvgId.toString(),
+              url: url);
+          print(item.toJson());
+          list.add(item);
         }
       }
       return list;
