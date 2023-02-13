@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-13 18:05:28
+ * @LastEditTime: 2023-02-13 18:12:27
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -196,11 +196,23 @@ class PlaylistUtil {
           .map((String e) {
             final List<String> arr = e.split(',');
 
-            return PlayListItem(
+            final item = PlayListItem(
                 group: matchTxtUrlGroup(groups, lines.indexOf(e)),
                 name: arr[0].trim(),
                 tvgId: '',
                 url: arr[1]);
+            
+            final platProxy = isDyHyDlProxyUrl(arr[1]);
+
+            if (platProxy['douyu'] == true ||
+                platProxy['huya'] == true ||
+                platProxy['bilibili'] == true) {
+              PlayListItem _temp = parseSingleUrl(arr[1]);
+
+              item.tvgId = _temp.tvgId;
+              item.group = _temp.group;
+            }
+            return item;
           })
           .where((PlayListItem element) =>
               element.url != null && element.name != null)
@@ -247,7 +259,6 @@ class PlaylistUtil {
             PlayListItem _temp = parseSingleUrl(url);
             tempItem.group = _temp.group;
             tempItem.tvgId = _temp.tvgId;
-             
           }
           final item = PlayListItem(
               group: group.isNotEmpty ? group : (tempItem.group ?? '未分组'),
