@@ -123,7 +123,7 @@ class Hackchat {
     if (msgData != null) {
       msgData!(obj);
     }
-    Logger.info("收到hackchat数据:" + msg);
+    //Logger.info("收到hackchat数据:" + msg);
   }
 
   _onChatReceive(Map<String, dynamic> data) {
@@ -150,6 +150,7 @@ class Hackchat {
 
   _onWarn(Map<String, dynamic> data) {
     final text = data['text'];
+    if (text == null) return;
     Logger.warn('hackchat $text');
   }
 }

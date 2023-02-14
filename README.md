@@ -9,7 +9,7 @@
 ![img](https://img.shields.io/github/license/moxun33/vvibe)
 ![img](https://img.shields.io/github/stars/moxun33/vvibe)
 ![img](https://img.shields.io/github/issues/moxun33/vvibe)
-[![img](https://github.com/moxun33/vvibe/actions/workflows/main.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
+[![img](https://github.com/moxun33/vvibe/actions/workflows/Build.yml/badge.svg)](https://github.com/moxun33/vvibe/actions)
 
 > 好用的视频直播观看软件
 
