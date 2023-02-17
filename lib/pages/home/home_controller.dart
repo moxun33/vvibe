@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-13 16:47:36
+ * @LastEditTime: 2023-02-17 14:14:08
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -195,56 +195,60 @@ class HomeController extends GetxController {
   }
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
-    await updateTexture();
-    stopDanmakuSocket();
-    if (!(item.url != null && item.url!.isNotEmpty)) {
-      EasyLoading.showError('播放地址错误');
-      stopPlayer();
+    try {
+      await updateTexture();
+      stopDanmakuSocket();
+      if (!(item.url != null && item.url!.isNotEmpty)) {
+        EasyLoading.showError('播放地址错误');
+        stopPlayer();
 
-      return;
-    }
-    tip = '正在打开';
-    update();
-    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
-    if (settings != null) {
-      await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
-    }
-    await player.setMedia(item.url!);
-
-    if (!playback) {
-      playingUrl = item;
+        return;
+      }
+      tip = '正在打开';
       update();
-      LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
-    }
+      final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+      if (settings != null) {
+        await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
+      }
+      await player.setMedia(item.url!);
 
-    player.onStateChanged((String state) {
-      print("-------------------接收到state改变 $state");
-    });
-    player.onMediaStatusChanged((String status) {
-      print("============接收到media status改变 $status");
-      if (status == '-2147483648') {
-        tip = '播放失败';
+      if (!playback) {
+        playingUrl = item;
         update();
+        LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
       }
-    });
-    player.onEvent((Map<String, dynamic> data) {
-      print("******接收到event改变 ${data}");
-      final value = data['error'].toInt();
-      switch (data['category']) {
-        case 'reader.buffering':
-          tip = value < 100 ? '缓冲 $value%' : '';
+
+      player.onStateChanged((String state) {
+        print("-------------------接收到state改变 $state");
+      });
+      player.onMediaStatusChanged((String status) {
+        print("============接收到media status改变 $status");
+        if (status == '-2147483648') {
+          tip = '播放失败';
           update();
-          break;
-        case 'render.video':
-          if (value > 0) {
-            startDanmakuSocket(item);
-            updateWindowTitle(item);
-          }
-          break;
-        default:
-          break;
-      }
-    });
+        }
+      });
+      player.onEvent((Map<String, dynamic> data) {
+        print("******接收到event改变 ${data}");
+        final value = data['error'].toInt();
+        switch (data['category']) {
+          case 'reader.buffering':
+            tip = value < 100 ? '缓冲 $value%' : '';
+            update();
+            break;
+          case 'render.video':
+            if (value > 0) {
+              startDanmakuSocket(item);
+              updateWindowTitle(item);
+            }
+            break;
+          default:
+            break;
+        }
+      });
+    } catch (e) {
+      Logger.error(e.toString());
+    }
   }
 
   //停止播放、销毁实例

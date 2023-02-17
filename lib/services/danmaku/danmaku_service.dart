@@ -34,7 +34,7 @@ class DanmakuService {
 
       if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
       final String rid = item.tvgId!;
-      print('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
+     // print('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
 
       if (canConnDanmaku(
           item, DanmakuType.douyuGroupReg, DanmakuType.douyuProxyUrlReg)) {

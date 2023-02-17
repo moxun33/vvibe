@@ -55,12 +55,12 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void init() async {
-    playPauseController = AnimationController(
+    /* playPauseController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
-    /*  playPauseStream = player?.playbackStream
-        .listen((event) => setPlaybackMode(event.isPlaying)); */
+      playPauseStream = player?.playbackStream
+        .listen((event) => setPlaybackMode(event.isPlaying)); 
     int state = await _fvp.getState();
-    if (FvpPlayState.playing == state) playPauseController.forward();
+    if (FvpPlayState.playing == state) playPauseController.forward(); */
   }
 
   Future<int> stop() async {
@@ -79,23 +79,14 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     super.dispose();
   }
 
-  void setPlaybackMode(bool isPlaying) {
-    if (isPlaying) {
-      playPauseController.forward();
-    } else {
-      playPauseController.reverse();
-    }
-    setState(() {});
-  }
-
   void playOrPuase() async {
     int state = await _fvp.getState();
     bool toPause = FvpPlayState.paused == state;
-    if (FvpPlayState.playing == state) {
+    /* if (FvpPlayState.playing == state) {
       playPauseController.reverse();
     } else {
       playPauseController.forward();
-    }
+    } */
     setState(() {
       isPlaying = toPause;
     });
@@ -215,9 +206,9 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   splashRadius: 12,
                                   iconSize: 28,
                                   tooltip: isPlaying == true ? '正在播放' : '已暂停',
-                                  icon: AnimatedIcon(
-                                      icon: AnimatedIcons.play_pause,
-                                      progress: playPauseController),
+                                  icon: Icon(isPlaying == true
+                                      ? Icons.pause
+                                      : Icons.play_arrow),
                                   onPressed: () {
                                     playOrPuase();
                                   },

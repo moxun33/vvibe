@@ -57,10 +57,11 @@ dependencies:
   #url_launcher: ^6.1.5
   html: ^0.15.0
   fvp:
+    #path: ../fvp
     git:
       url: https://github.com/moxun33/fvp.git
       ref: master
-  # path: ../fvp
+
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
   desktop_multi_window: 
     #path: E:\source-code\flutter-src\flutter-plugins\packages\desktop_multi_window
