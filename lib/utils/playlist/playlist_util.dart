@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-13 18:12:27
+ * @LastEditTime: 2023-02-17 12:14:28
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -120,7 +120,7 @@ class PlaylistUtil {
         final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
         if (queryId != null && queryId.isNotEmpty) {
           tvgId = queryId;
-        } else if (pathSegs.isNotEmpty && int.parse(pathSegs.last) > 0) {
+        } else if (pathSegs.isNotEmpty && pathSegs.last.isNotEmpty) {
           tvgId = pathSegs.last;
         }
       }
@@ -201,7 +201,7 @@ class PlaylistUtil {
                 name: arr[0].trim(),
                 tvgId: '',
                 url: arr[1]);
-            
+
             final platProxy = isDyHyDlProxyUrl(arr[1]);
 
             if (platProxy['douyu'] == true ||
