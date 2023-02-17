@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-17 14:14:08
+ * @LastEditTime: 2023-02-17 16:08:03
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -264,8 +264,14 @@ class HomeController extends GetxController {
   }
 
   //播放url改变
-  void onPlayUrlChange(PlayListItem item) {
+  void onPlayUrlChange(PlayListItem item) async {
     if (item.url == null) return;
+
+    if (item.ext?['platformHit'] == true) {
+      final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
+      item.url = _item.url;
+    }
+    // print(item.toJson());
     startPlay(item);
   }
 
@@ -292,10 +298,10 @@ class HomeController extends GetxController {
   }
 
 //打开单个播放url
-  void onOpenOneUrl(String url) {
+  void onOpenOneUrl(String url) async {
     debugPrint('打开链接 $url');
     if (url.isEmpty) return;
-    final item = PlaylistUtil().parseSingleUrl(url);
+    final item = await PlaylistUtil().parseSingleUrlAsync(url);
     startPlay(item);
   }
 

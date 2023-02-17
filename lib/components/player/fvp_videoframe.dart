@@ -74,7 +74,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   @override
   void dispose() {
     // playPauseStream?.cancel();
-    playPauseController.dispose();
+  //  playPauseController.dispose();
     textFocusNode.dispose();
     super.dispose();
   }

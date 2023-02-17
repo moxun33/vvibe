@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-17 12:14:28
+ * @LastEditTime: 2023-02-17 16:09:23
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -100,35 +100,86 @@ class PlaylistUtil {
         matchHy = uri.path.contains(DanmakuType.huyaProxyUrlReg),
         matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
 
-    return {'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl};
+    return {
+      'platformHit': matchDy || matchHy || matchBl,
+      'douyu': matchDy,
+      'huya': matchHy,
+      'bilibili': matchBl
+    };
   }
-  //根据单个打开的url解析
 
-  PlayListItem parseSingleUrl(String url) {
-    String group = '未分组';
-    String tvgId = '';
+  //解析代理url的最终url
+  Future<String> parseProxyTargetUrl(String url) async {
+    var _url = url;
     try {
-      final uri = Uri.parse(url),
-          matches = isDyHyDlProxyUrl(url),
-          matchDy = matches['douyu'] == true,
-          matchHy = matches['huya'] == true,
-          matchBl = matches['bilibili'] == true;
-      if (matchDy) group = DanmakuType.douyuCN;
-      if (matchHy) group = DanmakuType.huyaCN;
-      if (matchBl) group = DanmakuType.bilibiliCN;
-      if (matchBl || matchHy || matchDy) {
-        final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
-        if (queryId != null && queryId.isNotEmpty) {
-          tvgId = queryId;
-        } else if (pathSegs.isNotEmpty && pathSegs.last.isNotEmpty) {
-          tvgId = pathSegs.last;
+      final client = Dio(BaseOptions(followRedirects: false));
+      await client.get(url);
+    } on DioError catch (e) {
+      if ('${e.response?.statusCode}'.startsWith('30')) {
+        final urls = e.response?.headers['location'];
+        if (urls!.isNotEmpty) {
+          _url = urls.first;
         }
       }
-    } catch (e) {
-      Logger.error('解析 $url 出错 ${e.toString()}');
     }
-    final PlayListItem item = PlayListItem.fromJson(
-        {'url': url, 'name': 'vvibe', 'group': group, 'tvgId': tvgId});
+    return _url;
+  }
+
+//根据url解析分组、tvgId等信息
+  Map<String, dynamic> parseUrlExtInfos(String url) {
+    final map = {
+      'group': '未分组',
+      'tvgId': '',
+      'ext': Map<String, dynamic>.from({})
+    };
+    final uri = Uri.parse(url),
+        matches = isDyHyDlProxyUrl(url),
+        matchDy = matches['douyu'] == true,
+        matchHy = matches['huya'] == true,
+        matchBl = matches['bilibili'] == true;
+    if (matchDy) map['group'] = DanmakuType.douyuCN;
+    if (matchHy) map['group'] = DanmakuType.huyaCN;
+    if (matchBl) map['group'] = DanmakuType.bilibiliCN;
+    if (matches['platformHit'] == true) {
+      final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
+      if (queryId != null && queryId.isNotEmpty) {
+        map['tvgId'] = queryId;
+      } else if (pathSegs.isNotEmpty && pathSegs.last.isNotEmpty) {
+        map['tvgId'] = pathSegs.last;
+      }
+      map['ext'] = matches;
+    }
+    return map;
+  }
+
+  //根据单个打开的url解析
+  PlayListItem parseSingleUrl(String url) {
+    final _info = parseUrlExtInfos(url),
+        ext = _info['ext'] ?? Map<String, dynamic>.from({});
+    final PlayListItem item = PlayListItem.fromJson({
+      'url': url,
+      'name': 'vvibe',
+      'group': _info['group'],
+      'tvgId': _info['tvgId'],
+      'ext': ext
+    });
+    return item;
+  }
+
+  //根据单个打开的url解析 异步
+  Future<PlayListItem> parseSingleUrlAsync(String url) async {
+    String _url = url;
+    final _info = parseUrlExtInfos(url), ext = _info['ext'] ?? {};
+    if (ext['platformHit'] == true) {
+      _url = await parseProxyTargetUrl(url);
+    }
+    final PlayListItem item = PlayListItem.fromJson({
+      'url': _url,
+      'name': 'vvibe',
+      'group': _info['group'],
+      'tvgId': _info['tvgId'],
+      'ext': ext ?? {}
+    });
     return item;
   }
 
@@ -204,9 +255,7 @@ class PlaylistUtil {
 
             final platProxy = isDyHyDlProxyUrl(arr[1]);
 
-            if (platProxy['douyu'] == true ||
-                platProxy['huya'] == true ||
-                platProxy['bilibili'] == true) {
+            if (platProxy['platformHit'] == true) {
               PlayListItem _temp = parseSingleUrl(arr[1]);
 
               item.tvgId = _temp.tvgId;
@@ -235,7 +284,7 @@ class PlaylistUtil {
   }
 
   //根据文本行 解析m3u的播放列表文件内容
-  List<PlayListItem> parseM3uContents(List<String> lines) {
+  Future<List<PlayListItem>> parseM3uContents(List<String> lines) async {
     try {
       if (!(lines.length > 0 && lines[0].startsWith("#EXTM3U"))) {
         return [];
@@ -244,7 +293,8 @@ class PlaylistUtil {
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
         if (i > 0 && lines[i].startsWith("#EXTINF:")) {
-          PlayListItem tempItem = PlayListItem.fromJson({});
+          PlayListItem tempItem =
+              PlayListItem.fromJson({'ext': Map<String, dynamic>.from({})});
           final info = lines[i],
               url = lines[i + 1],
               name = info.split(',').last.trim(),
@@ -253,14 +303,14 @@ class PlaylistUtil {
               tvgId = getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
               platProxy = isDyHyDlProxyUrl(url);
 
-          if (platProxy['douyu'] == true ||
-              platProxy['huya'] == true ||
-              platProxy['bilibili'] == true) {
+          if (platProxy['platformHit'] == true) {
             PlayListItem _temp = parseSingleUrl(url);
             tempItem.group = _temp.group;
             tempItem.tvgId = _temp.tvgId;
+            tempItem.ext = _temp.ext;
           }
           final item = PlayListItem(
+              ext: tempItem.ext ?? Map<String, dynamic>.from({}),
               group: group.isNotEmpty ? group : (tempItem.group ?? '未分组'),
               tvgName: getTextByReg(info, new RegExp(r'tvg-name="(.*?)"')),
               tvgLogo: getTextByReg(info, new RegExp(r'tvg-logo="(.*?)"')),
@@ -270,7 +320,7 @@ class PlaylistUtil {
               name: name,
               tvgId: tvgId.isNotEmpty ? tvgId : tempItem.tvgId.toString(),
               url: url);
-          print(item.toJson());
+          //print(item.toJson());
           list.add(item);
         }
       }

@@ -34,21 +34,21 @@ class DanmakuService {
 
       if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
       final String rid = item.tvgId!;
-     // print('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
-
+      print('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
+      final ext = item.ext ?? {};
       if (canConnDanmaku(
-          item, DanmakuType.douyuGroupReg, DanmakuType.douyuProxyUrlReg)) {
+              item, DanmakuType.douyuGroupReg, DanmakuType.douyuProxyUrlReg) ||
+          ext['douyu'] == true) {
         _dy = DouyuDnamakuService(roomId: rid, onDanmaku: renderDanmaku);
         _dy!.connect();
-      }
-
-      if (canConnDanmaku(
-          item, DanmakuType.biliGroupReg, DanmakuType.biliProxyUrlReg)) {
+      } else if (canConnDanmaku(
+              item, DanmakuType.biliGroupReg, DanmakuType.biliProxyUrlReg) ||
+          ext['bilibili'] == true) {
         _bl = BilibiliDanmakuService(roomId: rid, onDanmaku: renderDanmaku);
         _bl?.connect();
-      }
-      if (canConnDanmaku(
-          item, DanmakuType.huyaGroupReg, DanmakuType.huyaProxyUrlReg)) {
+      } else if (canConnDanmaku(
+              item, DanmakuType.huyaGroupReg, DanmakuType.huyaProxyUrlReg) ||
+          ext['huya'] == true) {
         _hy = HuyaDanmakuService(roomId: rid, onDanmaku: renderDanmaku);
         _hy?.connect();
       }
