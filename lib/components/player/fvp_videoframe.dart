@@ -74,7 +74,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   @override
   void dispose() {
     // playPauseStream?.cancel();
-  //  playPauseController.dispose();
+    //  playPauseController.dispose();
     textFocusNode.dispose();
     super.dispose();
   }
@@ -393,8 +393,9 @@ class _VolumeControlState extends State<VolumeControl> {
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
-                        value: volume,
+                        value: volume.roundToDouble(),
                         onChanged: (v) {
+                          print('volume $v');
                           player?.setVolume(v);
                           setState(() {
                             volume = v;
@@ -435,13 +436,19 @@ class _VolumeControlState extends State<VolumeControl> {
     }
   }
 
-  void muteUnmute() {
-    if (volume > 0) {
-      unmutedVolume = volume;
+  void muteUnmute() async {
+    final v = volume;
+    if (v > 0) {
+      unmutedVolume = v;
       player?.setVolume(0);
+      setState(() {
+        volume = 0;
+      });
     } else {
       player?.setVolume(unmutedVolume);
+      setState(() {
+        volume = unmutedVolume;
+      });
     }
-    setState(() {});
   }
 }
