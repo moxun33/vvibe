@@ -142,7 +142,7 @@ class HomeController extends GetxController {
     final _urlItem = playingUrl!.toJson();
     var url = playingUrl?.url;
     if (url == null) return;
-    Uri u = Uri.parse(url);
+    Uri u = Uri.parse(url.trim());
     final haveQueries = u.queryParameters.length > 0;
     final _url = haveQueries
         ? '${url}&playseek=${playseek}'

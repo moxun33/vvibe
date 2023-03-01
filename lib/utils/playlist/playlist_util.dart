@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-17 16:09:23
+ * @LastEditTime: 2023-03-01 17:23:15
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -95,17 +95,21 @@ class PlaylistUtil {
   );
   //判断是否为斗鱼、虎牙、b站的代理url
   Map<String, bool> isDyHyDlProxyUrl(String url) {
-    final uri = Uri.parse(url),
-        matchDy = uri.path.contains(DanmakuType.douyuProxyUrlReg),
-        matchHy = uri.path.contains(DanmakuType.huyaProxyUrlReg),
-        matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
+    try {
+      final uri = Uri.parse(url.trim()),
+          matchDy = uri.path.contains(DanmakuType.douyuProxyUrlReg),
+          matchHy = uri.path.contains(DanmakuType.huyaProxyUrlReg),
+          matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
 
-    return {
-      'platformHit': matchDy || matchHy || matchBl,
-      'douyu': matchDy,
-      'huya': matchHy,
-      'bilibili': matchBl
-    };
+      return {
+        'platformHit': matchDy || matchHy || matchBl,
+        'douyu': matchDy,
+        'huya': matchHy,
+        'bilibili': matchBl
+      };
+    } catch (e) {
+      return {};
+    }
   }
 
   //解析代理url的最终url
@@ -132,7 +136,7 @@ class PlaylistUtil {
       'tvgId': '',
       'ext': Map<String, dynamic>.from({})
     };
-    final uri = Uri.parse(url),
+    final uri = Uri.parse(url.trim()),
         matches = isDyHyDlProxyUrl(url),
         matchDy = matches['douyu'] == true,
         matchHy = matches['huya'] == true,
@@ -154,7 +158,7 @@ class PlaylistUtil {
 
   //根据单个打开的url解析
   PlayListItem parseSingleUrl(String url) {
-    final _info = parseUrlExtInfos(url),
+    final _info = parseUrlExtInfos(url.trim()),
         ext = _info['ext'] ?? Map<String, dynamic>.from({});
     final PlayListItem item = PlayListItem.fromJson({
       'url': url,
@@ -241,6 +245,7 @@ class PlaylistUtil {
       final groups = parseTxtGroups(lines);
       final list = lines
           .where((element) =>
+              element.isNotEmpty &&
               element.contains(',') &&
               !element.contains('#genre#') &&
               element.contains('://'))
@@ -251,7 +256,7 @@ class PlaylistUtil {
                 group: matchTxtUrlGroup(groups, lines.indexOf(e)),
                 name: arr[0].trim(),
                 tvgId: '',
-                url: arr[1]);
+                url: arr[1].trim());
 
             final platProxy = isDyHyDlProxyUrl(arr[1]);
 
@@ -338,7 +343,7 @@ class PlaylistUtil {
 
   //检查是否为真实有效的url
   bool validateUrl(String url) {
-    return Uri.tryParse(url)?.hasAbsolutePath ?? false;
+    return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
   Future<int?> checkUrlAccessible(String url,

@@ -17,7 +17,7 @@ class DanmakuService {
   bool canConnDanmaku(PlayListItem item, RegExp groupReg, RegExp proxyUrlReg) {
     try {
       final groupMatch = item.group?.contains(groupReg) ?? false;
-      final uri = Uri.parse(item.url!),
+      final uri = Uri.parse(item.url!.trim()),
           urlMatch1 = uri.path.contains(proxyUrlReg);
 
       return groupMatch || urlMatch1;
