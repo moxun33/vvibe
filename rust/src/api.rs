@@ -34,7 +34,7 @@ pub fn get_ip_info(ip: String, db_path: String) -> String {
         Err(err) => err.to_string(),
     } }*/
 //执行ffmpeg，获取url的媒体信息
-pub fn get_media_info(url: String,dir: String) -> String  {
+pub fn get_media_info(url: String) -> String  {
     ffmpeg::init().unwrap();
      let v=std::path::Path::new(&url);
    let out=ffmpeg::format::input(&v);
