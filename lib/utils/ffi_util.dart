@@ -53,7 +53,7 @@ class FfiUtil {
   Future<FFprobeInfo?> getMediaInfo(String url) async {
     try {
       //'${Directory(ASSETS_DIR).path}/ffprobe.exe'
-      String raw = await api.getMediaInfo(url: url, ffprobeDir: '');
+      String raw = await api.getMediaInfo(url: url);
       FFprobeInfo info = FFprobeInfo.fromJson(jsonDecode(raw));
       return info;
     } catch (e) {

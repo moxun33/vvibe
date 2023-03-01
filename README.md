@@ -47,19 +47,11 @@
 
 ## 注意事项
 
-1、有些包不支持 safety模式。解决方案：``--no-sound-null-safety``
+1、项目使用了[rust-ffmpeg](https://github.com/meh/rust-ffmpeg)，需要提前配置编译环境 
 
-- run
-``flutter run --no-sound-null-safety``
-- build
-``flutter build apk --no-sound-null-safety``
+2、关于``flutter_rust_bridge``，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 
 
-2、项目使用了[rust-ffmpeg](https://github.com/meh/rust-ffmpeg)，需要提前配置编译环境 
-
-3、关于``flutter_rust_bridge``，具体参考 [flutter-rust-bridge](http://cjycode.com/flutter_rust_bridge/) 
-
-4、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误或扫源时无法获取媒体信息(Windows平台中显示无法加载``native.dll``)，Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录。具体参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。 
-
+3、若编译``rust-ffmpeg``出现``exit code: 0xc0000135, STATUS_DLL_NOT_FOUND``错误或扫源时无法获取媒体信息(Windows平台中显示无法加载``native.dll``)，Window平台中复制``ffmpeg/bin``目录下的所有``dll``到``cargo/bin``目录。具体参考 https://github.com/zmwangx/rust-ffmpeg/issues/119 进行设置。 
 
 ## 声明
 
@@ -67,7 +59,7 @@
 - 相关资源的版权归原公司所有。
 - 测试数据来源于互联网公开内容，没有收集任何私有和有权限的信息（个人信息等），由此引发的任何法律纠纷与本人无关。
 - 弹幕接口仅用作测试，请勿用于其他非法途径。若侵权，请联系本人删除。
-- 
+  
 ## 致谢
 
 - [mdk-sdk](https://github.com/wang-bin/mdk-sdk)

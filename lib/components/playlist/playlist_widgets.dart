@@ -189,7 +189,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
       return ListView.builder(
           shrinkWrap: true,
           itemCount: widget.data.length,
-          itemExtent: 25.0,
+          itemExtent: 20.0,
           cacheExtent: getDeviceHeight(context) - 50.0,
           itemBuilder: (context, index) {
             final e = widget.data[index];
@@ -309,7 +309,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       case 200:
         return Icon(
           Icons.check,
-          size: 10,
+          size: 8,
           color: Colors.green,
         );
       case 204:
@@ -320,7 +320,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         return Tooltip(
           child: Icon(
             Icons.timer_off_outlined,
-            size: 10,
+            size: 8,
             color: Colors.amber[900],
           ),
           message: '超时',
@@ -329,7 +329,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         return Tooltip(
           child: Icon(
             Icons.not_accessible_outlined,
-            size: 10,
+            size: 8,
             color: Colors.pink,
           ),
           message: '403禁止',
@@ -338,7 +338,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         return Tooltip(
           child: Icon(
             Icons.airplanemode_active_outlined,
-            size: 10,
+            size: 8,
             color: Colors.cyan[100],
           ),
           message: '检测被拒，可播放',
@@ -347,7 +347,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         return Tooltip(
           child: Icon(
             Icons.close,
-            size: 10,
+            size: 8,
             color: Colors.red,
           ),
           message: '不可用',
@@ -356,7 +356,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         return Tooltip(
           child: Icon(
             Icons.question_mark_outlined,
-            size: 10,
+            size: 8,
             color: Colors.orange,
           ),
           message: '链接不存在',
@@ -376,7 +376,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     final e = urlItem;
     if (e == null) return SizedBox();
     return Container(
-        height: 26,
+        height: 22,
         color: Colors.black12,
         child: ContextMenuRegion(
           onItemSelected: (item) {
@@ -393,7 +393,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             child: Tooltip(
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 2.0,
+                spacing: 1.0,
                 children: [
                   _getIcon(urlStatus),
                   SizedBox(
@@ -404,7 +404,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                       softWrap: false,
                       overflow: TextOverflow.clip,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: e.url == widget.selectedItem?.url
                             ? FontWeight.bold
                             : FontWeight.w300,
