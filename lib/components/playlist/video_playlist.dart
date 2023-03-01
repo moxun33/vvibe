@@ -175,18 +175,16 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   // This is called when the user selects an item.
                   onPlayFileChange(value);
                 },
-                itemHeight: 30,
-                dropdownMaxHeight: getDeviceHeight(context) - 50.0,
-
+                itemHeight: 25,
                 //on: updatePlaylistFiles,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
                     value: jsonEncode(v),
                     key: ObjectKey(v),
                     child: Wrap(children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 4, 0),
+                        padding: const EdgeInsets.only(top: 3, right: 4),
                         child: Icon(
                           v['url'] != null
                               ? Icons.insert_link_outlined
@@ -202,6 +200,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                           //overflow: TextOverflow.ellipsis,
                           maxLines: 1, overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
+                            fontSize: 12,
                             color: Colors.purple,
                           ),
                         ),
