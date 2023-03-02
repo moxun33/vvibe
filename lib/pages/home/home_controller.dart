@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-02 17:07:41
+ * @LastEditTime: 2023-03-02 22:05:37
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -224,17 +224,17 @@ class HomeController extends GetxController {
       }
 
       player.onStateChanged((String state) {
-        print("-------------------接收到state改变 $state");
+        debugPrint("-------------------接收到state改变 $state");
       });
       player.onMediaStatusChanged((String status) {
-        print("============接收到media status改变 $status");
+        debugPrint("============接收到media status改变 $status");
         if (status == '-2147483648') {
           tip = '播放失败';
           update();
         }
       });
       player.onEvent((Map<String, dynamic> data) {
-        print("******接收到event改变 ${data}");
+        debugPrint("******接收到event改变 ${data}");
         final value = data['error'].toInt();
         switch (data['category']) {
           case 'reader.buffering':
@@ -251,9 +251,11 @@ class HomeController extends GetxController {
             break;
         }
       });
-      player.onRenderCallback((msg) {});
+      player.onRenderCallback((msg) {
+        // debugPrint('======render cb log $msg');
+      });
       player.setLogHandler((msg) async {
-        if (IS_RELEASE != true) print('======log $msg');
+        debugPrint('【log】 $msg');
       });
     } catch (e) {
       Logger.error(e.toString());
