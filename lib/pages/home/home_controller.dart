@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-17 16:08:03
+ * @LastEditTime: 2023-03-02 15:17:55
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -246,6 +246,7 @@ class HomeController extends GetxController {
             break;
         }
       });
+      // player.onRenderCallback((msg) {});
     } catch (e) {
       Logger.error(e.toString());
     }

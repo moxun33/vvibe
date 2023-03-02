@@ -47,7 +47,7 @@ dependencies:
 
   # storage + cache
   shared_preferences: ^2.0.6
-  cached_network_image: ^3.0.0
+  #cached_network_image: ^3.0.0
 
   # webview
   #webview_flutter: ^2.0.8
@@ -60,7 +60,7 @@ dependencies:
     #path: ../fvp
     git:
       url: https://github.com/moxun33/fvp.git
-      ref: master
+      ref: dev
 
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
   desktop_multi_window: 
