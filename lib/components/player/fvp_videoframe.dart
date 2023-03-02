@@ -440,12 +440,14 @@ class _VolumeControlState extends State<VolumeControl> {
     final v = volume;
     if (v > 0) {
       unmutedVolume = v;
-      player?.setVolume(0);
+      player?.setMute(true);
       setState(() {
         volume = 0;
       });
     } else {
+      player?.setMute(false);
       player?.setVolume(unmutedVolume);
+
       setState(() {
         volume = unmutedVolume;
       });
