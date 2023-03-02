@@ -364,9 +364,11 @@ packages:
   fvp:
     dependency: "direct main"
     description:
-      path: "../fvp"
-      relative: true
-    source: path
+      path: "."
+      ref: dev
+      resolved-ref: ec601094ad5c8146543ec175d584c071b92f0b39
+      url: "https://github.com/moxun33/fvp.git"
+    source: git
     version: "0.0.2+3"
   get:
     dependency: "direct main"
