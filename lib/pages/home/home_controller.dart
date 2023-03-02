@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-02 15:17:55
+ * @LastEditTime: 2023-03-02 17:07:41
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -55,7 +55,12 @@ class HomeController extends GetxController {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
     initHackchat();
+    playerConfig();
     //_tt();
+  }
+
+  void playerConfig() async {
+    await player.setProperty('http_persistent', '0');
   }
 
   _tt() async {
@@ -246,7 +251,10 @@ class HomeController extends GetxController {
             break;
         }
       });
-      // player.onRenderCallback((msg) {});
+      player.onRenderCallback((msg) {});
+      player.setLogHandler((msg) async {
+        if (IS_RELEASE != true) print('======log $msg');
+      });
     } catch (e) {
       Logger.error(e.toString());
     }
