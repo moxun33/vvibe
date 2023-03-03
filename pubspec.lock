@@ -366,10 +366,10 @@ packages:
     description:
       path: "."
       ref: dev
-      resolved-ref: "45b66432e0f6177f1b8a5bd551a61a0d7fdfa7f6"
+      resolved-ref: "25d0a39491211e6c6a3f6e11065c8f3cea921cab"
       url: "https://github.com/moxun33/fvp.git"
     source: git
-    version: "0.0.2+3"
+    version: "0.0.3+4"
   get:
     dependency: "direct main"
     description:

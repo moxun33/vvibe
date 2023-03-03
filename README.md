@@ -72,9 +72,9 @@
 - 本应用不内置播放源，请自行准备直播源(源代码playlist目录中播放源仅供开发测试，请勿用于其他途径)
 
 - 直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
-- 使用[mdk-sdk](https://github.com/wang-bin/mdk-sdk)开发flutter插件进行视频播放，相对于``dart-vlc``性能大幅提升，产物大小大幅降低
+
 - 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://github.com/wang-bin/mdk-sdk/releases/download/v0.19.0/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
 - 视频播放器`fvp`插件的`API`持续开发中
 - ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
- 
+
 - 项目还使用或借鉴了未列出的其他项目，同样在此感谢。

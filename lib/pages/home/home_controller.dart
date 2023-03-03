@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-02 22:05:37
+ * @LastEditTime: 2023-03-03 21:20:18
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -42,7 +42,6 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // initPlayer();
   }
 
   @override
@@ -56,6 +55,7 @@ class HomeController extends GetxController {
     }
     initHackchat();
     playerConfig();
+
     //_tt();
   }
 
@@ -176,7 +176,7 @@ class HomeController extends GetxController {
 
 //断开所有弹幕连接
   void stopDanmakuSocket() {
-    //barrageWallController.disable();
+    barrageWallController.disable();
     DanmakuService().stop();
   }
 
@@ -201,7 +201,10 @@ class HomeController extends GetxController {
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
-      await updateTexture();
+      if (textureId == null) {
+        initPlayer();
+      }
+      //await updateTexture();
       stopDanmakuSocket();
       if (!(item.url != null && item.url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
