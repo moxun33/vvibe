@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-14 20:48:04
+ * @LastEditTime: 2023-03-14 21:21:15
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -201,10 +201,10 @@ class HomeController extends GetxController {
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
+      await stopPlayer();
       if (textureId == null) {
         initPlayer();
       }
-      await updateTexture();
 
       if (!(item.url != null && item.url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
