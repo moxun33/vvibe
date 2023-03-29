@@ -63,9 +63,6 @@
 ## 致谢
 
 - [mdk-sdk](https://github.com/wang-bin/mdk-sdk)
-- [fvp](https://github.com/wang-bin/fvp)
-- [ice_live_viewer](https://github.com/iiijam/ice_live_viewer)
-- [rust-ffmpeg](https://github.com/meh/rust-ffmpeg)
 
 ## 备注
 
@@ -73,7 +70,7 @@
 
 - 直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 
-- 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://github.com/wang-bin/mdk-sdk/releases/download/v0.19.0/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
+- 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
 - 视频播放器`fvp`插件的`API`持续开发中
 - ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
 

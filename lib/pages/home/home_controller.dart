@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-14 21:21:15
+ * @LastEditTime: 2023-03-16 14:10:44
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -266,6 +266,7 @@ class HomeController extends GetxController {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
+    await player.stop();
     EasyLoading.dismiss();
     textureId = null;
     playingUrl = null;
@@ -273,7 +274,7 @@ class HomeController extends GetxController {
     barrageWallController.disable();
     update();
     VWindow().setWindowTitle('vvibe');
-    return player.stop();
+    return 1;
   }
 
   //播放url改变
