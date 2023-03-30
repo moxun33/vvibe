@@ -32,7 +32,7 @@ class _LiveSniffState extends State<LiveSniff> {
   void initState() {
     super.initState();
     _batchNumCtl.text = '5';
-    _toNumCtl.text = '3000';
+    _toNumCtl.text = '3';
     _urlTextCtl.text = 'http://27.47.71.203:8811/hls/[1-4]/index.m3u8';
   }
 
