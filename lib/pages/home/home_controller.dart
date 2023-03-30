@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-16 14:10:44
+ * @LastEditTime: 2023-03-30 17:35:56
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -112,7 +112,7 @@ class HomeController extends GetxController {
     }
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fontSize =
-        settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20;
+        settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
     barrageWallController.send([
       new Bullet(
           child: Tooltip(
@@ -322,7 +322,6 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     stopPlayer();
-    VWindow().setWindowTitle('vvibe');
     hc?.close();
   }
 }

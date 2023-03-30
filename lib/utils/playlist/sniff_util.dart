@@ -124,7 +124,8 @@ class SniffUtil {
     try {
       final startTime = DateTime.now();
       final inst = Dio(new BaseOptions(
-          connectTimeout: timeout, headers: {'User-Agent': DEF_REQ_UA}));
+          connectTimeout: Duration(microseconds: timeout),
+          headers: {'User-Agent': DEF_REQ_UA}));
       final resp = await inst.head(url);
       FFprobeInfo? meta = null;
       String ipInfo = '';
@@ -150,10 +151,10 @@ class SniffUtil {
       print('$url 扫描错误   ${e.error}');
       return UrlSniffRes.fromJson({
         'index': index,
-        'status': e.type == DioErrorType.connectTimeout
+        'status': e.type == DioErrorType.connectionTimeout
             ? UrlSniffResStatus.timeout
             : UrlSniffResStatus.failed,
-        'statusCode': e.type == DioErrorType.connectTimeout ? 504 : 500,
+        'statusCode': e.type == DioErrorType.connectionTimeout ? 504 : 500,
         'mediaInfo': null,
         'ipInfo': '',
         'duration': 0,

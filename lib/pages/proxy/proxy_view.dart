@@ -1,5 +1,4 @@
-import 'dart:io';
-import 'package:dio/adapter.dart';
+//import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -62,14 +61,14 @@ class ProxyPage extends StatelessWidget {
     }
     Dio dio = Request().dio;
     // 在调试模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+  /*   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
       client.findProxy = (uri) {
         print('走了代理----$ip:$port');
         return "PROXY $ip:$port";
       };
       //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
       client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    };
+    }; */
     EasyLoading.showToast('代理设置成功');
   }
 }

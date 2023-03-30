@@ -177,14 +177,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.2"
-  cookie_jar:
-    dependency: "direct main"
-    description:
-      name: cookie_jar
-      sha256: d1cc6516a190ba667941f722b6365d202caff3dacb38de24268b8d6ff1ec8a1d
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.1"
   crypto:
     dependency: transitive
     description:
@@ -230,26 +222,18 @@ packages:
     dependency: "direct main"
     description:
       name: dio
-      sha256: "7d328c4d898a61efc3cd93655a0955858e29a0aa647f0f9e02d59b3bb275e2e8"
+      sha256: f7c26ddb3a10ff033cf1bfbf2c668feb3472327f48385775f7cf25b104f8bfce
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.0.6"
+    version: "5.1.0"
   dio_cache_interceptor:
     dependency: "direct main"
     description:
       name: dio_cache_interceptor
-      sha256: "3f76df600621f3a8ed9c57db053f602b24c7e64c108fbc2791d0fe779c52b45b"
+      sha256: "26ba5bb7c09a4fa47a851dad390ec20293c248425c492bd6e8343cef21aca3b7"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.3.1"
-  dio_cookie_manager:
-    dependency: "direct main"
-    description:
-      name: dio_cookie_manager
-      sha256: ed7ee3ba6cdb54599c8984d5a4ce09675c553ead6c28608eb54e38eec5b4f954
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
+    version: "3.4.1"
   dropdown_button2:
     dependency: "direct main"
     description:
@@ -390,10 +374,10 @@ packages:
     dependency: "direct main"
     description:
       name: html
-      sha256: bfef906cbd4e78ef49ae511d9074aebd1d2251482ef601a280973e8b58b51bbf
+      sha256: "79d498e6d6761925a34ee5ea8fa6dfef38607781d2fa91e37523474282af55cb"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.15.0"
+    version: "0.15.2"
   http:
     dependency: transitive
     description:

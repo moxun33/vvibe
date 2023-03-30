@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-01 17:23:15
+ * @LastEditTime: 2023-03-30 17:25:59
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -349,8 +349,7 @@ class PlaylistUtil {
   Future<int?> checkUrlAccessible(String url,
       {bool isolate = false, bool reqGet = false}) async {
     try {
-      final inst = Dio(new BaseOptions(
-          connectTimeout: 3000, headers: {'User-Agent': DEF_REQ_UA}));
+      final inst = Dio(new BaseOptions(headers: {'User-Agent': DEF_REQ_UA}));
       final req = inst.head;
       dynamic resp;
       if (isolate) {
