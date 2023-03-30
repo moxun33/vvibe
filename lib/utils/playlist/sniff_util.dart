@@ -120,11 +120,11 @@ class SniffUtil {
 
   //扫描检测url
   Future<UrlSniffRes> checkSniffUrl(String url,
-      {bool withMeta = false, timeout = 3000, int index = 0}) async {
+      {bool withMeta = false, timeout = 3, int index = 0}) async {
     try {
       final startTime = DateTime.now();
       final inst = Dio(new BaseOptions(
-          connectTimeout: Duration(microseconds: timeout),
+          connectTimeout: Duration(seconds: timeout),
           headers: {'User-Agent': DEF_REQ_UA}));
       final resp = await inst.head(url);
       FFprobeInfo? meta = null;
@@ -148,7 +148,7 @@ class SniffUtil {
         'duration': endTime.difference(startTime).inMilliseconds
       });
     } on DioError catch (e) {
-      print('$url 扫描错误   ${e.error}');
+      print('$url 扫描错误   ${e.toString()}');
       return UrlSniffRes.fromJson({
         'index': index,
         'status': e.type == DioErrorType.connectionTimeout
