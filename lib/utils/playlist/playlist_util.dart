@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-04-08 16:47:33
+ * @LastEditTime: 2023-04-08 16:59:41
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -365,7 +365,7 @@ class PlaylistUtil {
           ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
           : resp.statusCode; */
     } on DioError catch (e) {
-      int num = e.response?.statusCode ?? 500;
+      int num = 500;
       switch (e.type) {
         case DioErrorType.connectionTimeout:
         case DioErrorType.receiveTimeout:
@@ -373,6 +373,8 @@ class PlaylistUtil {
           num = 504;
           break;
         case DioErrorType.unknown:
+        case DioErrorType.badResponse:
+        case DioErrorType.badCertificate:
           num = 422;
           break;
         default:
