@@ -294,8 +294,8 @@ class _PlUrlTileState extends State<PlUrlTile>
     }
 
     final status = await PlaylistUtil().checkUrlAccessible(url.url!);
-    debugPrint(
-        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应状态$status');
+    /*  debugPrint(
+        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应状态$status'); */
     if (mounted) {
       setState(() {
         loading = false;
@@ -332,16 +332,25 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.pink,
           ),
-          message: '403禁止',
+          message: '禁止',
         );
       case 400:
         return Tooltip(
           child: Icon(
             Icons.airplanemode_active_outlined,
             size: 8,
-            color: Colors.cyan[100],
+            color: Colors.lightGreen[200],
           ),
-          message: '检测被拒，可播放',
+          message: '无法检测',
+        );
+      case 422:
+        return Tooltip(
+          child: Icon(
+            Icons.unpublished_rounded,
+            size: 8,
+            color: Colors.yellow[200],
+          ),
+          message: '未知',
         );
       case 500:
         return Tooltip(
@@ -359,7 +368,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.orange,
           ),
-          message: '链接不存在',
+          message: '链接丢失',
         );
       default:
         return loading

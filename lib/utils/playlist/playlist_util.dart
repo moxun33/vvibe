@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-30 17:25:59
+ * @LastEditTime: 2023-04-08 16:47:33
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -349,7 +349,9 @@ class PlaylistUtil {
   Future<int?> checkUrlAccessible(String url,
       {bool isolate = false, bool reqGet = false}) async {
     try {
-      final inst = Dio(new BaseOptions(headers: {'User-Agent': DEF_REQ_UA}));
+      final inst = Dio(new BaseOptions(headers: {
+        'User-Agent': DEF_REQ_UA,
+      }, receiveTimeout: Duration(seconds: 30)));
       final req = inst.head;
       dynamic resp;
       if (isolate) {
@@ -363,11 +365,23 @@ class PlaylistUtil {
           ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
           : resp.statusCode; */
     } on DioError catch (e) {
-      final num = e.response?.statusCode ?? 500;
-
-      debugPrint('检查 $url 可访问出错：  $num  ${e.message}');
+      int num = e.response?.statusCode ?? 500;
+      switch (e.type) {
+        case DioErrorType.connectionTimeout:
+        case DioErrorType.receiveTimeout:
+        case DioErrorType.sendTimeout:
+          num = 504;
+          break;
+        case DioErrorType.unknown:
+          num = 422;
+          break;
+        default:
+      }
+      debugPrint('检查 $url 可访问性出错：  $num  ${e.message ?? e.error} ${e.type}');
 
       return num;
+    } catch (e) {
+      return 500;
     }
   }
 }
