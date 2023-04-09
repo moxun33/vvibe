@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-04-08 16:59:41
+ * @LastEditTime: 2023-04-09 13:13:11
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -346,7 +346,7 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
-  Future<int?> checkUrlAccessible(String url,
+  Future<int> checkUrlAccessible(String url,
       {bool isolate = false, bool reqGet = false}) async {
     try {
       final inst = Dio(new BaseOptions(headers: {
@@ -373,16 +373,16 @@ class PlaylistUtil {
           num = 504;
           break;
         case DioErrorType.unknown:
-        case DioErrorType.badResponse:
-        case DioErrorType.badCertificate:
           num = 422;
           break;
         default:
+          break;
       }
       debugPrint('检查 $url 可访问性出错：  $num  ${e.message ?? e.error} ${e.type}');
 
       return num;
     } catch (e) {
+      debugPrint('检查 $url 可访问性出错：$e');
       return 500;
     }
   }
