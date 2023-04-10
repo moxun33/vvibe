@@ -42,7 +42,7 @@ class _SubWindowState extends State<SubWindow> {
             if (notification.size.width < 1200 ||
                 notification.size.height < 700) {
               widget.windowController
-                ..setFrame(const Offset(0, 0) & const Size(1280, 720))
+                ..setFrame(const Offset(0, 0) & const Size(1280, 720+CUS_WIN_TITLEBAR_HEIGHT))
                 ..center();
             }
             return true;

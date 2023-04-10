@@ -163,7 +163,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
-                dropdownWidth: 220,
+                dropdownWidth: 250,
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
@@ -175,7 +175,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   // This is called when the user selects an item.
                   onPlayFileChange(value);
                 },
-                itemHeight: 25,
+                itemHeight: 22,
                 //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
@@ -194,7 +194,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                         ),
                       ),
                       SizedBox(
-                        width: 150,
+                        width: 170,
                         child: Text(
                           v['name'],
                           //overflow: TextOverflow.ellipsis,

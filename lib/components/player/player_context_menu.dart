@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart' hide MenuItem;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/settings/open_url_dialog.dart';
 import 'package:vvibe/components/player/settings/setting_alert_dialog.dart';
 import 'package:native_context_menu/native_context_menu.dart';
@@ -39,7 +40,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
     }));
     window
       ..setTitle(title ?? 'VVibe')
-      ..setFrame(const Offset(0, 0) & const Size(1280, 720))
+      ..setFrame(const Offset(0, 0) & Size(1280, 720 + CUS_WIN_TITLEBAR_HEIGHT))
       ..center()
       ..show();
   }

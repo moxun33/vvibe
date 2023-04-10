@@ -1,5 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 
 class VWindow {
@@ -10,7 +11,7 @@ class VWindow {
 //初始化window熟悉
   void initWindow() {
     doWhenWindowReady(() {
-      const initialSize = Size(1280, 720);
+      final initialSize = Size(1280, 720 + CUS_WIN_TITLEBAR_HEIGHT);
       appWindow.minSize = initialSize;
       appWindow.size = initialSize;
       appWindow.alignment = Alignment.center;

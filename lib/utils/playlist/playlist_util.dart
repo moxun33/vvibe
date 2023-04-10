@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-04-09 13:13:11
+ * @LastEditTime: 2023-04-10 18:02:51
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -360,7 +360,8 @@ class PlaylistUtil {
         resp = await req(url);
       }
       //debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
-      return resp.statusCode;
+      final status = resp.statusCode;
+      return status > 300 && status < 400 ? 200 : status;
       /* return resp.statusCode != 200 && !reqGet
           ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
           : resp.statusCode; */
@@ -374,6 +375,10 @@ class PlaylistUtil {
           break;
         case DioErrorType.unknown:
           num = 422;
+          break;
+        case DioErrorType.badResponse:
+        case DioErrorType.badResponse:
+          num = 400;
           break;
         default:
           break;

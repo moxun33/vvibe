@@ -1,5 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 
 class WindowButtons extends StatefulWidget {
@@ -86,7 +87,7 @@ Widget WindowTitleBar({String title = 'VVibe'}) {
   return WindowTitleBarBox(
     child: MoveWindow(
         child: Container(
-      height: 30,
+      height: CUS_WIN_TITLEBAR_HEIGHT,
       // color: Color.fromRGBO(40, 40, 40, 1),
       child: Flex(
         direction: Axis.horizontal,
