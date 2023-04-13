@@ -87,6 +87,8 @@ Widget WindowTitleBar({String title = 'VVibe'}) {
   return WindowTitleBarBox(
     child: MoveWindow(
         child: Container(
+      decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.black38, width: 1))),
       height: CUS_WIN_TITLEBAR_HEIGHT,
       // color: Color.fromRGBO(40, 40, 40, 1),
       child: Flex(
