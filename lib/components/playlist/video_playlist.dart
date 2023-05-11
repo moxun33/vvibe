@@ -84,7 +84,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
 //切换播放文件或订阅
-  void onPlayFileChange(String? value) async {
+  void onPlayFileChange(String? value, {bool? forceRefresh = false}) async {
     setState(() {
       playlist = [];
       selectedFilename = value;
@@ -100,10 +100,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       List<PlayListItem> data = [];
       if (map['url'] != null) {
         data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
-        PlaylistUtil().parsePlaylistSubUrl(map['url']).then((list) {
-          setState(() => playlist = list);
-          LoacalStorage().setJSON(LAST_PLAYLIST_DATA, list);
-        });
+
+        setState(() => playlist = data);
+        LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
       } else {
         //本地文件
         data =
@@ -220,7 +219,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     widget.onUrlTap(e);
                   },
                   forceRefreshPlaylist: () {
-                    onPlayFileChange(selectedFilename);
+                    onPlayFileChange(selectedFilename, forceRefresh: true);
                   },
                 )
               : (widget.visible && loading
