@@ -15,7 +15,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/bridge_generated.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
-import 'package:vvibe/models/media_info.dart';
 
 // Re-export the bridge so it is only necessary to import this file.
 export 'package:vvibe/bridge_generated.dart';

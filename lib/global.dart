@@ -8,7 +8,7 @@ import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/logger.dart';
-
+import 'package:window_manager/window_manager.dart';
 import 'package:vvibe/utils/utils.dart';
 
 /// 全局配置
@@ -29,6 +29,7 @@ class Global {
   static Future<ThemeData> init({bool shouldSetSize = true}) async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
 
     // Ruquest 模块初始化
     Request();

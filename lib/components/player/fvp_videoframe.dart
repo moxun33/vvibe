@@ -96,7 +96,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void _getMetaInfo() async {
-    final info = await _fvp.getMediaInfo();
+    // final info = await _fvp.getMediaInfo();
   }
 
   void _toggleDanmakuShow() {

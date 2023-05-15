@@ -9,10 +9,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
-import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -136,7 +134,7 @@ class BilibiliDanmakuService {
           }
           break;
         case 3:
-          int people = readInt(list, headerLen, 4);
+          //int people = readInt(list, headerLen, 4);
           //debugPrint("B站房间人气: $people");
           break;
         default:

@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-11 11:44:51
+ * @LastEditTime: 2023-05-15 23:38:31
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -18,7 +18,6 @@ import 'package:collection/collection.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
 import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/utils/local_storage.dart';
-import 'package:vvibe/utils/logger.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -28,7 +27,7 @@ class PlaylistUtil {
   //创建目录（在应用根目录下）
   Future<Directory> createDir(String dirName) async {
     final dir = Directory(dirName);
-    if (!await (dir.exists())) {
+    if (!(await dir.exists())) {
       await dir.create();
     }
     return dir;

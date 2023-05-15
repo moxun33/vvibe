@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-03-30 17:35:56
+ * @LastEditTime: 2023-05-16 00:25:06
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -25,8 +25,9 @@ import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
 import 'package:vvibe/window/window.dart';
+import 'package:window_manager/window_manager.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WindowListener {
   Fvp player = Fvp();
 
   int? textureId; //fvp播放时的渲染id
@@ -41,6 +42,8 @@ class HomeController extends GetxController {
   Hackchat? hc;
   @override
   void onInit() {
+    windowManager.addListener(this);
+
     super.onInit();
   }
 
@@ -266,6 +269,7 @@ class HomeController extends GetxController {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
+    debugPrint('close player');
     await player.stop();
     EasyLoading.dismiss();
     textureId = null;
@@ -321,6 +325,15 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {
+    super.onClose();
+    windowManager.removeListener(this);
+
+    stopPlayer();
+    hc?.close();
+  }
+
+  @override
+  void onWindowClose() {
     stopPlayer();
     hc?.close();
   }

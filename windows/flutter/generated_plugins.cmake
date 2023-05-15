@@ -7,6 +7,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_multi_window
   fvp
   native_context_menu
+  screen_retriever
+  window_manager
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

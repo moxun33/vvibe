@@ -5,7 +5,7 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
-import 'package:flutter/material.dart' hide MenuItem;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
@@ -264,7 +264,7 @@ class _PlUrlTileState extends State<PlUrlTile>
 
     switch (value) {
       case '复制链接':
-        Clipboard.setData(ClipboardData(text: url.url));
+        Clipboard.setData(ClipboardData(text: url.url ?? ''));
         EasyLoading.showSuccess('复制成功');
         break;
       case '强制刷新列表':
@@ -406,7 +406,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                 children: [
                   _getIcon(urlStatus),
                   SizedBox(
-                    width: PLAYLIST_BAR_WIDTH - 30,
+                    width: PLAYLIST_BAR_WIDTH - 38,
                     child: Text(
                       e.name?.trim() ?? '未知名称',
                       maxLines: 1,

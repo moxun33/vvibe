@@ -39,7 +39,8 @@ class ProxyPage extends StatelessWidget {
               margin: EdgeInsets.symmetric(vertical: 30),
               width: getDeviceWidth(context) - 60,
               height: 50,
-              child: TextButton(child: Text('设置代理'), onPressed: () => setupProxy()),
+              child: TextButton(
+                  child: Text('设置代理'), onPressed: () => setupProxy()),
             )
           ],
         ),
@@ -59,9 +60,9 @@ class ProxyPage extends StatelessWidget {
       EasyLoading.showToast('端口不能为空');
       return;
     }
-    Dio dio = Request().dio;
+    //Dio dio = Request().dio;
     // 在调试模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
-  /*   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+    /*   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
       client.findProxy = (uri) {
         print('走了代理----$ip:$port');
         return "PROXY $ip:$port";

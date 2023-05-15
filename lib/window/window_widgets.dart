@@ -31,6 +31,7 @@ class _WindowButtonsState extends State<WindowButtons> {
     });
   }
 
+  windowClosed() {}
   @override
   Widget build(BuildContext context) {
     return Row(
