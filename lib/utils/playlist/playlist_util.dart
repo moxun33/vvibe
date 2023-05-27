@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-15 23:38:31
+ * @LastEditTime: 2023-05-27 15:40:27
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -189,7 +189,7 @@ class PlaylistUtil {
 //根据url解析远程txt或m3u内容
   Future<List<PlayListItem>> parsePlaylistSubUrl(String url,
       {bool? forceRefresh = false}) async {
-    final client = Dio()
+    final client = Dio(BaseOptions(receiveTimeout: const Duration(seconds: 30)))
       ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     final resp = await client.get(url);
     if (resp.statusCode == 200 || resp.statusCode! < 400) {
