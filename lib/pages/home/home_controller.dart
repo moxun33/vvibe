@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-27 15:26:55
+ * @LastEditTime: 2023-05-27 15:46:03
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -13,6 +13,7 @@ import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/components/widgets.dart';
@@ -208,7 +209,7 @@ class HomeController extends GetxController with WindowListener {
       if (textureId == null) {
         initPlayer();
       }
-
+      await player.setMute(false);
       if (!(item.url != null && item.url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
 
@@ -270,6 +271,7 @@ class HomeController extends GetxController with WindowListener {
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
     debugPrint('close player');
+    await player.setMute(true);
     await player.stop();
     EasyLoading.dismiss();
     textureId = null;
@@ -324,17 +326,17 @@ class HomeController extends GetxController with WindowListener {
   }
 
   @override
-  void onClose()   {
+  void onClose() async {
     super.onClose();
-      stopPlayer();
+    await stopPlayer();
     windowManager.removeListener(this);
 
     hc?.close();
   }
 
   @override
-  void onWindowClose()   {
-      stopPlayer();
+  void onWindowClose() async {
+    await stopPlayer();
     hc?.close();
   }
 }
