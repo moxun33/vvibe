@@ -85,35 +85,34 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
 
 //切换播放文件或订阅
   void onPlayFileChange(String? value, {bool? forceRefresh = false}) async {
+    if (loading) return;
     setState(() {
       playlist = [];
       selectedFilename = value;
     });
 
-    if (value != null) {
-      setState(() {
-        loading = true;
-      });
-      final map = jsonDecode(value);
-      debugPrint(value);
-      LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
-      List<PlayListItem> data = [];
-      if (map['url'] != null) {
-        data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
+    if (value == null) return;
+    setState(() {
+      loading = true;
+    });
+    final map = jsonDecode(value);
+    debugPrint(value);
+    LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
+    List<PlayListItem> data = [];
+    if (map['url'] != null) {
+      data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
 
-        setState(() => playlist = data);
-        LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
-      } else {
-        //本地文件
-        data =
-            await PlaylistUtil().parsePlaylistFile("playlist/${map['name']}");
-      }
-      setState(() {
-        playlist = data;
-        loading = false;
-      });
+      setState(() => playlist = data);
       LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
+    } else {
+      //本地文件
+      data = await PlaylistUtil().parsePlaylistFile("playlist/${map['name']}");
     }
+    setState(() {
+      playlist = data;
+      loading = false;
+    });
+    LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
   }
 
   //state发生变化时会回调该方法,可以是class

@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-16 00:25:06
+ * @LastEditTime: 2023-05-27 15:26:55
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -324,17 +324,17 @@ class HomeController extends GetxController with WindowListener {
   }
 
   @override
-  void onClose() {
+  void onClose()   {
     super.onClose();
+      stopPlayer();
     windowManager.removeListener(this);
 
-    stopPlayer();
     hc?.close();
   }
 
   @override
-  void onWindowClose() {
-    stopPlayer();
+  void onWindowClose()   {
+      stopPlayer();
     hc?.close();
   }
 }
