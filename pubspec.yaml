@@ -59,7 +59,7 @@ dependencies:
   fvp:
     #path: ../fvp
     git:
-      url: https://kgithub.com/moxun33/fvp.git
+      url: https://ghproxy.com/https://github.com/moxun33/fvp.git
       ref: dev
 
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330

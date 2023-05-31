@@ -350,10 +350,10 @@ packages:
     description:
       path: "."
       ref: dev
-      resolved-ref: "982d9b88a589803fad54aa5244618c50ef6bbee4"
-      url: "https://kgithub.com/moxun33/fvp.git"
+      resolved-ref: "3bd28075360808f772c66cafb473ebaf43a14d67"
+      url: "https://ghproxy.com/https://github.com/moxun33/fvp.git"
     source: git
-    version: "0.0.6+6"
+    version: "0.0.8+8"
   get:
     dependency: "direct main"
     description:
