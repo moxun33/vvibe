@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-27 15:46:03
+ * @LastEditTime: 2023-05-31 20:05:32
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -235,7 +235,7 @@ class HomeController extends GetxController with WindowListener {
       player.onMediaStatusChanged((String status) {
         debugPrint("============接收到media status改变 $status");
         if (status == '-2147483648') {
-          tip = '播放失败';
+          tip = '${item.name}播放失败';
           update();
         }
       });
