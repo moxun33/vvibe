@@ -171,8 +171,21 @@ class PlUrlListView extends StatefulWidget {
 
 class _PlUrlListViewState extends State<PlUrlListView> {
   PlayListItem? selectedItem;
+  @override
+  void initState() {
+    super.initState();
+    _initCacheUrl();
+  }
 
-  void selectUrl(PlayListItem e) {
+  void _initCacheUrl() async {
+    final lastUrl = await LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+    final urlItem = PlayListItem.fromJson(lastUrl);
+    setState(() {
+      selectedItem = urlItem;
+    });
+  }
+
+  void onSelectUrl(PlayListItem e) {
     if (!(e.url != null && e.url!.isNotEmpty)) {
       EasyLoading.showError('缺少播放地址或地址错误');
       return;
@@ -195,7 +208,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
             final e = widget.data[index];
             return PlUrlTile(
                 index: index,
-                onSelectUrl: selectUrl,
+                onSelectUrl: onSelectUrl,
                 selectedItem: selectedItem,
                 url: e,
                 key: ObjectKey(e),
@@ -312,10 +325,7 @@ class _PlUrlTileState extends State<PlUrlTile>
           size: 8,
           color: Colors.green,
         );
-      case 204:
-        return SizedBox(
-          width: 0,
-        );
+
       case 504:
         return Tooltip(
           child: Icon(
@@ -353,6 +363,8 @@ class _PlUrlTileState extends State<PlUrlTile>
           message: '未知',
         );
       case 500:
+      case 503:
+      case 502:
         return Tooltip(
           child: Icon(
             Icons.close,
