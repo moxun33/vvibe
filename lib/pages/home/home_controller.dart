@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-06-08 22:26:59
+ * @LastEditTime: 2023-06-09 16:26:57
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -209,8 +209,7 @@ class HomeController extends GetxController with WindowListener {
       if (textureId == null) {
         initPlayer();
       }
-      await player.setMute(false);
-      if (!(item.url != null && item.url!.isNotEmpty)) {
+       if (!(item.url != null && item.url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
 
         return;
@@ -271,8 +270,7 @@ class HomeController extends GetxController with WindowListener {
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
     debugPrint('close player');
-    await player.setMute(true);
-    await player.stop();
+     await player.stop();
     EasyLoading.dismiss();
     textureId = null;
     playingUrl = null;
