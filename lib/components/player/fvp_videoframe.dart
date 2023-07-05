@@ -389,7 +389,7 @@ class _VolumeControlState extends State<VolumeControl> {
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
-                        label: (volume * 1 * 100).toString(),
+                        label: (volume * 1 * 100).roundToDouble().toString(),
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
