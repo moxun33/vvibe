@@ -249,7 +249,7 @@ class PlUrlTile extends StatefulWidget {
 
 class _PlUrlTileState extends State<PlUrlTile>
     with AutomaticKeepAliveClientMixin {
-  PlayListItem? urlItem;
+  //PlayListItem? urlItem;
   int? urlStatus;
   bool loading = true;
 
@@ -259,11 +259,11 @@ class _PlUrlTileState extends State<PlUrlTile>
   @override
   void initState() {
     super.initState();
-    setState(() {
+    /* setState(() {
       urlItem = widget.url;
-    });
+    }); */
 
-    _checkUrlAccessible(widget.url);
+    _checkUrlAccessible();
   }
 
   void _selectUrl(PlayListItem url) {
@@ -271,12 +271,15 @@ class _PlUrlTileState extends State<PlUrlTile>
   }
 
   //菜单点击
-  void _onMenuItemTap(BuildContext context, MenuItem item, PlayListItem url) {
+  void _onMenuItemTap(
+    BuildContext context,
+    MenuItem item,
+  ) {
     final value = item.title;
 
     switch (value) {
       case '复制链接':
-        Clipboard.setData(ClipboardData(text: url.url ?? ''));
+        Clipboard.setData(ClipboardData(text: widget.url.url ?? ''));
         EasyLoading.showSuccess('复制成功');
         break;
       case '强制刷新列表':
@@ -287,17 +290,10 @@ class _PlUrlTileState extends State<PlUrlTile>
   }
 
 //检查url访问性
-  void _checkUrlAccessible(PlayListItem url) async {
+  void _checkUrlAccessible() async {
+    final url = widget.url;
     if (urlStatus != null) return;
     if (url.url == null) {
-      setState(() {
-        urlStatus = 204;
-        loading = false;
-      });
-      return;
-    }
-
-    if (!url.url!.startsWith('http')) {
       setState(() {
         urlStatus = 204;
         loading = false;
@@ -393,14 +389,14 @@ class _PlUrlTileState extends State<PlUrlTile>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final e = urlItem;
-    if (e == null) return SizedBox();
+    final e = widget.url;
+    //  if (e == null) return SizedBox();
     return Container(
         height: 22,
         color: Colors.black12,
         child: ContextMenuRegion(
           onItemSelected: (item) {
-            _onMenuItemTap(context, item, e);
+            _onMenuItemTap(context, item);
           },
           menuItems: [
             MenuItem(title: '复制链接'),

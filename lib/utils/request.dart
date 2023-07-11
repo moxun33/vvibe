@@ -54,7 +54,7 @@ class Request {
     }, onResponse: (response, handler) {
       // 在返回响应数据之前做一些预处理
       return handler.next(response);
-    }, onError: (DioError e, handler) {
+    }, onError: (DioException e, handler) {
       // 当请求失败时做一些预处理
       ErrorEntity eInfo = createErrorEntity(e);
       // 错误提示
@@ -167,26 +167,26 @@ class Request {
   /*
    * error统一处理
    */
-  ErrorEntity createErrorEntity(DioError error) {
+  ErrorEntity createErrorEntity(DioException error) {
     switch (error.type) {
-      case DioErrorType.cancel:
+      case DioExceptionType.cancel:
         {
           return ErrorEntity(code: -1, message: "请求取消");
         }
-      case DioErrorType.connectionTimeout:
+      case DioExceptionType.connectionTimeout:
         {
           return ErrorEntity(code: -1, message: "连接超时");
         }
-      case DioErrorType.sendTimeout:
+      case DioExceptionType.sendTimeout:
         {
           return ErrorEntity(code: -1, message: "请求超时");
         }
 
-      case DioErrorType.receiveTimeout:
+      case DioExceptionType.receiveTimeout:
         {
           return ErrorEntity(code: -1, message: "响应超时");
         }
-      case DioErrorType.badResponse:
+      case DioExceptionType.badResponse:
         {
           try {
             int? errCode = error.response?.statusCode;

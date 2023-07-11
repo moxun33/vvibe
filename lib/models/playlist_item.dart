@@ -50,7 +50,7 @@ class PlayListItem {
   String? catchup;
   String? catchupSource;
   Map<String, dynamic>?
-      ext; //平台代理配置{ 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl }
+      ext; //平台代理配置{ 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
       name: json["name"],

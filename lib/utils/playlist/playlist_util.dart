@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-05-27 15:40:27
+ * @LastEditTime: 2023-07-11 16:06:27
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -90,10 +90,10 @@ class PlaylistUtil {
   final dioCacheOptions = CacheOptions(
     // A default store is required for interceptor.
     store: MemCacheStore(),
-    maxStale: const Duration(hours: 10),
+    maxStale: const Duration(seconds: 30),
   );
   //判断是否为斗鱼、虎牙、b站的代理url
-  Map<String, bool> isDyHyDlProxyUrl(String url) {
+  Map<String, dynamic> isDyHyDlProxyUrl(String url) {
     try {
       final uri = Uri.parse(url.trim()),
           matchDy = uri.path.contains(DanmakuType.douyuProxyUrlReg),
@@ -101,6 +101,7 @@ class PlaylistUtil {
           matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
 
       return {
+        'playUrl': '',
         'platformHit': matchDy || matchHy || matchBl,
         'douyu': matchDy,
         'huya': matchHy,
@@ -117,7 +118,7 @@ class PlaylistUtil {
     try {
       final client = Dio(BaseOptions(followRedirects: false));
       await client.get(url);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if ('${e.response?.statusCode}'.startsWith('30')) {
         final urls = e.response?.headers['location'];
         if (urls!.isNotEmpty) {
@@ -171,13 +172,12 @@ class PlaylistUtil {
 
   //根据单个打开的url解析 异步
   Future<PlayListItem> parseSingleUrlAsync(String url) async {
-    String _url = url;
     final _info = parseUrlExtInfos(url), ext = _info['ext'] ?? {};
     if (ext['platformHit'] == true) {
-      _url = await parseProxyTargetUrl(url);
+      ext['playUrl'] = await parseProxyTargetUrl(url);
     }
     final PlayListItem item = PlayListItem.fromJson({
-      'url': _url,
+      'url': url,
       'name': 'vvibe',
       'group': _info['group'],
       'tvgId': _info['tvgId'],
@@ -365,19 +365,18 @@ class PlaylistUtil {
       /* return resp.statusCode != 200 && !reqGet
           ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
           : resp.statusCode; */
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       int num = 500;
       switch (e.type) {
-        case DioErrorType.connectionTimeout:
-        case DioErrorType.receiveTimeout:
-        case DioErrorType.sendTimeout:
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.sendTimeout:
           num = 504;
           break;
-        case DioErrorType.unknown:
+        case DioExceptionType.unknown:
           num = 422;
           break;
-        case DioErrorType.badResponse:
-        case DioErrorType.badResponse:
+        case DioExceptionType.badResponse:
           num = 400;
           break;
         default:

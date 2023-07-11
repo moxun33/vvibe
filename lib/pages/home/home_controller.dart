@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-06-13 11:44:30
+ * @LastEditTime: 2023-07-11 16:10:58
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -13,7 +13,6 @@ import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/components/widgets.dart';
@@ -51,7 +50,7 @@ class HomeController extends GetxController with WindowListener {
   @override
   void onReady() {
     //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
-    final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
+    // final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
     // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
@@ -205,11 +204,13 @@ class HomeController extends GetxController with WindowListener {
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
-      await stopPlayer();
+      debugPrint('start play ${item.toJson()}');
+      stopPlayer();
       if (textureId == null) {
         initPlayer();
       }
-      if (!(item.url != null && item.url!.isNotEmpty)) {
+      final url = item.ext?['playUrl'] ?? item.url;
+      if (!(url != null && url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
 
         return;
@@ -220,7 +221,7 @@ class HomeController extends GetxController with WindowListener {
       if (settings != null) {
         await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
       }
-      await player.setMedia(item.url!);
+      await player.setMedia(url);
 
       if (!playback) {
         playingUrl = item;
@@ -269,6 +270,7 @@ class HomeController extends GetxController with WindowListener {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
+    if (textureId == null) return 0;
     debugPrint('close player');
     await player.stop();
     EasyLoading.dismiss();
@@ -284,13 +286,10 @@ class HomeController extends GetxController with WindowListener {
   //播放url改变
   void onPlayUrlChange(PlayListItem item) async {
     if (item.url == null) return;
-//    await stopPlayer();
-    if (item.ext?['platformHit'] == true) {
-      final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
-      item.url = _item.url;
-    }
-    // print(item.toJson());
-    startPlay(item);
+    await stopPlayer();
+
+    final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
+    startPlay(_item);
   }
 
   void updateWindowTitle(PlayListItem item) async {
