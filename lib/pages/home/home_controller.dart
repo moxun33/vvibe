@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-07-11 16:10:58
+ * @LastEditTime: 2023-07-14 14:04:54
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -49,26 +49,16 @@ class HomeController extends GetxController with WindowListener {
 
   @override
   void onReady() {
-    //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
-    // final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
-    // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
     initHackchat();
     playerConfig();
-
-    //_tt();
   }
 
   void playerConfig() async {
     await player.setProperty('http_persistent', '0');
-  }
-
-  _tt() async {
-    FfiUtil().getMediaInfo(
-        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
   }
 
 //hack chat init
@@ -289,6 +279,7 @@ class HomeController extends GetxController with WindowListener {
     await stopPlayer();
 
     final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
+    _item.name = item.name;
     startPlay(_item);
   }
 
