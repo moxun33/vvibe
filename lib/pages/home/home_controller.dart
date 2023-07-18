@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-07-16 14:31:33
+ * @LastEditTime: 2023-07-18 23:14:12
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -160,7 +160,7 @@ class HomeController extends GetxController with WindowListener {
 
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
-    //stopDanmakuSocket();
+    // stopDanmakuSocket();
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
     }
@@ -279,8 +279,8 @@ class HomeController extends GetxController with WindowListener {
     await stopPlayer();
 
     final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
-    _item.name = item.name;
-    startPlay(_item);
+    item.ext = _item.ext ?? {};
+    startPlay(item);
   }
 
   void updateWindowTitle(PlayListItem item) async {
