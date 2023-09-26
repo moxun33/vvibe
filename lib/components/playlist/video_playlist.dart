@@ -7,6 +7,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
@@ -102,7 +103,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
     } else {
       //本地文件
-      data = await PlaylistUtil().parsePlaylistFile("playlist/${map['name']}");
+      data = await PlaylistUtil().parsePlaylistFile(map['name']);
     }
     setState(() {
       if (value == selectedFilename) playlist = data;
@@ -110,6 +111,20 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     });
     if (value == selectedFilename)
       LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
+  }
+
+  //菜单点击
+  void _onMenuItemTap(
+      BuildContext context, MenuItem item, Map<String, dynamic> file) {
+    final value = item.title;
+
+    switch (value) {
+      case '编辑文件内容':
+        PlaylistUtil().launchFile(file['name']);
+        break;
+
+      default:
+    }
   }
 
   //state发生变化时会回调该方法,可以是class
@@ -147,6 +162,33 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     super.reassemble();
   }
 
+  Widget MenuItemRow(Map<String, dynamic> v) {
+    return Wrap(children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 3, right: 4),
+        child: Icon(
+          v['url'] != null
+              ? Icons.insert_link_outlined
+              : Icons.file_present_outlined,
+          size: 12,
+          color: Colors.purple,
+        ),
+      ),
+      SizedBox(
+        width: 170,
+        child: Text(
+          v['name'],
+          //overflow: TextOverflow.ellipsis,
+          maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.purple,
+          ),
+        ),
+      )
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -175,33 +217,19 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
-                    value: jsonEncode(v),
-                    key: ObjectKey(v),
-                    child: Wrap(children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 3, right: 4),
-                        child: Icon(
-                          v['url'] != null
-                              ? Icons.insert_link_outlined
-                              : Icons.file_present_outlined,
-                          size: 12,
-                          color: Colors.purple,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 170,
-                        child: Text(
-                          v['name'],
-                          //overflow: TextOverflow.ellipsis,
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.purple,
-                          ),
-                        ),
-                      )
-                    ]),
-                  );
+                      value: jsonEncode(v),
+                      key: ObjectKey(v),
+                      child: ContextMenuRegion(
+                        onItemSelected: (item) {
+                          _onMenuItemTap(context, item, v);
+                        },
+                        menuItems: v['url'] == null
+                            ? [
+                                MenuItem(title: '编辑文件内容'),
+                              ]
+                            : [],
+                        child: MenuItemRow(v),
+                      ));
                 }).toList(),
               ),
             )),

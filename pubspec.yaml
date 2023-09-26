@@ -85,7 +85,7 @@ dependencies:
   dio_cache_interceptor: ^3.3.1
   shortid: ^0.1.2
   bitsdojo_window: ^0.1.5
-  window_manager: ^0.3.2
+  window_manager: 0.3.6
   #archive: ^3.3.6
 
 

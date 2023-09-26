@@ -41,17 +41,6 @@ class Global {
 
     //播放列表截图目录
     await PlaylistUtil().getSnapshotDir();
-    // 极光推送初始化
-    // await PushManager.setup();
-
-    // 语音播报初始化
-    // await TtsManager.setup();
-
-    // 高德地图初始化
-    // await AmapService.instance.init(
-    //   iosKey: 'xxxx',
-    //   androidKey: 'xxxx',
-    // );
 
     // 读取设备第一次打开
     isFirstOpen = !LoacalStorage().getBool(STORAGE_DEVICE_ALREADY_OPEN_KEY);

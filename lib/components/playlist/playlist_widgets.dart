@@ -43,7 +43,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   void toggleExpand(int panelIndex, bool isExpanded, String key) {
     setState(() {
       //  expanded[key] = !isExpanded;
-      expandKey = isExpanded ? '' : key;
+      expandKey = !isExpanded ? '' : key;
     });
     if (!isExpanded) {
       _searchController.clear();
@@ -337,7 +337,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.pink,
           ),
-          message: '禁止',
+          message: '禁止访问',
         );
       case 400:
         return Tooltip(
@@ -355,7 +355,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.yellow[200],
           ),
-          message: '未知',
+          message: '拒绝连接',
         );
       case 500:
       case 503:
@@ -375,7 +375,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.orange,
           ),
-          message: '链接丢失',
+          message: '不存在',
         );
       default:
         return loading

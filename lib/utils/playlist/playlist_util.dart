@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-07-18 23:13:06
+ * @LastEditTime: 2023-09-26 21:21:12
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -43,6 +43,23 @@ class PlaylistUtil {
     return createDir('snapshots');
   }
 
+  //在其他应用打开文件
+  Future<void> launchFile(String file) async {
+    String path = (await getPlayListDir()).path;
+    if (file.isEmpty) {
+      path = path.replaceAll("/", "\\"); // necessary for Windows
+      await Process.start('explorer', [path]);
+    } else {
+      ProcessResult result =
+          await Process.run('cmd', ['/c', 'start', '', '$path/$file']);
+      if (result.exitCode == 0) {
+        // good
+      } else {
+        // bad
+      }
+    }
+  }
+
   //获取本地播放列表文件列表
   Future<List<String>> getPlayListFiles({bool basename = false}) async {
     try {
@@ -62,8 +79,10 @@ class PlaylistUtil {
   }
 
   //解析【本地】文件的播放列表内容
-  Future<List<PlayListItem>> parsePlaylistFile(String filePath) async {
+  Future<List<PlayListItem>> parsePlaylistFile(String filename) async {
     try {
+      final filePath =
+          "${(await PlaylistUtil().getPlayListDir()).path}/${filename}";
       if (filePath.endsWith('.m3u')) {
         final lines = await compute(readFileLines, filePath);
         return compute(parseM3uContents, lines);
@@ -346,27 +365,44 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
-  Future<int> checkUrlAccessible(String url,
-      {bool isolate = false, bool reqGet = false}) async {
+  Future<int> checkUrlAccessible(String url, {bool reqGet = false}) async {
     try {
-      final inst = Dio(new BaseOptions(headers: {
-        'User-Agent': DEF_REQ_UA,
-      }, receiveTimeout: Duration(seconds: 30)));
-      final req = inst.head;
-      dynamic resp;
-      if (isolate) {
-        resp = await compute(req, url);
-      } else {
-        resp = await req(url);
+      CancelToken token = CancelToken();
+      final dio = Dio(new BaseOptions(
+          responseType: ResponseType.stream,
+          headers: {
+            'User-Agent': DEF_REQ_UA,
+          },
+          receiveTimeout: Duration(seconds: 30)));
+
+      int receivedBytes = 0;
+       final resp = await dio.get(url, cancelToken: token);
+
+      // 创建可读流
+      final stream = resp.data.stream;
+
+      // 循环读取流数据
+      await for (List<int> value in stream) {
+        // 更新已接收的字节数
+        receivedBytes += value.length;
+
+        // 如果超过，则取消请求
+        if (receivedBytes > 1) {
+          token.cancel('canceled');
+          debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
+          break;
+        }
+
+        // 处理接收到的数据
+        // ...
+
+        
       }
       //debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
-      final status = resp.statusCode;
-      return status > 300 && status < 400 ? 200 : status;
-      /* return resp.statusCode != 200 && !reqGet
-          ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
-          : resp.statusCode; */
+       return receivedBytes > 0 ? 200 : 500;
     } on DioException catch (e) {
       int num = 500;
+      final msg = (e.message ?? e.error).toString();
       switch (e.type) {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.receiveTimeout:
@@ -374,20 +410,39 @@ class PlaylistUtil {
           num = 504;
           break;
         case DioExceptionType.unknown:
-          num = 422;
+          num = extractStatusCode(msg, 422);
           break;
         case DioExceptionType.badResponse:
-          num = 400;
+          num = extractStatusCode(msg, 400);
           break;
         default:
           break;
       }
-      debugPrint('检查 $url 可访问性出错：  $num  ${e.message ?? e.error} ${e.type}');
-
+      debugPrint('检查 可访问性出错：  $num  $msg ${e.type}  $url ');
+      if (msg.indexOf('拒绝网络连接') > -1) {
+        num = 500;
+      }
+      // 检测错误是不是因为取消请求引起的，如果是打印取消提醒
+      if (CancelToken.isCancel(e)) {
+        num = 200;
+      }
       return num;
+    } on SocketException catch (e) {
+      // 网络连接错误
+      debugPrint('网络连接错误: ${e.message}');
+      return 500;
     } catch (e) {
-      debugPrint('检查 $url 可访问性出错：$e');
+      debugPrint('检查异常：$e   $url ');
       return 500;
     }
+  }
+
+  int extractStatusCode(String input, [int status = 400]) {
+    RegExp regex = RegExp(r'\d+');
+    Iterable<Match> matches = regex.allMatches(input);
+
+    List<int> numbers =
+        matches.map((match) => int.parse(match.group(0)!)).toList();
+    return numbers.isNotEmpty ? numbers[0] : status;
   }
 }

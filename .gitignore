@@ -55,3 +55,4 @@ flutter_rust_bridge_codegen.exe
 /data/
 /logs/
 *.local.*
+*udp*.*
