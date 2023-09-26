@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-09-26 21:21:12
+ * @LastEditTime: 2023-09-26 21:33:51
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -376,7 +376,7 @@ class PlaylistUtil {
           receiveTimeout: Duration(seconds: 30)));
 
       int receivedBytes = 0;
-       final resp = await dio.get(url, cancelToken: token);
+      final resp = await dio.get(url, cancelToken: token);
 
       // 创建可读流
       final stream = resp.data.stream;
@@ -385,21 +385,17 @@ class PlaylistUtil {
       await for (List<int> value in stream) {
         // 更新已接收的字节数
         receivedBytes += value.length;
-
+        print('====' + value.length.toString());
         // 如果超过，则取消请求
         if (receivedBytes > 1) {
           token.cancel('canceled');
-          debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
+          // debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
           break;
         }
-
-        // 处理接收到的数据
-        // ...
-
-        
       }
-      //debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
-       return receivedBytes > 0 ? 200 : 500;
+      debugPrint(url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}' );
+
+      return receivedBytes > 0 ? 200 : resp.statusCode ?? 500;
     } on DioException catch (e) {
       int num = 500;
       final msg = (e.message ?? e.error).toString();
