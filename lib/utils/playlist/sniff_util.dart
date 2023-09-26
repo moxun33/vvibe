@@ -8,7 +8,6 @@ import 'package:shortid/shortid.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
-import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';

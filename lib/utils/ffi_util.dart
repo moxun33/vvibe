@@ -45,6 +45,7 @@ class FfiUtil {
       return addr.replaceAll('0|', '');
     } catch (e) {
       EasyLoading.showError(e.toString());
+      return null;
     }
   }
 

@@ -58,7 +58,7 @@ class _WindowButtonsState extends State<WindowButtons> {
 
 class WindowTitle extends StatefulWidget {
   WindowTitle({Key? key, this.title}) : super(key: key);
-  String? title;
+  final String? title;
   @override
   _WindowTitleState createState() => _WindowTitleState();
 }
