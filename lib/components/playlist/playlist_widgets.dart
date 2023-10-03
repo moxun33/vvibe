@@ -317,7 +317,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       case 200:
         return Icon(
           Icons.check,
-          size: 8,
+          size: 10,
           color: Colors.green,
         );
 
@@ -358,7 +358,6 @@ class _PlUrlTileState extends State<PlUrlTile>
           message: '拒绝连接',
         );
       case 500:
-      case 503:
       case 502:
         return Tooltip(
           child: Icon(
@@ -367,6 +366,15 @@ class _PlUrlTileState extends State<PlUrlTile>
             color: Colors.red,
           ),
           message: '不可用',
+        );
+      case 503:
+        return Tooltip(
+          child: Icon(
+            Icons.linear_scale_rounded,
+            size: 8,
+            color: Colors.cyan[200],
+          ),
+          message: '客户端限制',
         );
       case 404:
         return Tooltip(
@@ -380,8 +388,13 @@ class _PlUrlTileState extends State<PlUrlTile>
       default:
         return loading
             ? SmallSpinning()
-            : SizedBox(
-                width: 0,
+            : Tooltip(
+                child: Icon(
+                  Icons.notification_important_outlined,
+                  size: 8,
+                  color: Colors.pink,
+                ),
+                message: '未知',
               );
     }
   }

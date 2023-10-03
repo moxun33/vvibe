@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-09-26 21:33:51
+ * @LastEditTime: 2023-10-04 00:14:18
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -360,7 +360,7 @@ class PlaylistUtil {
     return groupBy(list, (e) => e.group ?? "未分组");
   }
 
-  //检查是否为真实有效的url
+  //检查是否为真实有效的url TODO:请求队列，防止过多请求导致服务器拒绝
   bool validateUrl(String url) {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
@@ -373,7 +373,7 @@ class PlaylistUtil {
           headers: {
             'User-Agent': DEF_REQ_UA,
           },
-          receiveTimeout: Duration(seconds: 30)));
+          receiveTimeout: Duration(seconds: 10)));
 
       int receivedBytes = 0;
       final resp = await dio.get(url, cancelToken: token);
@@ -393,12 +393,13 @@ class PlaylistUtil {
           break;
         }
       }
-      debugPrint(url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}' );
+      debugPrint(url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}');
 
       return receivedBytes > 0 ? 200 : resp.statusCode ?? 500;
     } on DioException catch (e) {
       int num = 500;
-      final msg = (e.message ?? e.error).toString();
+      final msg =
+          (e.response?.statusMessage ?? e.message ?? e.error).toString();
       switch (e.type) {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.receiveTimeout:
@@ -434,6 +435,7 @@ class PlaylistUtil {
   }
 
   int extractStatusCode(String input, [int status = 400]) {
+    if (input.indexOf('Client limit reached') > -1) return 503;
     RegExp regex = RegExp(r'\d+');
     Iterable<Match> matches = regex.allMatches(input);
 
