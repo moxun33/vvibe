@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-10-04 13:57:27
+ * @LastEditTime: 2023-10-04 21:24:26
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -366,7 +366,7 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
-  Future<int> checkUrlAccessible(String url, {bool reqGet = false}) async {
+  Future<int> checkUrlAccessible(String url) async {
     return PlaylistCheckReq().check(url);
   }
 }

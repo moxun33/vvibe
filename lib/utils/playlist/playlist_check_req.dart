@@ -46,6 +46,7 @@ class PlaylistCheckReq {
   factory PlaylistCheckReq() => _instance;
 
   late Dio dio;
+  late Dio headDio;
 
   PlaylistCheckReq._internal() {
     dio = Dio(new BaseOptions(
@@ -53,11 +54,41 @@ class PlaylistCheckReq {
         headers: {
           'User-Agent': DEF_REQ_UA,
         },
-        receiveTimeout: Duration(seconds: 10)));
-    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 5);
+        receiveTimeout: Duration(seconds: 15)));
+    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 10);
+    headDio = Dio(new BaseOptions(
+        responseType: ResponseType.stream,
+        headers: {
+          'User-Agent': DEF_REQ_UA,
+        },
+        receiveTimeout: Duration(seconds: 15)));
+  }
+  bool shouldGetReq(String url) {
+    return url.indexOf('/udp/') > -1 || url.indexOf('/rtp/') > -1;
   }
 
   Future<int> check(String url) async {
+    if (shouldGetReq(url)) {
+      return get(url);
+    }
+    return head(url);
+  }
+
+  Future<int> head(String url) async {
+    try {
+      final resp = await headDio.head(url);
+      return resp.statusCode ?? 500;
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 422;
+      debugPrint(e.toString());
+      return status;
+    } catch (e) {
+      debugPrint(e.toString());
+      return 500;
+    }
+  }
+
+  Future<int> get(String url) async {
     try {
       CancelToken token = CancelToken();
       int receivedBytes = 0;
