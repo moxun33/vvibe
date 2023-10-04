@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-10-04 00:14:18
+ * @LastEditTime: 2023-10-04 13:57:27
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -18,6 +18,7 @@ import 'package:collection/collection.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
 import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/playlist/playlist_check_req.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -360,87 +361,12 @@ class PlaylistUtil {
     return groupBy(list, (e) => e.group ?? "未分组");
   }
 
-  //检查是否为真实有效的url TODO:请求队列，防止过多请求导致服务器拒绝
+  //检查是否为真实有效的url
   bool validateUrl(String url) {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
   Future<int> checkUrlAccessible(String url, {bool reqGet = false}) async {
-    try {
-      CancelToken token = CancelToken();
-      final dio = Dio(new BaseOptions(
-          responseType: ResponseType.stream,
-          headers: {
-            'User-Agent': DEF_REQ_UA,
-          },
-          receiveTimeout: Duration(seconds: 10)));
-
-      int receivedBytes = 0;
-      final resp = await dio.get(url, cancelToken: token);
-
-      // 创建可读流
-      final stream = resp.data.stream;
-
-      // 循环读取流数据
-      await for (List<int> value in stream) {
-        // 更新已接收的字节数
-        receivedBytes += value.length;
-        print('====' + value.length.toString());
-        // 如果超过，则取消请求
-        if (receivedBytes > 1) {
-          token.cancel('canceled');
-          // debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
-          break;
-        }
-      }
-      debugPrint(url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}');
-
-      return receivedBytes > 0 ? 200 : resp.statusCode ?? 500;
-    } on DioException catch (e) {
-      int num = 500;
-      final msg =
-          (e.response?.statusMessage ?? e.message ?? e.error).toString();
-      switch (e.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.receiveTimeout:
-        case DioExceptionType.sendTimeout:
-          num = 504;
-          break;
-        case DioExceptionType.unknown:
-          num = extractStatusCode(msg, 422);
-          break;
-        case DioExceptionType.badResponse:
-          num = extractStatusCode(msg, 400);
-          break;
-        default:
-          break;
-      }
-      debugPrint('检查 可访问性出错：  $num  $msg ${e.type}  $url ');
-      if (msg.indexOf('拒绝网络连接') > -1) {
-        num = 500;
-      }
-      // 检测错误是不是因为取消请求引起的，如果是打印取消提醒
-      if (CancelToken.isCancel(e)) {
-        num = 200;
-      }
-      return num;
-    } on SocketException catch (e) {
-      // 网络连接错误
-      debugPrint('网络连接错误: ${e.message}');
-      return 500;
-    } catch (e) {
-      debugPrint('检查异常：$e   $url ');
-      return 500;
-    }
-  }
-
-  int extractStatusCode(String input, [int status = 400]) {
-    if (input.indexOf('Client limit reached') > -1) return 503;
-    RegExp regex = RegExp(r'\d+');
-    Iterable<Match> matches = regex.allMatches(input);
-
-    List<int> numbers =
-        matches.map((match) => int.parse(match.group(0)!)).toList();
-    return numbers.isNotEmpty ? numbers[0] : status;
+    return PlaylistCheckReq().check(url);
   }
 }

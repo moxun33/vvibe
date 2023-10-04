@@ -23,7 +23,7 @@ class LimitedConnectionAdapter implements HttpClientAdapter {
   @override
   Future<ResponseBody> fetch(RequestOptions options,
       Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
-    await _lock.synchronized(() async {
+    return await _lock.synchronized(() async {
       while (_connections.length > maxConnections) {
         await Future.any(_connections.values as Iterable<Future>);
       }
@@ -42,7 +42,6 @@ class LimitedConnectionAdapter implements HttpClientAdapter {
 }
 
 class PlaylistCheckReq {
-  final int maxConnections = 5;
   static PlaylistCheckReq _instance = PlaylistCheckReq._internal();
   factory PlaylistCheckReq() => _instance;
 
@@ -56,33 +55,9 @@ class PlaylistCheckReq {
         },
         receiveTimeout: Duration(seconds: 10)));
     dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 5);
-    // 添加拦截器
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-      // 在请求被发送之前做一些预处理
-      return handler.next(options); //continue
-    }, onResponse: (response, handler) {
-      // 在返回响应数据之前做一些预处理
-      return handler.next(response);
-    }, onError: (DioException e, handler) {
-      // 当请求失败时做一些预处理
-
-      return handler.next(e);
-    }));
-    /*   dio.interceptors
-        .add(QueuedInterceptorsWrapper(onRequest: (options, handler) {
-      // 在请求被发送之前做一些预处理
-      return handler.next(options); //continue
-    }, onResponse: (response, handler) {
-      // 在返回响应数据之前做一些预处理
-      return handler.next(response);
-    }, onError: (DioException e, handler) {
-      // 当请求失败时做一些预处理
-
-      return handler.next(e);
-    })); */
   }
 
-  check(String url) async {
+  Future<int> check(String url) async {
     try {
       CancelToken token = CancelToken();
       int receivedBytes = 0;

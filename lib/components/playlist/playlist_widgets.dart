@@ -374,7 +374,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.cyan[200],
           ),
-          message: '客户端限制',
+          message: '限制连接数',
         );
       case 404:
         return Tooltip(
