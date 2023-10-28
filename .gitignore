@@ -59,4 +59,4 @@ flutter_rust_bridge_codegen.exe
 *iptv*.txt
 
 .vs/
-assets/epg/
+assets/epg/*
