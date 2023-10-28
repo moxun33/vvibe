@@ -14,16 +14,19 @@ class ChannelEpg {
     required this.date,
     required this.channelName,
     this.url,
+    this.channelId,
     required this.epgData,
   });
 
   DateTime date;
+  String? channelId;
   String channelName;
   String? url;
   List<EpgDatum> epgData;
 
   factory ChannelEpg.fromJson(Map<String, dynamic> json) => ChannelEpg(
         date: DateTime.parse(json["date"]),
+        channelId: json["channel_id"],
         channelName: json["channel_name"],
         url: json["url"],
         epgData: List<EpgDatum>.from(
@@ -34,6 +37,7 @@ class ChannelEpg {
         "date":
             "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
         "channel_name": channelName,
+        "channel_id": channelId,
         "url": url,
         "epg_data": List<dynamic>.from(epgData.map((x) => x.toJson())),
       };
@@ -55,7 +59,7 @@ class EpgDatum {
   factory EpgDatum.fromJson(Map<String, dynamic> json) => EpgDatum(
         start: json["start"],
         desc: json["desc"],
-        end: json["end"],
+        end: json["end"] ?? json['stop'],
         title: json["title"],
       );
 

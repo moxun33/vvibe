@@ -888,6 +888,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "6.3.0"
+  xml2json:
+    dependency: "direct main"
+    description:
+      name: xml2json
+      sha256: "1cd5d23474f38e794fbcab262290bc638c59c985c34d29180fc4525eda24ea7d"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "6.2.0"
   yaml:
     dependency: transitive
     description:

@@ -8,6 +8,7 @@ import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/logger.dart';
+import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:vvibe/utils/utils.dart';
 
@@ -67,7 +68,7 @@ class Global {
         width: 40,
         child: Spinning(),
       );
-    // EpgUtil().downloadEpgDataIsolate();
+    EpgUtil().downloadEpgDataIsolate();
 
     return genTheme();
   }

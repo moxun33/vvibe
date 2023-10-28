@@ -75,3 +75,11 @@
 - ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
 
 - 项目还使用或借鉴了未列出的其他项目，同样在此感谢。
+
+- epg
+
+```bash
+http://epg.aptvapp.com/xml
+http://epg.51zmt.top:8000/e.xml.gz
+https://epg.112114.xyz/pp.xml.gz
+```

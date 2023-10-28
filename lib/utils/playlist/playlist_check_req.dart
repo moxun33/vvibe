@@ -64,7 +64,9 @@ class PlaylistCheckReq {
         receiveTimeout: Duration(seconds: 15)));
   }
   bool shouldGetReq(String url) {
-    return url.indexOf('/udp/') > -1 || url.indexOf('/rtp/') > -1;
+    return url.indexOf('/udp/') > -1 ||
+        url.indexOf('/rtp/') > -1 ||
+        url.indexOf('/PLTV/') > -1;
   }
 
   Future<int> check(String url) async {

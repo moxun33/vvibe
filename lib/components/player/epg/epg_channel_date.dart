@@ -30,15 +30,19 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   void getEpgData() async {
     try {
+      final name = widget.urlItem.tvgName ?? widget.urlItem.name;
+      if (name == null || name == '') {
+        EasyLoading.showError('缺少频道名称，无法获取节目单');
+        return;
+      }
       EasyLoading.show(status: '正在加载节目单');
-      ChannelEpg? _data = await EpgUtil()
-          .getChannelEpg(widget.urlItem.tvgName, date: widget.date);
+      ChannelEpg? _data = await EpgUtil().getChannelDateEpg(name, widget.date);
       setState(() {
         data = _data;
       });
       EasyLoading.dismiss();
     } catch (e) {
-      EasyLoading.showError('加载节目单失败');
+      EasyLoading.showError('加载节目单失败: ' + e.toString());
       EasyLoading.dismiss();
     }
   }
