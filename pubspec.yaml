@@ -63,7 +63,7 @@ dependencies:
   desktop_multi_window: 
     #path: E:\source-code\flutter-src\flutter-plugins\packages\desktop_multi_window
     git:
-      url: https://github.com/moxun33/flutter-plugins
+      url: https://github.com/MixinNetwork/flutter-plugins
       path: packages/desktop_multi_window
   mixin_logger: 
     git:

@@ -214,8 +214,8 @@ packages:
     description:
       path: "packages/desktop_multi_window"
       ref: HEAD
-      resolved-ref: e1ca5e3277eb642d365f6c11b3b7039a171a7f1d
-      url: "https://github.com/moxun33/flutter-plugins"
+      resolved-ref: "68dad7b26b850188eeb8c434fd5332b2c7f3eeb4"
+      url: "https://github.com/MixinNetwork/flutter-plugins"
     source: git
     version: "0.2.0"
   dio:

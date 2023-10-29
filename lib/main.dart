@@ -35,7 +35,7 @@ void main(List<String> args) async {
         windowController: WindowController.fromWindowId(windowId),
         args: argument,
       ));
-      //VWindow().initWindow();
+      VWindow().initWindow();
     });
   } else {
     Global.init().then((theme) {

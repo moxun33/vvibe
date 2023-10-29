@@ -30,6 +30,7 @@ class Global {
   static Future<ThemeData> init({bool shouldSetSize = true}) async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
+
     await windowManager.ensureInitialized();
 
     // Ruquest 模块初始化
@@ -68,7 +69,7 @@ class Global {
         width: 40,
         child: Spinning(),
       );
-    EpgUtil().downloadEpgDataIsolate();
+    if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
 
     return genTheme();
   }
