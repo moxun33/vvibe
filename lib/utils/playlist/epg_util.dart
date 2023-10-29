@@ -237,7 +237,7 @@ class EpgUtil {
       final tz = DateTime.now().timeZoneOffset;
       String tzOffset = date.length > 14
           ? date.substring(15)
-          : '+${tz.inHours}${tz.inMinutes}';
+          : '+${tz.inHours.toString().padLeft(2, '0')}${tz.inMinutes.toString().padLeft(2, '0')}';
 
       /*  dateTime = dateTime
           .add(Duration(hours: int.parse(tzOffset.substring(0, 3))));
