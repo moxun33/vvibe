@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/utils/gzip.dart';
@@ -68,15 +67,17 @@ class EpgUtil {
     return url;
   }
 
-  String getToday([seg = '']) {
+  String getToday() {
     DateTime now = DateTime.now();
-    return getDate(now, seg);
+    return getDate(
+      now,
+    );
   }
 
-  String getDate(DateTime dt, [seg = '']) {
-    final m = dt.month < 10 ? '0${dt.month}' : dt.month;
-    final d = dt.day < 10 ? '0${dt.day}' : dt.day;
-    return '${dt.year}$seg$m$seg$d';
+  String getDate(DateTime dt) {
+    final m = dt.month.toString().padLeft(2, '0');
+    final d = dt.day.toString().padLeft(2, '0');
+    return '${dt.year.toString().padLeft(4, '0')}$m$d';
   }
 
   String subDate(DateTime dt, days) {
@@ -113,21 +114,35 @@ class EpgUtil {
     }
   }
 
-//根据[tvg-id、tvg-name、name]获取节目单
-  Future<ChannelEpg?> getChannelEpg(channel) async {
+//根据[tvg-id、tvg-name、name]获取每天的节目单
+  Future<List<ChannelEpg>?> getChannelEpg(channel) async {
     const res = null;
     if (res != null) {
+      return res;
     } else {
       print('获取 $channel 的节目单失败 ');
       return null;
     }
   }
 
-//根据gvg-id、tvg-name、name和date获取节目单
+//根据tvg-id、tvg-name、name和date获取节目单
   Future<ChannelEpg?> getChannelDateEpg(channel, [String? date]) async {
     final d = date ?? getToday();
-    try {} catch (e) {
-      print('获取 $channel $d的节目单失败 $e');
+
+    try {
+      if (channel.isEmpty) return null;
+      final Map<String, dynamic> map = {'date': d};
+      if (int.tryParse(channel) is int) {
+        map['id'] = channel;
+      } else {
+        map['name'] = channel;
+      }
+      final epg = await pickChannelEpgJson(channel, d);
+      map['epg'] = epg ?? [];
+      return ChannelEpg.fromJson(map);
+    } catch (e) {
+      print('获取 $channel $d 的节目单失败 $e');
+      return null;
     }
   }
 
@@ -147,6 +162,62 @@ class EpgUtil {
 
   Future<String> getJsonFilePath() async {
     return (await getZipPath()).replaceAll('e.xml.gz', 'e.json');
+  }
+
+// 格式化epg的时间 String dateString = '20231029190000 +0800';
+  DateTime parseEpgTime(String date) {
+    try {
+      DateTime dateTime =
+          DateTime.parse(date.substring(0, 8) + 'T' + date.substring(8, 14));
+      String timeZoneOffset = date.substring(15);
+
+      /*  dateTime = dateTime
+          .add(Duration(hours: int.parse(timeZoneOffset.substring(0, 3))));
+      dateTime = dateTime
+          .add(Duration(minutes: int.parse(timeZoneOffset.substring(3))));
+ */
+      return dateTime;
+    } catch (e) {
+      print('$e');
+      return DateTime.now();
+    }
+  }
+
+// 从下载的epg文件提取频道、日期的epg数据
+  Future<List<Map<String, dynamic>>?> pickChannelEpgJson(
+      String channel, String date) async {
+    try {
+      if (channel.isEmpty) return null;
+
+      final epgStr = await readEpgJson();
+      if (epgStr == null) return null;
+      final json = jsonDecode(epgStr);
+      final Map<String, dynamic> tv = json['tv'] ?? {};
+      final List<dynamic> channels = tv['channel'] ?? [];
+
+      final List<dynamic> programmes = (tv['programme'] ?? []);
+      var myChannels = channels
+          .where((e) =>
+              e['display-name'] == channel ||
+              channel.contains(e['display-name']) ||
+              e['id'] == int.tryParse(channel))
+          .toList();
+      if (myChannels.isEmpty) {
+        return null;
+      }
+      final myChannel = myChannels[0];
+      final tvgId = myChannel['id'];
+      final List epg = programmes
+          .where((e) =>
+              e['channel'].toString() == tvgId.toString() &&
+              e['start'].startsWith(date) &&
+              e['stop'].startsWith(date))
+          .toList();
+      return List<Map<String, dynamic>>.from(epg);
+    } catch (e) {
+      print('pickChannelEpgJson 出错： $e');
+      return null;
+    }
   }
 
   Future<String?> readEpgJson() async {

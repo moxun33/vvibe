@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/components/components.dart';
+import 'package:intl/intl.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
@@ -30,8 +30,11 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   void getEpgData() async {
     try {
-      final name = widget.urlItem.tvgName ?? widget.urlItem.name;
-      if (name == null || name == '') {
+      final name = widget.urlItem.tvgName!.isNotEmpty
+          ? widget.urlItem.tvgName
+          : widget.urlItem.name;
+      final id = widget.urlItem.tvgId;
+      if (name == null || name == '' && (id == null || id == '')) {
         EasyLoading.showError('缺少频道名称，无法获取节目单');
         return;
       }
@@ -53,13 +56,16 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
   }
 
   DateTime _toDateTime(String time) {
+    if (time.endsWith('+0800') && !time.contains('-')) {
+      return EpgUtil().parseEpgTime(time);
+    }
     final ymd = widget.date.split('-'), hm = time.split(':');
     return DateTime(int.parse(ymd[0]), int.parse(ymd[1]), int.parse(ymd[2]),
         int.parse(hm[0]), int.parse(hm[1]));
   }
 
-  String _toSeekTime(String time) {
-    return widget.date.replaceAll('-', '') + time.replaceAll(':', '') + '00';
+  String _toSeekTime(DateTime time) {
+    return DateFormat('yyyyMMddHHmmss').format(time);
   }
 
   bool canUrlPlayback() {
@@ -70,6 +76,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   String getPlayseek(EpgDatum epg) {
     return _toSeekTime(epg.start) + '-' + _toSeekTime(epg.end);
+    //_toSeekTime(epg.start) + '-' + _toSeekTime(epg.end);
   }
 
   Widget _setBtn(EpgDatum epg,
@@ -96,8 +103,8 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   Widget _EpgRow(EpgDatum epg) {
     DateTime now = DateTime.now();
-    DateTime st = _toDateTime(epg.start);
-    DateTime et = _toDateTime(epg.end);
+    DateTime st = (epg.start);
+    DateTime et = (epg.end);
     final isLive = now.isAfter(st) && now.isBefore(et),
         played = st.isBefore(now),
         toPlay = et.isAfter(now);
@@ -108,7 +115,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
             child: Row(
           children: [
             Text(
-              epg.start,
+              DateFormat('HH:mm').format(epg.start),
               style: TextStyle(color: Colors.purple),
             ),
             SizedBox(
@@ -119,8 +126,8 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
               width: 20,
             ),
             Text(
-              '结束时间：${epg.end}',
-              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+              '结束于：${DateFormat('yyyy-MM-dd HH:mm:ss').format(epg.end)}',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
           ],
         )),
@@ -136,7 +143,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
   }
 
   Widget _buildList() {
-    List<EpgDatum> _epg = data?.epgData ?? [];
+    List<EpgDatum> _epg = data?.epg ?? [];
     if (_epg.length != 0) {
       return ListView.builder(
           shrinkWrap: true,
@@ -148,7 +155,11 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
             return _EpgRow(e);
           });
     } else {
-      return Spinning();
+      return Center(
+        child: SizedBox(
+          child: Text('节目单为空'),
+        ),
+      );
     }
   }
 
