@@ -81,5 +81,5 @@
 ```bash
 http://epg.aptvapp.com/xml
 http://epg.51zmt.top:8000/e.xml.gz
-https://epg.112114.xyz/pp.xml.gz
+https://epg.112114.xyz/e.xml.gz
 ```

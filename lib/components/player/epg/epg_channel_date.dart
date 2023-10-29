@@ -55,15 +55,6 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
     super.dispose();
   }
 
-  DateTime _toDateTime(String time) {
-    if (time.endsWith('+0800') && !time.contains('-')) {
-      return EpgUtil().parseEpgTime(time);
-    }
-    final ymd = widget.date.split('-'), hm = time.split(':');
-    return DateTime(int.parse(ymd[0]), int.parse(ymd[1]), int.parse(ymd[2]),
-        int.parse(hm[0]), int.parse(hm[1]));
-  }
-
   String _toSeekTime(DateTime time) {
     return DateFormat('yyyyMMddHHmmss').format(time);
   }
@@ -126,7 +117,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
               width: 20,
             ),
             Text(
-              '结束于：${DateFormat('yyyy-MM-dd HH:mm:ss').format(epg.end)}',
+              '结束于：${DateFormat('HH:mm').format(epg.end)}',
               style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
           ],

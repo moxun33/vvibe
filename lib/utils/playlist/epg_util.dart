@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/utils/gzip.dart';
@@ -27,7 +28,7 @@ final _epgCacheoptions = CacheOptions(
   // Overrides any HTTP directive to delete entry past this duration.
   // Useful only when origin server has no cache config or custom behaviour is desired.
   // Defaults to [null].
-  maxStale: const Duration(days: 1),
+  maxStale: const Duration(hours: 1),
   // Default. Allows 3 cache sets and ease cleanup.
   priority: CachePriority.normal,
   // Default. Body and headers encryption with your own algorithm.
@@ -58,13 +59,51 @@ class EpgUtil {
     return dir;
   }
 
+// epg 主机
   Future<String> getEpgUrl() async {
     String url = DEF_EPG_URL;
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     if (settings != null) {
-      url = settings['egp'] ?? DEF_EPG_URL;
+      url = settings['epg'] ?? DEF_EPG_URL;
     }
     return url;
+  }
+
+  List<String> extractXmlUrls(String text) {
+    RegExp regex = RegExp(r'https?://[^\s/$.?#].[^\s]*\.xml');
+    Iterable<RegExpMatch> matches = regex.allMatches(text);
+    List<String> urls = [];
+
+    for (RegExpMatch match in matches) {
+      if (match.group(0) != null) urls.add(match.group(0)!);
+    }
+
+    return urls;
+  }
+
+  // epg xml地址
+  Future<String?> getEpgXmlUrl() async {
+    try {
+      String url = await getEpgUrl();
+      if (url.contains('epg.aptvapp.com'))
+        return Uri.parse(url).origin + '/xml';
+      var resp = await client.get(url);
+      if (resp.statusCode != 200 && resp.statusCode != 201) return null;
+      final type = resp.headers['Content-Type'] ?? [];
+      if (type.first.contains('text/html')) {
+        final urls = extractXmlUrls(resp.data);
+        if (urls.isEmpty) return null;
+        final xmlUrl = urls[0].replaceAll('</br>', '\n').split('\n')[0];
+        final uri = Uri.tryParse(xmlUrl);
+        String _xmlUri = xmlUrl;
+        if (uri != null) '${uri.origin}${uri.path}';
+        return _xmlUri.endsWith('.gz') ? _xmlUri : _xmlUri + '.gz';
+      }
+      return url + '/e.xml.gz';
+    } catch (e) {
+      print('getEpgXmlUrl 出错：' + e.toString());
+      return null;
+    }
   }
 
   String getToday() {
@@ -88,7 +127,6 @@ class EpgUtil {
   List<String> genWeekDays() {
     DateTime now = DateTime.now();
     return [
-      subDate(now, 7),
       subDate(now, 6),
       subDate(now, 5),
       subDate(now, 4),
@@ -100,21 +138,44 @@ class EpgUtil {
   }
 
 //根据[tvg-id、tvg-name、name和dates 远程获取节目单
-  Future<ChannelEpg?> getChannelBiypEpg(channel, [String? date]) async {
-    final params = {'ch': channel, 'date': date ?? getToday()};
-    final resp = await client.get(await getEpgUrl(), queryParameters: params);
-    if (resp.statusCode == 200) {
-      if (resp.data is Map)
-        return ChannelEpg.fromJson(resp.data);
-      else
+  Future<ChannelEpg?> getChannelApiEpg(String channel, [String? date]) async {
+    final d = date ?? getToday();
+    final params = {
+      'ch': channel,
+      'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(d))
+    };
+    try {
+      final resp = await client.get(await getEpgUrl(),
+          queryParameters: params,
+          options: Options(responseType: ResponseType.json));
+
+      if (resp.data != null && resp.data is Map) {
+        final Map<String, dynamic> map = {
+          'date': resp.data['date'] ?? d,
+          'epg': List<dynamic>.from(resp.data['epg_data'] ?? [])
+              .map((e) => Map<String, dynamic>.from({
+                    ...e,
+                    'start': d + e['start'].toString().replaceAll(':', ''),
+                    'end': d + e['end'].toString().replaceAll(':', ''),
+                  }))
+              .toList()
+        };
+        if (int.tryParse(channel) is int) {
+          map['id'] = channel;
+        } else {
+          map['name'] = resp.data['channel_name'] ?? channel;
+        }
+        return ChannelEpg.fromJson(map);
+      } else {
         return null;
-    } else {
-      print('加载节目单失败 $params');
+      }
+    } catch (e) {
+      print('加载节目单出错 $params ${e.toString()}');
       return null;
     }
   }
 
-//根据[tvg-id、tvg-name、name]获取每天的节目单
+//根据[tvg-id、tvg-name、name]获取频道节目单
   Future<List<ChannelEpg>?> getChannelEpg(channel) async {
     const res = null;
     if (res != null) {
@@ -138,7 +199,10 @@ class EpgUtil {
         map['name'] = channel;
       }
       final epg = await pickChannelEpgJson(channel, d);
-      map['epg'] = epg ?? [];
+      map['epg'] = epg;
+      if (!(epg != null && epg.isNotEmpty)) {
+        return getChannelApiEpg(channel, d);
+      }
       return ChannelEpg.fromJson(map);
     } catch (e) {
       print('获取 $channel $d 的节目单失败 $e');
@@ -164,21 +228,25 @@ class EpgUtil {
     return (await getZipPath()).replaceAll('e.xml.gz', 'e.json');
   }
 
-// 格式化epg的时间 String dateString = '20231029190000 +0800';
+// 格式化epg的时间 String dateString = '2023 1029 19 00 00 +0800';
   DateTime parseEpgTime(String date) {
     try {
+      date = date.padRight(14, '0');
       DateTime dateTime =
           DateTime.parse(date.substring(0, 8) + 'T' + date.substring(8, 14));
-      String timeZoneOffset = date.substring(15);
+      final tz = DateTime.now().timeZoneOffset;
+      String tzOffset = date.length > 14
+          ? date.substring(15)
+          : '+${tz.inHours}${tz.inMinutes}';
 
       /*  dateTime = dateTime
-          .add(Duration(hours: int.parse(timeZoneOffset.substring(0, 3))));
+          .add(Duration(hours: int.parse(tzOffset.substring(0, 3))));
       dateTime = dateTime
-          .add(Duration(minutes: int.parse(timeZoneOffset.substring(3))));
+          .add(Duration(minutes: int.parse(tzOffset.substring(3))));
  */
       return dateTime;
     } catch (e) {
-      print('$e');
+      print('parseEpgTime出错$e $date');
       return DateTime.now();
     }
   }
@@ -254,8 +322,8 @@ class EpgUtil {
   }
 
   Future downloadEpgData() async {
-    String url = await getEpgUrl();
-
+    final url = await getEpgXmlUrl();
+    if (url == null || !url.contains('xml')) return;
     final savePath = await getZipPath();
     final dlRes = await downloadFile(url, savePath);
 

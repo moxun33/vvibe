@@ -82,8 +82,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
               _buldInputRow(_epgUrlTextCtl,
                   label: 'EPG地址',
                   decoration: InputDecoration(
-                      hintText:
-                          '完整的EPG xml地址，默认 http://epg.51zmt.top:8000/e.xml.gz')),
+                      hintText: 'EPG地址，默认 https://epg.112114.xyz')),
             ],
           ),
           Row(

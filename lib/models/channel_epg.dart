@@ -31,7 +31,8 @@ class ChannelEpg {
         id: json["id"],
         name: json["name"],
         url: json["url"],
-        epg: List<EpgDatum>.from(json["epg"].map((x) => EpgDatum.fromJson(x))),
+        epg: List<EpgDatum>.from(
+            (json["epg"] ?? json["epg_data"]).map((x) => EpgDatum.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
