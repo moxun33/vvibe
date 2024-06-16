@@ -7,7 +7,7 @@
  * @Description: 
  * @qmj
  */
-import 'dart:convert';
+/*import 'dart:convert';
 import 'dart:ffi';
 
 import 'dart:io';
@@ -63,3 +63,4 @@ class FfiUtil {
     }
   }
 }
+*/

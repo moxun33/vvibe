@@ -9,7 +9,6 @@ import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
-import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 class SniffUtil {
@@ -131,10 +130,10 @@ class SniffUtil {
       DateTime endTime = DateTime.now();
       final ipv4 = extractIpv4(url);
       if (withMeta) {
-        meta = await FfiUtil().getMediaInfo(url);
+        // meta = await FfiUtil().getMediaInfo(url);
       }
       if (ipv4.isNotEmpty) {
-        ipInfo = (await FfiUtil().getIpInfo(ipv4)) ?? '';
+        //  ipInfo = (await FfiUtil().getIpInfo(ipv4)) ?? '';
       }
       //print(endTime.difference(startTime).inMilliseconds);
       return UrlSniffRes.fromJson({
@@ -146,14 +145,14 @@ class SniffUtil {
         'ipInfo': ipInfo,
         'duration': endTime.difference(startTime).inMilliseconds
       });
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       print('$url 扫描错误   ${e.toString()}');
       return UrlSniffRes.fromJson({
         'index': index,
-        'status': e.type == DioErrorType.connectionTimeout
+        'status': e.type == DioExceptionType.connectionTimeout
             ? UrlSniffResStatus.timeout
             : UrlSniffResStatus.failed,
-        'statusCode': e.type == DioErrorType.connectionTimeout ? 504 : 500,
+        'statusCode': e.type == DioExceptionType.connectionTimeout ? 504 : 500,
         'mediaInfo': null,
         'ipInfo': '',
         'duration': 0,

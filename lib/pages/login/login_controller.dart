@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:vvibe/utils/ffi_util.dart';
 
 class LoginController extends GetxController {
   final count = 0.obs;
@@ -11,14 +10,7 @@ class LoginController extends GetxController {
   }
 
   @override
-  void onReady() {
-    FfiUtil().getIpInfo('27.47.71.99').then((info) {
-      print('get ip info');
-      print(info);
-      ipAddr = info ?? '';
-      update();
-    });
-  }
+  void onReady() {}
 
   @override
   void onClose() {}

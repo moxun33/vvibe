@@ -83,7 +83,8 @@ class Request {
   }
 
   /// restful get 操作
-  Future get(String path, {dynamic params, Options? options}) async {
+  Future get(String path, Map<String, String> map,
+      {dynamic params, Options? options}) async {
     Options requestOptions = options ?? Options();
 
     Map<String, dynamic> _authorization = getAuthorizationHeader();

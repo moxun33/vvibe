@@ -105,14 +105,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.4.1"
-  build_cli_annotations:
-    dependency: transitive
-    description:
-      name: build_cli_annotations
-      sha256: b59d2769769efd6c9ff6d4c4cede0be115a566afc591705c2040b707534b1172
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.0"
   build_config:
     dependency: transitive
     description:
@@ -161,14 +153,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.18.0"
-  colorize:
-    dependency: transitive
-    description:
-      name: colorize
-      sha256: "584746cd6ba1cba0633b6720f494fe6f9601c4170f0666c1579d2aa2a61071ba"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.0"
   convert:
     dependency: transitive
     description:
@@ -303,14 +287,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.13.1"
-  flutter_rust_bridge:
-    dependency: "direct main"
-    description:
-      name: flutter_rust_bridge
-      sha256: "672a905f54ca8107481ac8e9cb7df74afa6bf006fe8c82d58cb752525615ca33"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.66.0"
   flutter_spinkit:
     dependency: transitive
     description:
@@ -410,14 +386,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.18.0"
-  js:
-    dependency: transitive
+  ip2region_plus:
+    dependency: "direct main"
     description:
-      name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      name: ip2region_plus
+      sha256: "4c4e70492ece629f2b4f4e90d9565daa875b3a9810499c109fa590aa9565a50f"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.6.7"
+    version: "1.0.2"
   json_annotation:
     dependency: transitive
     description:
@@ -514,14 +490,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.12.0"
-  mime:
-    dependency: transitive
-    description:
-      name: mime
-      sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.5"
   mixin_logger:
     dependency: "direct main"
     description:
@@ -603,14 +571,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.8"
-  pool:
-    dependency: transitive
-    description:
-      name: pool
-      sha256: "20fe868b6314b322ea036ba325e6fc0711a22948856475e2c2b6306e8ab39c2a"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.5.1"
   pub_semver:
     dependency: transitive
     description:
@@ -627,14 +587,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.3.0"
-  puppeteer:
-    dependency: transitive
-    description:
-      name: puppeteer
-      sha256: cc2475f3945c68596c59d3cc2da9f7d0b0279ddf7d593bcc218a164b51c27aab
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.25.0"
   quiver:
     dependency: transitive
     description:
@@ -715,30 +667,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.3.2"
-  shelf:
-    dependency: transitive
-    description:
-      name: shelf
-      sha256: ad29c505aee705f41a4d8963641f91ac4cee3c8fad5947e033390a7bd8180fa4
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.4.1"
-  shelf_static:
-    dependency: transitive
-    description:
-      name: shelf_static
-      sha256: a41d3f53c4adf0f57480578c1d61d90342cd617de7fc8077b1304643c2d85c1e
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.2"
-  shelf_web_socket:
-    dependency: transitive
-    description:
-      name: shelf_web_socket
-      sha256: "9ca081be41c60190ebcb4766b2486a7d50261db7bd0f5d9615f2d653637a84c1"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.4"
   shortid:
     dependency: "direct main"
     description:
@@ -816,14 +744,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.7.0"
-  tuple:
-    dependency: transitive
-    description:
-      name: tuple
-      sha256: a97ce2013f240b2f3807bcbaf218765b6f301c3eff91092bcfa23a039e7dd151
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:
