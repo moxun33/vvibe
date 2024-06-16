@@ -200,19 +200,20 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
-                dropdownWidth: 250,
+                dropdownStyleData: DropdownStyleData(width: 250),
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
                 hint:
                     Text('选择播放列表', style: TextStyle(color: Colors.purple[100])),
                 value: selectedFilename,
-                icon: const Icon(Icons.keyboard_arrow_down),
+                iconStyleData:
+                    IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),
                 onChanged: (String? value) {
                   // This is called when the user selects an item.
                   onPlayFileChange(value);
                 },
-                itemHeight: 22,
+                menuItemStyleData: MenuItemStyleData(height: 22),
                 //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {

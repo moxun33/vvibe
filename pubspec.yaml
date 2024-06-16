@@ -30,16 +30,16 @@ dependencies:
 
   # ui kit
   # getx
-  get: 4.6.4
+  get: 4.6.6
 
   # 日期格式
   intl: ^0.17.0
 
   # loaing
-  flutter_easyloading: ^3.0.0
+  flutter_easyloading: ^3.0.5
 
   # http
-  dio: ^5.0.0
+  dio: ^5.4.3
   #cookie_jar: ^3.0.1
   #dio_cookie_manager: ^2.0.0
 
@@ -73,21 +73,21 @@ dependencies:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding
 #      path: plugins/window_size
-  ffi: ^2.0.1
+  ffi: ^2.1.2
   flutter_rust_bridge: 1.66.0
-  collection: ^1.16.0
-  dropdown_button2: ^1.7.2
-  flutter_barrage: ^0.5.2
-  json_theme: ^4.0.1+1
+  collection: ^1.18.0
+  dropdown_button2: ^2.3.9
+  flutter_barrage: ^0.5.5
+  json_theme: ^6.0.0
   uuid: ^3.0.6
   native_context_menu: ^0.2.2+5
   # dio cache
-  dio_cache_interceptor: ^3.3.1
+  dio_cache_interceptor: ^3.5.0
   shortid: ^0.1.2
-  bitsdojo_window: ^0.1.5
-  window_manager: 0.3.6
-  synchronized: ^3.1.0
-  xml2json: ^6.2.0
+  bitsdojo_window: ^0.1.6
+  window_manager: 0.3.9
+  synchronized: ^3.1.0+1
+  xml2json: ^6.2.3
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +96,12 @@ dev_dependencies:
   freezed: ^2.1.0+1
   #替换图标
   flutter_launcher_icons: ^0.10.0
+  
+dependency_overrides: 
+  dio: ^5.2.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_easyloading: ^3.0.3
+  intl: 0.18.0
 
 flutter_icons:
   image_path: "assets//logo.png"

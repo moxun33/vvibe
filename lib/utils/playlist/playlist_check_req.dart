@@ -54,14 +54,14 @@ class PlaylistCheckReq {
         headers: {
           'User-Agent': DEF_REQ_UA,
         },
-        receiveTimeout: Duration(seconds: 15)));
+        receiveTimeout: Duration(seconds: 10)));
     dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 10);
     headDio = Dio(new BaseOptions(
         responseType: ResponseType.stream,
         headers: {
           'User-Agent': DEF_REQ_UA,
         },
-        receiveTimeout: Duration(seconds: 15)));
+        receiveTimeout: Duration(seconds: 10)));
   }
   bool shouldGetReq(String url) {
     return url.indexOf('/udp/') > -1 ||
