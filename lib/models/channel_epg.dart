@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:vvibe/utils/playlist/epg_util.dart';
+
 ChannelEpg channelEpgFromJson(String str) =>
     ChannelEpg.fromJson(json.decode(str));
 
@@ -12,30 +14,34 @@ String channelEpgToJson(ChannelEpg data) => json.encode(data.toJson());
 class ChannelEpg {
   ChannelEpg({
     required this.date,
-    required this.channelName,
+    required this.name,
     this.url,
-    required this.epgData,
+    this.id,
+    required this.epg,
   });
 
   DateTime date;
-  String channelName;
+  int? id;
+  String name;
   String? url;
-  List<EpgDatum> epgData;
+  List<EpgDatum> epg;
 
   factory ChannelEpg.fromJson(Map<String, dynamic> json) => ChannelEpg(
         date: DateTime.parse(json["date"]),
-        channelName: json["channel_name"],
+        id: json["id"],
+        name: json["name"],
         url: json["url"],
-        epgData: List<EpgDatum>.from(
-            json["epg_data"].map((x) => EpgDatum.fromJson(x))),
+        epg: List<EpgDatum>.from(
+            (json["epg"] ?? json["epg_data"]).map((x) => EpgDatum.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "date":
-            "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
-        "channel_name": channelName,
+            "${date.year.toString().padLeft(4, '0')}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}",
+        "name": name,
+        "id": id,
         "url": url,
-        "epg_data": List<dynamic>.from(epgData.map((x) => x.toJson())),
+        "epg": List<dynamic>.from(epg.map((x) => x.toJson())),
       };
 }
 
@@ -47,16 +53,16 @@ class EpgDatum {
     required this.title,
   });
 
-  String start;
-  String? desc;
-  String end;
+  DateTime start;
+  DateTime end;
   String title;
+  String? desc;
 
   factory EpgDatum.fromJson(Map<String, dynamic> json) => EpgDatum(
-        start: json["start"],
-        desc: json["desc"],
-        end: json["end"],
+        start: EpgUtil().parseEpgTime(json["start"]),
+        end: EpgUtil().parseEpgTime(json["end"] ?? json['stop']),
         title: json["title"],
+        desc: json["desc"] is String ? json["desc"] : '',
       );
 
   Map<String, dynamic> toJson() => {

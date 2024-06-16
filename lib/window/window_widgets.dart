@@ -1,5 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 
 class WindowButtons extends StatefulWidget {
@@ -30,6 +31,7 @@ class _WindowButtonsState extends State<WindowButtons> {
     });
   }
 
+  windowClosed() {}
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -56,7 +58,7 @@ class _WindowButtonsState extends State<WindowButtons> {
 
 class WindowTitle extends StatefulWidget {
   WindowTitle({Key? key, this.title}) : super(key: key);
-  String? title;
+  final String? title;
   @override
   _WindowTitleState createState() => _WindowTitleState();
 }
@@ -86,7 +88,9 @@ Widget WindowTitleBar({String title = 'VVibe'}) {
   return WindowTitleBarBox(
     child: MoveWindow(
         child: Container(
-      height: 30,
+      decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Colors.black38, width: 1))),
+      height: CUS_WIN_TITLEBAR_HEIGHT,
       // color: Color.fromRGBO(40, 40, 40, 1),
       child: Flex(
         direction: Axis.horizontal,

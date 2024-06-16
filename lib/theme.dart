@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 //根据JSON生成主题
 Future<ThemeData> genTheme(
     {String jsonPath = 'assets/light_theme.json'}) async {
+  SchemaValidator.enabled = false;
   final themeStr = await rootBundle.loadString(jsonPath);
   final themeJson = jsonDecode(themeStr);
   return ThemeDecoder.decodeThemeData(themeJson)!;

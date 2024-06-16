@@ -7,6 +7,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
@@ -62,46 +63,67 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     });
   }
 
+  bool _containSelectedFile(List<Map<String, dynamic>> files) {
+    if (selectedFilename == null) return true;
+    final map = jsonDecode(selectedFilename!);
+    return files.map((e) => e['name']).contains(map['name']);
+  }
+
   void updatePlaylistFiles() async {
-    final files = await PlaylistUtil().getPlayListFiles(basename: true);
-    final urls = await PlaylistUtil().getSubUrls();
-    urls.addAll(files.map((e) => {'name': e}));
-    setState(() {
-      playFiles = urls;
-    });
+    try {
+      final files = await PlaylistUtil().getPlayListFiles(basename: true);
+      final urls = await PlaylistUtil().getSubUrls();
+      urls.addAll(files.map((e) => {'name': e}));
+
+      setState(() {
+        playFiles = urls;
+        if (!_containSelectedFile(urls)) {
+          selectedFilename = null;
+        }
+      });
+    } catch (e) {}
   }
 
 //切换播放文件或订阅
-  void onPlayFileChange(String? value) async {
+  void onPlayFileChange(String? value, {bool? forceRefresh = false}) async {
     setState(() {
       playlist = [];
       selectedFilename = value;
     });
 
-    if (value != null) {
-      setState(() {
-        loading = true;
-      });
-      final map = jsonDecode(value);
-      debugPrint(value);
-      LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
-      List<PlayListItem> data = [];
-      if (map['url'] != null) {
-        data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
-        PlaylistUtil().parsePlaylistSubUrl(map['url']).then((list) {
-          setState(() => playlist = list);
-          LoacalStorage().setJSON(LAST_PLAYLIST_DATA, list);
-        });
-      } else {
-        //本地文件
-        data =
-            await PlaylistUtil().parsePlaylistFile("playlist/${map['name']}");
-      }
-      setState(() {
-        playlist = data;
-        loading = false;
-      });
+    if (value == null) return;
+    setState(() {
+      loading = true;
+    });
+    final map = jsonDecode(value);
+
+    LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
+    List<PlayListItem> data = [];
+    if (map['url'] != null) {
+      data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
+    } else {
+      //本地文件
+      data = await PlaylistUtil().parsePlaylistFile(map['name']);
+    }
+    setState(() {
+      if (value == selectedFilename) playlist = data;
+      loading = false;
+    });
+    if (value == selectedFilename)
       LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
+  }
+
+  //菜单点击
+  void _onMenuItemTap(
+      BuildContext context, MenuItem item, Map<String, dynamic> file) {
+    final value = item.title;
+
+    switch (value) {
+      case '编辑文件内容':
+        PlaylistUtil().launchFile(file['name']);
+        break;
+
+      default:
     }
   }
 
@@ -140,6 +162,33 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     super.reassemble();
   }
 
+  Widget MenuItemRow(Map<String, dynamic> v) {
+    return Wrap(children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 3, right: 4),
+        child: Icon(
+          v['url'] != null
+              ? Icons.insert_link_outlined
+              : Icons.file_present_outlined,
+          size: 12,
+          color: Colors.purple,
+        ),
+      ),
+      SizedBox(
+        width: 170,
+        child: Text(
+          v['name'],
+          //overflow: TextOverflow.ellipsis,
+          maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.purple,
+          ),
+        ),
+      )
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -151,51 +200,37 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
-                dropdownWidth: 220,
+                dropdownStyleData: DropdownStyleData(width: 250),
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
                 hint:
                     Text('选择播放列表', style: TextStyle(color: Colors.purple[100])),
                 value: selectedFilename,
-                icon: const Icon(Icons.keyboard_arrow_down),
+                iconStyleData:
+                    IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),
                 onChanged: (String? value) {
                   // This is called when the user selects an item.
                   onPlayFileChange(value);
                 },
-                itemHeight: 30,
-                dropdownMaxHeight: getDeviceHeight(context) - 50.0,
-
+                menuItemStyleData: MenuItemStyleData(height: 22),
                 //on: updatePlaylistFiles,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
-                    value: jsonEncode(v),
-                    key: ObjectKey(v),
-                    child: Wrap(children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 5, 4, 0),
-                        child: Icon(
-                          v['url'] != null
-                              ? Icons.insert_link_outlined
-                              : Icons.file_present_outlined,
-                          size: 12,
-                          color: Colors.purple,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 150,
-                        child: Text(
-                          v['name'],
-                          //overflow: TextOverflow.ellipsis,
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.purple,
-                          ),
-                        ),
-                      )
-                    ]),
-                  );
+                      value: jsonEncode(v),
+                      key: ObjectKey(v),
+                      child: ContextMenuRegion(
+                        onItemSelected: (item) {
+                          _onMenuItemTap(context, item, v);
+                        },
+                        menuItems: v['url'] == null
+                            ? [
+                                MenuItem(title: '编辑文件内容'),
+                              ]
+                            : [],
+                        child: MenuItemRow(v),
+                      ));
                 }).toList(),
               ),
             )),
@@ -209,7 +244,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     widget.onUrlTap(e);
                   },
                   forceRefreshPlaylist: () {
-                    onPlayFileChange(selectedFilename);
+                    onPlayFileChange(selectedFilename, forceRefresh: true);
                   },
                 )
               : (widget.visible && loading

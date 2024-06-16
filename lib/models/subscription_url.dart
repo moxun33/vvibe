@@ -2,7 +2,6 @@
 //
 //     final subscriptionUrl = subscriptionUrlFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 SubscriptionUrl subscriptionUrlFromJson(String str) =>

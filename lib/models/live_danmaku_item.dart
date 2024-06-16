@@ -17,6 +17,7 @@ class LiveDanmakuItem {
       required this.msg,
       required this.uid,
       this.ext,
+      this.isUpper,
       this.color});
 
   String name;
@@ -24,17 +25,16 @@ class LiveDanmakuItem {
   String uid;
   Map<String, dynamic>? ext;
   Color? color;
+  bool? isUpper;
 
   factory LiveDanmakuItem.fromJson(Map<String, dynamic> json) =>
       LiveDanmakuItem(
         name: json["name"],
-        msg: json["uid"],
-        uid: json["msg"],
+        msg: json["msg"],
+        uid: json["uid"],
+        isUpper: json["isUpper"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "msg": msg,
-        "uid": uid,
-      };
+  Map<String, dynamic> toJson() =>
+      {"name": name, "msg": msg, "uid": uid, 'isUpper': isUpper};
 }

@@ -49,8 +49,14 @@ app.*.map.json
 target/
 
 flutter_rust_bridge_codegen.exe
-./playlist/*
+/playlist/*
 
-snapshots/*
-./data/
-/assets/epg/
+/snapshots/
+/data/
+/logs/
+*.local.*
+*udp*.*
+*iptv*.txt
+
+.vs/
+assets/epg/*

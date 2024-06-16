@@ -9,10 +9,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
-import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class BilibiliDanmakuService {
@@ -81,62 +80,67 @@ class BilibiliDanmakuService {
 
   //对消息进行解码
   decode(Uint8List list) {
-    int headerLen = readInt(list, 4, 2);
-    int ver = readInt(list, 6, 2);
-    int op = readInt(list, 8, 4);
+    try {
+      int headerLen = readInt(list, 4, 2);
+      int ver = readInt(list, 6, 2);
+      int op = readInt(list, 8, 4);
 
-    switch (op) {
-      case 8:
-        debugPrint("B站进入房间");
-        break;
-      case 5:
-        int offset = 0;
-        while (offset < list.length) {
-          int packLen = readInt(list, offset + 0, 4);
-          int headerLen = readInt(list, offset + 4, 2);
-          Uint8List body;
-          if (ver == 2) {
-            body = list.sublist(offset + headerLen, offset + packLen);
-            decode(ZLibDecoder().convert(body) as Uint8List);
+      switch (op) {
+        case 8:
+          debugPrint("B站进入房间");
+          break;
+        case 5:
+          int offset = 0;
+          while (offset < list.length) {
+            int packLen = readInt(list, offset + 0, 4);
+            int headerLen = readInt(list, offset + 4, 2);
+            Uint8List body;
+            if (ver == 2) {
+              body = list.sublist(offset + headerLen, offset + packLen);
+              decode(ZLibDecoder().convert(body) as Uint8List);
+              offset += packLen;
+              continue;
+            } else {
+              body = list.sublist(offset + headerLen, offset + packLen);
+            }
+            String data = utf8.decode(body);
             offset += packLen;
-            continue;
-          } else {
-            body = list.sublist(offset + headerLen, offset + packLen);
-          }
-          String data = utf8.decode(body);
-          offset += packLen;
-          Map<String, dynamic> jd = json.decode(data);
-          switch (jd["cmd"]) {
-            case "DANMU_MSG":
-              String msg = jd["info"][1].toString();
-              String name = jd["info"][2][1].toString();
-              String uid = jd["info"][2][0].toString();
+            Map<String, dynamic> jd = json.decode(data);
+            switch (jd["cmd"]) {
+              case "DANMU_MSG":
+                String msg = jd["info"][1].toString();
+                String name = jd["info"][2][1].toString();
+                String uid = jd["info"][2][0].toString();
 
-              /* final extStr = jd["info"][0][15];
-              print(extStr);
-              Map<String, dynamic> extMap = extStr != null
-                  ? new Map<String, dynamic>.from(jsonDecode(extStr))
-                  : {};
-              Color color =
-                  ColorUtil.fromDecimal(extMap['extra']?['color']?.toString()); */
-              // addDanmaku(LiveDanmakuItem(name, msg));
-              debugPrint('B站弹幕--> $uid $name: $msg');
-              onDanmaku(LiveDanmakuItem(
-                name: name,
-                msg: msg,
-                uid: uid,
-                ext: {},
-              ));
-              break;
-            default:
+                final extStr = jd["info"][0][15];
+
+                final extMap = extStr['extra'] ?? {};
+                print(extMap);
+
+                /*  Color color =
+                    ColorUtil.fromDecimal(extMap['color']?.toString()); */
+                // addDanmaku(LiveDanmakuItem(name, msg));
+                debugPrint('B站弹幕--> $uid $name: $msg ');
+                onDanmaku(LiveDanmakuItem(
+                  name: name,
+                  msg: msg,
+                  uid: uid,
+                  //color: color,
+                  ext: {},
+                ));
+                break;
+              default:
+            }
           }
-        }
-        break;
-      case 3:
-        int people = readInt(list, headerLen, 4);
-        //debugPrint("B站房间人气: $people");
-        break;
-      default:
+          break;
+        case 3:
+          //int people = readInt(list, headerLen, 4);
+          //debugPrint("B站房间人气: $people");
+          break;
+        default:
+      }
+    } catch (e) {
+      Logger.error('解析bili弹幕异常 ${e.toString()}');
     }
   }
 

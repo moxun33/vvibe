@@ -8,7 +8,6 @@ import 'package:shortid/shortid.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
-import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/ffi_util.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
@@ -120,11 +119,12 @@ class SniffUtil {
 
   //扫描检测url
   Future<UrlSniffRes> checkSniffUrl(String url,
-      {bool withMeta = false, timeout = 3000, int index = 0}) async {
+      {bool withMeta = false, timeout = 3, int index = 0}) async {
     try {
       final startTime = DateTime.now();
       final inst = Dio(new BaseOptions(
-          connectTimeout: timeout, headers: {'User-Agent': DEF_REQ_UA}));
+          connectTimeout: Duration(seconds: timeout),
+          headers: {'User-Agent': DEF_REQ_UA}));
       final resp = await inst.head(url);
       FFprobeInfo? meta = null;
       String ipInfo = '';
@@ -147,13 +147,13 @@ class SniffUtil {
         'duration': endTime.difference(startTime).inMilliseconds
       });
     } on DioError catch (e) {
-      print('$url 扫描错误   ${e.error}');
+      print('$url 扫描错误   ${e.toString()}');
       return UrlSniffRes.fromJson({
         'index': index,
-        'status': e.type == DioErrorType.connectTimeout
+        'status': e.type == DioErrorType.connectionTimeout
             ? UrlSniffResStatus.timeout
             : UrlSniffResStatus.failed,
-        'statusCode': e.type == DioErrorType.connectTimeout ? 504 : 500,
+        'statusCode': e.type == DioErrorType.connectionTimeout ? 504 : 500,
         'mediaInfo': null,
         'ipInfo': '',
         'duration': 0,

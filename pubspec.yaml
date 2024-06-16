@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.4.0+1
+version: 0.5.8+9
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -24,89 +24,96 @@ dependencies:
   flutter:
     sdk: flutter
 
-  #替换图标
-  flutter_launcher_icons: ^0.10.0
 
   # ios 图标库
   cupertino_icons: ^1.0.2
 
   # ui kit
   # getx
-  get: 4.6.4
+  get: 4.6.6
 
   # 日期格式
   intl: ^0.17.0
 
   # loaing
-  flutter_easyloading: ^3.0.0
+  flutter_easyloading: ^3.0.5
 
   # http
-  dio: ^4.0.0
-  cookie_jar: ^3.0.1
-  dio_cookie_manager: ^2.0.0
+  dio: ^5.4.3
+  #cookie_jar: ^3.0.1
+  #dio_cookie_manager: ^2.0.0
 
   # storage + cache
   shared_preferences: ^2.0.6
-  cached_network_image: ^3.0.0
+  #cached_network_image: ^3.0.0
 
   # webview
   #webview_flutter: ^2.0.8
 
   #flutter_cache_manager: ^3.1.0
-  web_socket_channel: ^2.2.0
+  web_socket_channel: ^2.3.0
   #url_launcher: ^6.1.5
-  html: ^0.15.0
+  html: ^0.15.2
   fvp:
     git:
       url: https://github.com/moxun33/fvp.git
-      ref: master
-  # path: ../fvp
+      ref: dev
+
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
   desktop_multi_window: 
     #path: E:\source-code\flutter-src\flutter-plugins\packages\desktop_multi_window
     git:
-      url: https://github.com/moxun33/flutter-plugins
+      url: https://github.com/MixinNetwork/flutter-plugins
       path: packages/desktop_multi_window
+  mixin_logger: 
+    git:
+      url: https://github.com/moxun33/flutter-plugins
+      path: packages/mixin_logger
 #  window_size:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding
 #      path: plugins/window_size
-  ffi: ^2.0.0
-  flutter_rust_bridge: 1.41.3
-  collection: ^1.16.0
-  dropdown_button2: ^1.7.2
-  flutter_barrage: ^0.5.1
-  json_theme: ^4.0.1+1
+  ffi: ^2.1.2
+  flutter_rust_bridge: 1.66.0
+  collection: ^1.18.0
+  dropdown_button2: ^2.3.9
+  flutter_barrage: ^0.5.5
+  json_theme: ^6.0.0
   uuid: ^3.0.6
   native_context_menu: ^0.2.2+5
   # dio cache
-  dio_cache_interceptor: ^3.3.1
+  dio_cache_interceptor: ^3.5.0
   shortid: ^0.1.2
-  bitsdojo_window: ^0.1.5
-  #archive: ^3.3.6
-
-
+  bitsdojo_window: ^0.1.6
+  window_manager: 0.3.9
+  synchronized: ^3.1.0+1
+  xml2json: ^6.2.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ffigen: ^6.0.1
+  ffigen: ^7.2.6
   freezed: ^2.1.0+1
-
+  #替换图标
+  flutter_launcher_icons: ^0.10.0
+  
+dependency_overrides: 
+  dio: ^5.2.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_easyloading: ^3.0.3
+  intl: 0.18.0
 
 flutter_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "public/logo.png"
+  image_path: "assets//logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "public/logo.png"
+    image_path: "assets/logo.png"
     background_color: "#hexcode"
     theme_color: "#hexcode"
   windows:
     generate: true
-    image_path: "public/logo.png"
+    image_path: "assets/logo.png"
     icon_size: 64 # min:48, max:256, default: 48
 
 # For information on the generic Dart part of this file, see the

@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-07 13:21:17
+ * @LastEditTime: 2023-09-17 16:43:03
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -15,15 +15,19 @@ import 'package:fvp/fvp.dart';
 import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
+import 'package:vvibe/components/widgets.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/ffi_util.dart';
-import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/services.dart';
+import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/utils/logger.dart';
+import 'package:vvibe/utils/utils.dart';
 import 'package:vvibe/window/window.dart';
+import 'package:window_manager/window_manager.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WindowListener {
   Fvp player = Fvp();
 
   int? textureId; //fvp播放时的渲染id
@@ -32,52 +36,89 @@ class HomeController extends GetxController {
 
   final barrageWallController = BarrageWallController();
   PlayListItem? playingUrl;
-  DouyuDnamakuService? dyDanmakuService;
-  BilibiliDanmakuService? blDanmakuService;
-  HuyaDanmakuService? hyDanmakuService;
+
   bool danmakuManualShow = true;
   String tip = ''; //左上角的文字提示
+  Hackchat? hc;
   @override
   void onInit() {
+    windowManager.addListener(this);
+
     super.onInit();
-    // initPlayer();
   }
 
   @override
   void onReady() {
-    //final url = 'http://27.47.71.53:808/hls/1/index.m3u8';
-    final url = 'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8';
-    // startPlay(url);
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-    //_tt();
+    initHackchat();
+    playerConfig();
   }
 
-  _tt() async {
-    FfiUtil().getMediaInfo(
-        'https://hdltctwk.douyucdn2.cn/live/4549169rYnH7POVF.m3u8');
+  void playerConfig() async {
+    await player.setProperty('http_persistent', '0');
+  }
+
+//hack chat init
+  initHackchat() {
+    final _ws = Hackchat(
+        nickname: genRandomStr(),
+        onChat: onHackchatMsg,
+        onClose: onHackchatClose);
+    hc = _ws;
+    _ws.init();
+  }
+
+  void onHackchatClose() {
+    initHackchat();
+  }
+
+  onHackchatMsg(Map<String, dynamic> data) {
+    final danmaku = LiveDanmakuItem.fromJson({
+      'name': data['nick'],
+      'uid': data['userid'].toString(),
+      'msg': data['text']
+    });
+    danmaku.color = ColorUtil.fromHex('#ffffff');
+    danmaku.ext = data;
+    renderDanmaku(danmaku, isHackchat: true);
+  }
+
+//发送弹幕到远程
+  void sendDanmaku(String text) {
+    if (hc == null) return;
+    /* if (hc!.readyState != 1) {
+      Logger.error('${hc!.readyState} hackchat已断开，无法发送消息');
+      initHackchat();
+      return;
+    } */
+    hc!.sendMsg(text);
   }
 
 //发送弹幕到屏幕
-  void sendDanmakuBullet(LiveDanmakuItem? data) async {
+  void renderDanmaku(LiveDanmakuItem? data, {isHackchat = false}) async {
     if (!danmakuManualShow) return;
     if (data?.msg != null && !barrageWallController.isEnabled) {
       barrageWallController.enable();
     }
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final fontSize =
+        settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
     barrageWallController.send([
       new Bullet(
           child: Tooltip(
         message: data?.name ?? '',
-        child: Text(
-          data?.msg ?? '',
-          style: TextStyle(
-              color: data?.color ?? Colors.white,
-              fontSize:
-                  settings != null ? settings['dmFSize'].toDouble() ?? 20 : 20),
-        ),
+        child: isHackchat
+            ? BorderText(text: data?.msg ?? '', fontSize: fontSize)
+            : Text(
+                data?.msg ?? '',
+                style: TextStyle(
+                    color: data?.color ?? Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: fontSize),
+              ),
       ))
     ]);
   }
@@ -93,62 +134,43 @@ class HomeController extends GetxController {
     }
   }
 
+//实现回看
+  void doPlayback(String playseek) {
+    if (playingUrl == null) return;
+    final _urlItem = playingUrl!.toJson();
+    var url = playingUrl?.url;
+    if (url == null) return;
+    Uri u = Uri.parse(url.trim());
+    final haveQueries = u.queryParameters.length > 0;
+    final _url = haveQueries
+        ? '${url}&playseek=${playseek}'
+        : '${url}${url.endsWith('?') ? '' : '?'}playseek=${playseek}';
+    _urlItem['url'] = _url;
+    startPlay(PlayListItem.fromJson(_urlItem), playback: true);
+  }
+
   //显示、隐藏节目单
   void toggleEpgDialog() {
     if (playingUrl == null) return;
-    Get.dialog(EpgAlertDialog(urlItem: playingUrl!));
+    Get.dialog(EpgAlertDialog(
+      urlItem: playingUrl!,
+      doPlayback: doPlayback,
+    ));
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
-    stopDanmakuSocket();
+    // stopDanmakuSocket();
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
     }
-    if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
-    final String rid = item.tvgId!;
-    debugPrint('登录弹幕 ${item.group}');
-    switch (item.group) {
-      case '斗鱼':
-      case 'douyu':
-        dyDanmakuService = DouyuDnamakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
-            });
-        dyDanmakuService!.connect();
-        break;
-      case 'B站':
-      case 'bilibili':
-        blDanmakuService = BilibiliDanmakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
-            });
-        blDanmakuService?.connect();
-        break;
-      case '虎牙':
-      case 'huya':
-        hyDanmakuService = HuyaDanmakuService(
-            roomId: rid,
-            onDanmaku: (LiveDanmakuItem? node) {
-              sendDanmakuBullet(node);
-            });
-        hyDanmakuService?.connect();
-        break;
-      default:
-    }
+    DanmakuService().start(item, renderDanmaku);
   }
 
 //断开所有弹幕连接
   void stopDanmakuSocket() {
-    //barrageWallController.disable();
-
-    dyDanmakuService?.dispose();
-
-    blDanmakuService?.displose();
-
-    hyDanmakuService?.displose();
+    barrageWallController.disable();
+    DanmakuService().stop();
   }
 
   void initPlayer() async {
@@ -170,58 +192,77 @@ class HomeController extends GetxController {
     return ttId;
   }
 
-  void startPlay(PlayListItem item, {bool? first}) async {
-    await updateTexture();
-    stopDanmakuSocket();
-    if (!(item.url != null && item.url!.isNotEmpty)) {
-      EasyLoading.showError('播放地址错误');
+  void startPlay(PlayListItem item, {bool? first, playback = false}) async {
+    try {
+      debugPrint('start play ${item.toJson()}');
       stopPlayer();
+      if (textureId == null) {
+        initPlayer();
+      }
+      final url = item.ext?['playUrl'] ?? item.url;
+      if (!(url != null && url!.isNotEmpty)) {
+        EasyLoading.showError('播放地址错误');
 
-      return;
-    }
-    tip = '正在打开';
-    update();
-    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
-    if (settings != null) {
-      await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
-    }
-    await player.setMedia(item.url!);
+        return;
+      }
+      tip = '正在打开';
+      update();
+      final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+      if (settings != null) {
+        await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
+      }
+      await player.setMedia(url);
 
-    playingUrl = item;
-    update();
-    LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
-    player.onStateChanged((String state) {
-      print("-------------------接收到state改变 $state");
-    });
-    player.onMediaStatusChanged((String status) {
-      print("============接收到media status改变 $status");
-      if (status == '-2147483648') {
-        tip = '播放失败';
+      if (!playback) {
+        playingUrl = item;
         update();
+        LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
       }
-    });
-    player.onEvent((Map<String, dynamic> data) {
-      print("******接收到event改变 ${data}");
-      final value = data['error'].toInt();
-      switch (data['category']) {
-        case 'reader.buffering':
-          tip = value < 100 ? '缓冲 $value%' : '';
+
+      player.onStateChanged((String state) {
+        debugPrint("-------------------接收到state改变 $state");
+      });
+      player.onMediaStatusChanged((String status) {
+        debugPrint("============接收到media status改变 $status");
+        if (status == '-2147483648') {
+          tip = '${item.name}播放失败';
           update();
-          break;
-        case 'render.video':
-          if (value > 0) {
-            startDanmakuSocket(item);
-            updateWindowTitle(item);
-          }
-          break;
-        default:
-          break;
-      }
-    });
+        }
+      });
+      player.onEvent((Map<String, dynamic> data) {
+        debugPrint("******接收到event改变 ${data}");
+        final value = data['error'].toInt();
+        switch (data['category']) {
+          case 'reader.buffering':
+            tip = value < 100 ? '缓冲 $value%' : '';
+            update();
+            break;
+          case 'render.video':
+            if (value > 0) {
+              startDanmakuSocket(item);
+              updateWindowTitle(item);
+            }
+            break;
+          default:
+            break;
+        }
+      });
+      player.onRenderCallback((msg) {
+        // debugPrint('======render cb log $msg');
+      });
+      player.setLogHandler((msg) async {
+        debugPrint('【log】 $msg');
+      });
+    } catch (e) {
+      Logger.error(e.toString());
+    }
   }
 
   //停止播放、销毁实例
-  Future<int> stopPlayer({bool dispose = false}) async {
+  Future<int> stopPlayer() async {
+    if (textureId == null) return 0;
+    debugPrint('close player');
+    await player.stop();
     EasyLoading.dismiss();
     textureId = null;
     playingUrl = null;
@@ -229,12 +270,16 @@ class HomeController extends GetxController {
     barrageWallController.disable();
     update();
     VWindow().setWindowTitle('vvibe');
-    return player.stop();
+    return 1;
   }
 
   //播放url改变
-  void onPlayUrlChange(PlayListItem item) {
+  void onPlayUrlChange(PlayListItem item) async {
     if (item.url == null) return;
+    await stopPlayer();
+
+    final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
+    item.ext = _item.ext ?? {};
     startPlay(item);
   }
 
@@ -261,22 +306,26 @@ class HomeController extends GetxController {
   }
 
 //打开单个播放url
-  void onOpenOneUrl(String url) {
+  void onOpenOneUrl(String url) async {
     debugPrint('打开链接 $url');
     if (url.isEmpty) return;
-    final PlayListItem item =
-        PlayListItem.fromJson({'url': url, 'name': 'vvibe'});
+    await stopPlayer();
+    final item = await PlaylistUtil().parseSingleUrlAsync(url);
     startPlay(item);
   }
 
   @override
-  void onClose() {}
+  void onClose() async {
+    super.onClose();
+    await stopPlayer();
+    windowManager.removeListener(this);
+
+    hc?.close();
+  }
 
   @override
-  void dispose() {
-    stopPlayer(dispose: Global.isRelease);
-    VWindow().setWindowTitle('vvibe');
-
-    super.dispose();
+  void onWindowClose() async {
+    await stopPlayer();
+    hc?.close();
   }
 }

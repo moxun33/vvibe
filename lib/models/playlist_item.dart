@@ -1,8 +1,8 @@
 /*
  * @Author: Moxx
  * @Date: 2022-09-15 15:59:57
- * @LastEditors: Moxx
- * @LastEditTime: 2022-09-19 16:55:41
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-02-17 15:51:05
  * @FilePath: \vvibe\lib\models\playlist_item.dart
  * @Description: 
  * @qmj
@@ -38,6 +38,7 @@ class PlayListItem {
     this.tvgLogo,
     this.catchup,
     this.catchupSource,
+    this.ext,
   });
 
   String? name;
@@ -48,17 +49,19 @@ class PlayListItem {
   String? tvgLogo;
   String? catchup;
   String? catchupSource;
+  Map<String, dynamic>?
+      ext; //平台代理配置{ 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
-        name: json["name"],
-        group: json["group"],
-        url: json["url"],
-        tvgId: json["tvgId"],
-        tvgName: json["tvgName"],
-        tvgLogo: json["tvgLogo"],
-        catchup: json["catchup"],
-        catchupSource: json["catchup-source"],
-      );
+      name: json["name"],
+      group: json["group"],
+      url: json["url"],
+      tvgId: json["tvgId"],
+      tvgName: json["tvgName"],
+      tvgLogo: json["tvgLogo"],
+      catchup: json["catchup"],
+      catchupSource: json["catchup-source"],
+      ext: Map<String, dynamic>.from(json['ext']));
 
   Map<String, dynamic> toJson() => {
         "name": name,
@@ -69,5 +72,6 @@ class PlayListItem {
         "tvgLogo": tvgLogo,
         "catchup": catchup,
         "catchup-source": catchupSource,
+        'ext': ext
       };
 }

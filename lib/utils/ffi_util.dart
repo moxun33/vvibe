@@ -15,7 +15,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/bridge_generated.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
-import 'package:vvibe/models/media_info.dart';
 
 // Re-export the bridge so it is only necessary to import this file.
 export 'package:vvibe/bridge_generated.dart';
@@ -46,6 +45,7 @@ class FfiUtil {
       return addr.replaceAll('0|', '');
     } catch (e) {
       EasyLoading.showError(e.toString());
+      return null;
     }
   }
 
@@ -53,7 +53,7 @@ class FfiUtil {
   Future<FFprobeInfo?> getMediaInfo(String url) async {
     try {
       //'${Directory(ASSETS_DIR).path}/ffprobe.exe'
-      String raw = await api.getMediaInfo(url: url, ffprobeDir: '');
+      String raw = await api.getMediaInfo(url: url);
       FFprobeInfo info = FFprobeInfo.fromJson(jsonDecode(raw));
       return info;
     } catch (e) {

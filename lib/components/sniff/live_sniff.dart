@@ -32,7 +32,7 @@ class _LiveSniffState extends State<LiveSniff> {
   void initState() {
     super.initState();
     _batchNumCtl.text = '5';
-    _toNumCtl.text = '3000';
+    _toNumCtl.text = '3';
     _urlTextCtl.text = 'http://27.47.71.203:8811/hls/[1-4]/index.m3u8';
   }
 
@@ -75,7 +75,7 @@ class _LiveSniffState extends State<LiveSniff> {
 
       final reqs = subUrls.map((url) => _checkUrl(url,
           withMeta: withMeta,
-          timeout: int.tryParse(_toNumCtl.text) ?? 1000,
+          timeout: int.tryParse(_toNumCtl.text) ?? 3,
           index: urls.indexOf(url)));
       if (canceled) {
         _stop();
@@ -101,7 +101,7 @@ class _LiveSniffState extends State<LiveSniff> {
 
   //检测url
   Future<UrlSniffRes> _checkUrl(String url,
-      {bool withMeta = false, int timeout = 3000, int index = 0}) async {
+      {bool withMeta = false, int timeout = 3, int index = 0}) async {
     final res = await SniffUtil()
         .checkSniffUrl(url, withMeta: withMeta, timeout: timeout, index: index);
     return res;
@@ -224,10 +224,10 @@ class _LiveSniffState extends State<LiveSniff> {
               width: 100,
               margin: const EdgeInsets.only(left: 20, right: 50),
               child: TextField(
-                decoration: InputDecoration(label: Text('超时(ms)')),
+                decoration: InputDecoration(label: Text('超时(s)')),
                 controller: _toNumCtl,
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(10),
+                  LengthLimitingTextInputFormatter(3),
                   FilteringTextInputFormatter.digitsOnly
                 ],
                 keyboardType: TextInputType.number,

@@ -14,6 +14,7 @@ class FvpVideoFrame extends StatefulWidget {
       required this.toggleDanmaku,
       required this.stopPlayer,
       required this.toggleEpgDialog,
+      this.sendDanmaku,
       this.playingUrl})
       : super(key: key);
 
@@ -24,6 +25,7 @@ class FvpVideoFrame extends StatefulWidget {
   final Function toggleDanmaku;
   final Function stopPlayer;
   final Function toggleEpgDialog;
+  final Function? sendDanmaku;
   PlayListItem? playingUrl;
 
   @override
@@ -40,9 +42,12 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   Fvp get _fvp => widget.fvp;
   int? textureId;
 
+  TextEditingController danmakuCtrl = new TextEditingController();
+
   //late StreamSubscription<FvpPlayState>? playPauseStream;
   late AnimationController playPauseController;
 
+  late FocusNode textFocusNode = new FocusNode();
   @override
   void initState() {
     super.initState();
@@ -50,12 +55,12 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void init() async {
-    playPauseController = AnimationController(
+    /* playPauseController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
-    /*  playPauseStream = player?.playbackStream
-        .listen((event) => setPlaybackMode(event.isPlaying)); */
+      playPauseStream = player?.playbackStream
+        .listen((event) => setPlaybackMode(event.isPlaying)); 
     int state = await _fvp.getState();
-    if (FvpPlayState.playing == state) playPauseController.forward();
+    if (FvpPlayState.playing == state) playPauseController.forward(); */
   }
 
   Future<int> stop() async {
@@ -69,27 +74,19 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   @override
   void dispose() {
     // playPauseStream?.cancel();
-    playPauseController.dispose();
+    //  playPauseController.dispose();
+    textFocusNode.dispose();
     super.dispose();
-  }
-
-  void setPlaybackMode(bool isPlaying) {
-    if (isPlaying) {
-      playPauseController.forward();
-    } else {
-      playPauseController.reverse();
-    }
-    setState(() {});
   }
 
   void playOrPuase() async {
     int state = await _fvp.getState();
     bool toPause = FvpPlayState.paused == state;
-    if (FvpPlayState.playing == state) {
+    /* if (FvpPlayState.playing == state) {
       playPauseController.reverse();
     } else {
       playPauseController.forward();
-    }
+    } */
     setState(() {
       isPlaying = toPause;
     });
@@ -99,7 +96,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void _getMetaInfo() async {
-    final info = await _fvp.getMediaInfo();
+    // final info = await _fvp.getMediaInfo();
   }
 
   void _toggleDanmakuShow() {
@@ -111,6 +108,44 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
 
   void _toggleEpgDialog() {
     widget.toggleEpgDialog();
+  }
+
+  void _sendDanmaku({String? value}) {
+    final text = value ?? danmakuCtrl.text;
+    if (widget.sendDanmaku == null || text.isEmpty) return;
+    widget.sendDanmaku!(danmakuCtrl.text);
+    danmakuCtrl.text = '';
+  }
+
+  void onTextFocusChange(v) {
+    if (v) {
+      _hideTimer?.cancel();
+    } else {
+      _startHideTimer();
+    }
+  }
+
+  void _cancelAndRestartTimer() {
+    _hideTimer?.cancel();
+
+    if (mounted) {
+      _startHideTimer();
+
+      setState(() {
+        _hideControls = false;
+        _displayTapped = true;
+      });
+    }
+  }
+
+  void _startHideTimer() {
+    _hideTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _hideControls = true;
+        });
+      }
+    });
   }
 
   @override
@@ -128,14 +163,16 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
           }
         },
         child: MouseRegion(
-          onHover: (_) => _cancelAndRestartTimer(),
+          onHover: (_) {
+            _cancelAndRestartTimer();
+          },
           child: AbsorbPointer(
               absorbing: _hideControls,
               child: Stack(
                 children: [
                   widget.videoWidget,
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 500),
                     opacity: _hideControls ? 0.0 : 1.0,
                     child: Stack(fit: StackFit.expand, children: [
                       //widget.videoWidget,
@@ -169,9 +206,9 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   splashRadius: 12,
                                   iconSize: 28,
                                   tooltip: isPlaying == true ? '正在播放' : '已暂停',
-                                  icon: AnimatedIcon(
-                                      icon: AnimatedIcons.play_pause,
-                                      progress: playPauseController),
+                                  icon: Icon(isPlaying == true
+                                      ? Icons.pause
+                                      : Icons.play_arrow),
                                   onPressed: () {
                                     playOrPuase();
                                   },
@@ -222,6 +259,41 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   _toggleDanmakuShow();
                                 },
                               ),
+                              Focus(
+                                  focusNode: textFocusNode,
+                                  onFocusChange: onTextFocusChange,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(left: 150),
+                                    width: 220,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 180,
+                                          child: TextField(
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                              decoration: InputDecoration(
+                                                hintText: '发个弹幕吧',
+                                                hintStyle: TextStyle(
+                                                    color: Colors.grey[500]),
+                                              ),
+                                              controller: danmakuCtrl,
+                                              onSubmitted: (v) =>
+                                                  _sendDanmaku(value: v)),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 20),
+                                          child: Tooltip(
+                                            message: '发弹幕',
+                                            child: IconButton(
+                                                onPressed: _sendDanmaku,
+                                                icon: Icon(Icons.send_sharp)),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )),
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],
@@ -263,29 +335,6 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                 ],
               )),
         ));
-  }
-
-  void _cancelAndRestartTimer() {
-    _hideTimer?.cancel();
-
-    if (mounted) {
-      _startHideTimer();
-
-      setState(() {
-        _hideControls = false;
-        _displayTapped = true;
-      });
-    }
-  }
-
-  void _startHideTimer() {
-    _hideTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _hideControls = true;
-        });
-      }
-    });
   }
 }
 
@@ -340,12 +389,13 @@ class _VolumeControlState extends State<VolumeControl> {
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
-                        label: (volume * 1 * 100).toString(),
+                        label: (volume * 1 * 100).roundToDouble().toString(),
                         min: 0.0,
                         max: 1.0,
                         divisions: 100,
-                        value: volume,
+                        value: volume.roundToDouble(),
                         onChanged: (v) {
+                          print('volume $v');
                           player?.setVolume(v);
                           setState(() {
                             volume = v;
@@ -386,13 +436,21 @@ class _VolumeControlState extends State<VolumeControl> {
     }
   }
 
-  void muteUnmute() {
-    if (volume > 0) {
-      unmutedVolume = volume;
-      player?.setVolume(0);
+  void muteUnmute() async {
+    final v = volume;
+    if (v > 0) {
+      unmutedVolume = v;
+      player?.setMute(true);
+      setState(() {
+        volume = 0;
+      });
     } else {
+      player?.setMute(false);
       player?.setVolume(unmutedVolume);
+
+      setState(() {
+        volume = unmutedVolume;
+      });
     }
-    setState(() {});
   }
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: moxun33
  * @Date: 2022-09-09 21:59:47
- * @LastEditors: Moxx
- * @LastEditTime: 2022-11-21 15:07:51
+ * @LastEditors: moxun33
+ * @LastEditTime: 2023-02-12 15:53:26
  * @FilePath: \vvibe\lib\utils\color_util.dart
  * @Description: 
  * @qmj
@@ -34,7 +34,11 @@ class ColorUtil {
 
 //十进制转颜色
   static Color fromDecimal(String? num) {
-    if (!(num != null && num.isNotEmpty)) return ColorUtil.fromHex('FFFFFF');
-    return ColorUtil.fromHex(int.parse(num.toString(), radix: 16).toString());
+    try {
+      if (!(num != null && num.isNotEmpty)) return ColorUtil.fromHex('FFFFFF');
+      return ColorUtil.fromHex(int.parse(num.toString(), radix: 16).toString());
+    } catch (e) {
+      return ColorUtil.fromHex('FFFFFF');
+    }
   }
 }

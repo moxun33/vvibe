@@ -7,7 +7,9 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
-
+import 'package:vvibe/utils/logger.dart';
+import 'package:vvibe/utils/playlist/epg_util.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:vvibe/utils/utils.dart';
 
 /// 全局配置
@@ -21,34 +23,26 @@ class Global {
   /// 是否离线登录
   static bool isOfflineLogin = true;
 
-  /// vlc是否使用native window
-  static bool useNativeView = false; //Global.isRelease && Platform.isWindows;
-
   /// 是否 release
-  static bool get isRelease => bool.fromEnvironment("dart.vm.product");
+  static bool get isRelease => IS_RELEASE;
 
   /// init
   static Future<ThemeData> init({bool shouldSetSize = true}) async {
     // 运行初始
     WidgetsFlutterBinding.ensureInitialized();
 
+    await windowManager.ensureInitialized();
+
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化
     await LoacalStorage.init();
 
+    //日志
+    await Logger().init();
+
+    //播放列表截图目录
     await PlaylistUtil().getSnapshotDir();
-    // 极光推送初始化
-    // await PushManager.setup();
-
-    // 语音播报初始化
-    // await TtsManager.setup();
-
-    // 高德地图初始化
-    // await AmapService.instance.init(
-    //   iosKey: 'xxxx',
-    //   androidKey: 'xxxx',
-    // );
 
     // 读取设备第一次打开
     isFirstOpen = !LoacalStorage().getBool(STORAGE_DEVICE_ALREADY_OPEN_KEY);
@@ -75,7 +69,7 @@ class Global {
         width: 40,
         child: Spinning(),
       );
-    // EpgUtil().downloadEpgDataIsolate();
+    if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
 
     return genTheme();
   }

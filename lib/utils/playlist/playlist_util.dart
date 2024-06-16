@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 16:22:39
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-05 16:23:10
+ * @LastEditTime: 2023-10-04 21:24:26
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
  * @Description: 
  * @qmj
@@ -16,7 +16,9 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:collection/collection.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
+import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/playlist/playlist_check_req.dart';
 
 class PlaylistUtil {
   static PlaylistUtil _instance = new PlaylistUtil._();
@@ -26,7 +28,7 @@ class PlaylistUtil {
   //创建目录（在应用根目录下）
   Future<Directory> createDir(String dirName) async {
     final dir = Directory(dirName);
-    if (!await (dir.exists())) {
+    if (!(await dir.exists())) {
       await dir.create();
     }
     return dir;
@@ -40,6 +42,23 @@ class PlaylistUtil {
 //本地视频截图
   Future<Directory> getSnapshotDir() async {
     return createDir('snapshots');
+  }
+
+  //在其他应用打开文件
+  Future<void> launchFile(String file) async {
+    String path = (await getPlayListDir()).path;
+    if (file.isEmpty) {
+      path = path.replaceAll("/", "\\"); // necessary for Windows
+      await Process.start('explorer', [path]);
+    } else {
+      ProcessResult result =
+          await Process.run('cmd', ['/c', 'start', '', '$path/$file']);
+      if (result.exitCode == 0) {
+        // good
+      } else {
+        // bad
+      }
+    }
   }
 
   //获取本地播放列表文件列表
@@ -61,8 +80,10 @@ class PlaylistUtil {
   }
 
   //解析【本地】文件的播放列表内容
-  Future<List<PlayListItem>> parsePlaylistFile(String filePath) async {
+  Future<List<PlayListItem>> parsePlaylistFile(String filename) async {
     try {
+      final filePath =
+          "${(await PlaylistUtil().getPlayListDir()).path}/${filename}";
       if (filePath.endsWith('.m3u')) {
         final lines = await compute(readFileLines, filePath);
         return compute(parseM3uContents, lines);
@@ -89,11 +110,106 @@ class PlaylistUtil {
   final dioCacheOptions = CacheOptions(
     // A default store is required for interceptor.
     store: MemCacheStore(),
-    maxStale: const Duration(hours: 10),
+    maxStale: const Duration(seconds: 30),
   );
+  //判断是否为斗鱼、虎牙、b站的代理url
+  Map<String, dynamic> isDyHyDlProxyUrl(String url) {
+    try {
+      final uri = Uri.parse(url.trim()),
+          matchDy = uri.path.contains(DanmakuType.douyuProxyUrlReg),
+          matchHy = uri.path.contains(DanmakuType.huyaProxyUrlReg),
+          matchBl = uri.path.contains(DanmakuType.biliProxyUrlReg);
+
+      return {
+        'playUrl': '',
+        'platformHit': matchDy || matchHy || matchBl,
+        'douyu': matchDy,
+        'huya': matchHy,
+        'bilibili': matchBl
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  //解析代理url的最终url
+  Future<String> parseProxyTargetUrl(String url) async {
+    var _url = url;
+    try {
+      final client = Dio(BaseOptions(followRedirects: false));
+      await client.get(url);
+    } on DioException catch (e) {
+      if ('${e.response?.statusCode}'.startsWith('30')) {
+        final urls = e.response?.headers['location'];
+        if (urls!.isNotEmpty) {
+          _url = urls.first;
+        }
+      }
+    }
+    return _url;
+  }
+
+//根据url解析分组、tvgId等信息
+  Map<String, dynamic> parseUrlExtInfos(String url) {
+    final map = {
+      'group': '未分组',
+      'tvgId': '',
+      'ext': Map<String, dynamic>.from({})
+    };
+    final uri = Uri.parse(url.trim()),
+        matches = isDyHyDlProxyUrl(url),
+        matchDy = matches['douyu'] == true,
+        matchHy = matches['huya'] == true,
+        matchBl = matches['bilibili'] == true;
+    if (matchDy) map['group'] = DanmakuType.douyuCN;
+    if (matchHy) map['group'] = DanmakuType.huyaCN;
+    if (matchBl) map['group'] = DanmakuType.bilibiliCN;
+    if (matches['platformHit'] == true) {
+      final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
+      if (queryId != null && queryId.isNotEmpty) {
+        map['tvgId'] = queryId;
+      } else if (pathSegs.isNotEmpty && pathSegs.last.isNotEmpty) {
+        map['tvgId'] = pathSegs.last;
+      }
+      map['ext'] = matches;
+    }
+    return map;
+  }
+
+  //根据单个打开的url解析
+  PlayListItem parseSingleUrl(String url) {
+    final _info = parseUrlExtInfos(url.trim()),
+        ext = _info['ext'] ?? Map<String, dynamic>.from({});
+    final PlayListItem item = PlayListItem.fromJson({
+      'url': url,
+      'name': 'vvibe',
+      'group': _info['group'],
+      'tvgId': _info['tvgId'],
+      'ext': ext
+    });
+    return item;
+  }
+
+  //根据单个打开的url解析 异步
+  Future<PlayListItem> parseSingleUrlAsync(String url, {String? name}) async {
+    final _info = parseUrlExtInfos(url), ext = _info['ext'] ?? {};
+    if (ext['platformHit'] == true) {
+      ext['playUrl'] = await parseProxyTargetUrl(url);
+    }
+    final PlayListItem item = PlayListItem.fromJson({
+      'url': url,
+      'name': name ?? 'vvibe',
+      'group': _info['group'],
+      'tvgId': _info['tvgId'],
+      'ext': ext ?? {}
+    });
+    return item;
+  }
+
 //根据url解析远程txt或m3u内容
-  Future<List<PlayListItem>> parsePlaylistSubUrl(String url) async {
-    final client = Dio()
+  Future<List<PlayListItem>> parsePlaylistSubUrl(String url,
+      {bool? forceRefresh = false}) async {
+    final client = Dio(BaseOptions(receiveTimeout: const Duration(seconds: 30)))
       ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     final resp = await client.get(url);
     if (resp.statusCode == 200 || resp.statusCode! < 400) {
@@ -149,17 +265,28 @@ class PlaylistUtil {
       final groups = parseTxtGroups(lines);
       final list = lines
           .where((element) =>
+              element.isNotEmpty &&
               element.contains(',') &&
               !element.contains('#genre#') &&
               element.contains('://'))
           .map((String e) {
             final List<String> arr = e.split(',');
 
-            return PlayListItem(
+            final item = PlayListItem(
                 group: matchTxtUrlGroup(groups, lines.indexOf(e)),
                 name: arr[0].trim(),
                 tvgId: '',
-                url: arr[1]);
+                url: arr[1].trim());
+
+            final platProxy = isDyHyDlProxyUrl(arr[1]);
+
+            if (platProxy['platformHit'] == true) {
+              PlayListItem _temp = parseSingleUrl(arr[1]);
+
+              item.tvgId = _temp.tvgId;
+              item.group = _temp.group;
+            }
+            return item;
           })
           .where((PlayListItem element) =>
               element.url != null && element.name != null)
@@ -182,7 +309,7 @@ class PlaylistUtil {
   }
 
   //根据文本行 解析m3u的播放列表文件内容
-  List<PlayListItem> parseM3uContents(List<String> lines) {
+  Future<List<PlayListItem>> parseM3uContents(List<String> lines) async {
     try {
       if (!(lines.length > 0 && lines[0].startsWith("#EXTM3U"))) {
         return [];
@@ -191,20 +318,35 @@ class PlaylistUtil {
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
         if (i > 0 && lines[i].startsWith("#EXTINF:")) {
+          PlayListItem tempItem =
+              PlayListItem.fromJson({'ext': Map<String, dynamic>.from({})});
           final info = lines[i],
               url = lines[i + 1],
-              name = info.split(',').last.trim();
-          list.add(PlayListItem(
-              group: getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
-                  defVal: '未分组'),
+              name = info.split(',').last.trim(),
+              group = getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
+                  defVal: ''),
+              tvgId = getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
+              platProxy = isDyHyDlProxyUrl(url);
+
+          if (platProxy['platformHit'] == true) {
+            PlayListItem _temp = parseSingleUrl(url);
+            tempItem.group = _temp.group;
+            tempItem.tvgId = _temp.tvgId;
+            tempItem.ext = _temp.ext;
+          }
+          final item = PlayListItem(
+              ext: tempItem.ext ?? Map<String, dynamic>.from({}),
+              group: group.isNotEmpty ? group : (tempItem.group ?? '未分组'),
               tvgName: getTextByReg(info, new RegExp(r'tvg-name="(.*?)"')),
               tvgLogo: getTextByReg(info, new RegExp(r'tvg-logo="(.*?)"')),
               catchup: getTextByReg(info, new RegExp(r'catchup="(.*?)"')),
               catchupSource:
                   getTextByReg(info, new RegExp(r'catchup-source="(.*?)"')),
               name: name,
-              tvgId: getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
-              url: url));
+              tvgId: tvgId.isNotEmpty ? tvgId : tempItem.tvgId.toString(),
+              url: url);
+          //print(item.toJson());
+          list.add(item);
         }
       }
       return list;
@@ -221,32 +363,10 @@ class PlaylistUtil {
 
   //检查是否为真实有效的url
   bool validateUrl(String url) {
-    return Uri.tryParse(url)?.hasAbsolutePath ?? false;
+    return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
-  Future<int?> checkUrlAccessible(String url,
-      {bool isolate = false, bool reqGet = false}) async {
-    try {
-      final inst = Dio(new BaseOptions(
-          connectTimeout: 3000, headers: {'User-Agent': DEF_REQ_UA}));
-      final req = inst.head;
-      dynamic resp;
-      if (isolate) {
-        resp = await compute(req, url);
-      } else {
-        resp = await req(url);
-      }
-      //debugPrint('检查 $url 可访问状态:${resp.statusCode} ');
-      return resp.statusCode;
-      /* return resp.statusCode != 200 && !reqGet
-          ? checkUrlAccessible(url, isolate: isolate, reqGet: true)
-          : resp.statusCode; */
-    } on DioError catch (e) {
-      final num = e.response?.statusCode ?? 500;
-
-      debugPrint('检查 $url 可访问出错：  $num  ${e.message}');
-
-      return num;
-    }
+  Future<int> checkUrlAccessible(String url) async {
+    return PlaylistCheckReq().check(url);
   }
 }

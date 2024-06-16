@@ -9,7 +9,7 @@
       "request": "launch",
       "program": "lib/main.dart",
       "type": "dart",
-      "args": ["--no-sound-null-safety"]
+      "args": []
     },
     {
       "name": "vvibe (profile mode)",
@@ -17,7 +17,7 @@
       "program": "lib/main.dart",
       "type": "dart",
       "flutterMode": "profile",
-      "args": ["--no-sound-null-safety"]
+      "args": []
     },
     {
       "name": "vvibe (release mode)",
@@ -25,7 +25,7 @@
       "program": "lib/main.dart",
       "type": "dart",
       "flutterMode": "release",
-      "args": ["--no-sound-null-safety"]
+      "args": []
     }
   ]
 }

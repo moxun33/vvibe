@@ -6,7 +6,6 @@ import 'dart:convert';
 
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/models/ffprobe_info.dart';
-import 'package:vvibe/models/media_info.dart';
 
 UrlSniffRes mediaInfoFromJson(String str) =>
     UrlSniffRes.fromJson(json.decode(str));

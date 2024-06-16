@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vvibe/common/values/enum.dart';
-import 'package:vvibe/models/media_info.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/playlist/sniff_util.dart';
 

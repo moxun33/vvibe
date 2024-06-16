@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
-import 'package:vvibe/services/notifications/v_size_changed_layout_notification.dart';
-import 'package:vvibe/window/window_widgets.dart';
 
 class SubWindow extends StatefulWidget {
   const SubWindow(
@@ -42,7 +40,7 @@ class _SubWindowState extends State<SubWindow> {
             if (notification.size.width < 1200 ||
                 notification.size.height < 700) {
               widget.windowController
-                ..setFrame(const Offset(0, 0) & const Size(1280, 720))
+                ..setFrame(const Offset(0, 0) & const Size(1280, 720+CUS_WIN_TITLEBAR_HEIGHT))
                 ..center();
             }
             return true;
