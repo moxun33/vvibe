@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 class LimitedConnectionAdapter implements HttpClientAdapter {
   final int maxConnections;
@@ -41,6 +43,12 @@ class LimitedConnectionAdapter implements HttpClientAdapter {
   }
 }
 
+final dioCacheOptions = CacheOptions(
+  // A default store is required for interceptor.
+  store: MemCacheStore(),
+  maxStale: const Duration(minutes: 30),
+);
+
 class PlaylistCheckReq {
   static PlaylistCheckReq _instance = PlaylistCheckReq._internal();
   factory PlaylistCheckReq() => _instance;
@@ -56,6 +64,7 @@ class PlaylistCheckReq {
         },
         receiveTimeout: Duration(seconds: 10)));
     dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 10);
+    dio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     headDio = Dio(new BaseOptions(
         responseType: ResponseType.stream,
         headers: {
@@ -70,7 +79,8 @@ class PlaylistCheckReq {
   }
 
   Future<int> check(String url) async {
-    if (shouldGetReq(url)) {
+    if (shouldGetReq(url) ||
+        !!PlaylistUtil().isDyHyDlProxyUrl(url)['platformHit']) {
       return get(url);
     }
     return head(url);
@@ -82,7 +92,7 @@ class PlaylistCheckReq {
       return resp.statusCode ?? 500;
     } on DioException catch (e) {
       final status = e.response?.statusCode ?? 422;
-      debugPrint(e.toString());
+      debugPrint(e.toString() + url);
       return status;
     } catch (e) {
       debugPrint(e.toString());

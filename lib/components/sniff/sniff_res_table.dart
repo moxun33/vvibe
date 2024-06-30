@@ -4,6 +4,7 @@ import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/models/url_sniff_res.dart';
 import 'package:vvibe/utils/playlist/sniff_util.dart';
 
+// ignore: must_be_immutable
 class SniffResTable extends StatelessWidget {
   SniffResTable({Key? key, required this.data, required this.validOnly})
       : super(key: key);

@@ -26,7 +26,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
     final v = await LoacalStorage().getJSON(PLAYER_SETTINGS);
 
     if (v != null) {
-      _uaTextCtl.text = v['header'] ?? '';
+      _uaTextCtl.text = v['ua'] ?? '';
       _epgUrlTextCtl.text = v['epg'] ?? '';
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
     }
