@@ -88,6 +88,7 @@ dependencies:
   synchronized: ^3.1.0+1
   xml2json: ^6.2.3
   ip2region_plus: ^1.0.2
+  dart_ping: ^9.0.1
 
 dev_dependencies:
   flutter_test:

@@ -366,7 +366,7 @@ class PlaylistUtil {
     return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
   }
 
-  Future<int> checkUrlAccessible(String url) async {
-    return PlaylistCheckReq().check(url);
+  Future<Map> checkUrlAccessible(String url, CancelToken cancelToken) async {
+    return PlaylistCheckReq().check(url, cancelToken);
   }
 }

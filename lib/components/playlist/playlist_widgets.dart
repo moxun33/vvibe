@@ -5,6 +5,8 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
+import 'package:dart_ping/dart_ping.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -252,7 +254,8 @@ class _PlUrlTileState extends State<PlUrlTile>
   //PlayListItem? urlItem;
   int? urlStatus;
   bool loading = true;
-
+  CancelToken _cancelToken = CancelToken();
+  PingResponse? pingRes;
   @override
   bool get wantKeepAlive => true;
 
@@ -301,25 +304,45 @@ class _PlUrlTileState extends State<PlUrlTile>
       return;
     }
 
-    final status = await PlaylistUtil().checkUrlAccessible(url.url!);
-    /*  debugPrint(
-        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应状态$status'); */
+    final res = await PlaylistUtil().checkUrlAccessible(url.url!, _cancelToken);
+
+    debugPrint(
+        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应 $res');
     if (mounted) {
       setState(() {
         loading = false;
-        urlStatus = status;
+        urlStatus = res['status'];
+        pingRes = res['ping'];
       });
     }
   }
 
+  Color _getPingColor(Duration? time) {
+    final ms = time?.inMilliseconds ?? 0;
+    if (ms > 300 && ms <= 500) {
+      return Colors.cyan;
+    }
+    if (ms > 500 && ms <= 1000) {
+      return Colors.blue;
+    }
+    if (ms > 1000) {
+      return Colors.red;
+    }
+    return Colors.green;
+  }
+
   Widget _getIcon(int? status) {
+    final pingTime = pingRes?.time?.inMilliseconds;
+    final okIcon = Icon(
+      Icons.check,
+      size: 10,
+      color: _getPingColor(pingRes?.time),
+    );
     switch (status) {
       case 200:
-        return Icon(
-          Icons.check,
-          size: 10,
-          color: Colors.green,
-        );
+      case 204:
+      case 206:
+        return Tooltip(child: okIcon, message: '${pingTime}ms');
 
       case 504:
         return Tooltip(
@@ -350,12 +373,14 @@ class _PlUrlTileState extends State<PlUrlTile>
         );
       case 422:
         return Tooltip(
-          child: Icon(
-            Icons.unpublished_rounded,
-            size: 8,
-            color: Colors.yellow[200],
-          ),
-          message: '拒绝连接',
+          child: pingRes?.time != null
+              ? okIcon
+              : Icon(
+                  Icons.unpublished_rounded,
+                  size: 8,
+                  color: Colors.yellow[200],
+                ),
+          message: pingRes?.time != null ? '${pingTime}ms' : '拒绝连接',
         );
       case 500:
       case 502:
@@ -450,5 +475,11 @@ class _PlUrlTileState extends State<PlUrlTile>
             ),
           ),
         ));
+  }
+
+  @override
+  void dispose() {
+    _cancelToken.cancel("Request cancelled");
+    super.dispose();
   }
 }

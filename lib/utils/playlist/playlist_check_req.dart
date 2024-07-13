@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
+import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
@@ -62,8 +64,8 @@ class PlaylistCheckReq {
         headers: {
           'User-Agent': DEF_REQ_UA,
         },
-        receiveTimeout: Duration(seconds: 10)));
-    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 10);
+        receiveTimeout: Duration(seconds: 5)));
+    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 5);
     dio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     headDio = Dio(new BaseOptions(
         responseType: ResponseType.stream,
@@ -71,6 +73,7 @@ class PlaylistCheckReq {
           'User-Agent': DEF_REQ_UA,
         },
         receiveTimeout: Duration(seconds: 10)));
+    headDio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
   }
   bool shouldGetReq(String url) {
     return url.indexOf('/udp/') > -1 ||
@@ -78,17 +81,32 @@ class PlaylistCheckReq {
         url.indexOf('/PLTV/') > -1;
   }
 
-  Future<int> check(String url) async {
-    if (shouldGetReq(url) ||
-        !!PlaylistUtil().isDyHyDlProxyUrl(url)['platformHit']) {
-      return get(url);
+  Future<Map> check(String url, CancelToken cancelToken) async {
+    final res = {};
+
+    try {
+      final uri = Uri.parse(url);
+      final pingRes =
+          await Ping(uri.host, count: 1, forceCodepage: true).stream.first;
+      debugPrint('pingRes ${uri.host} $pingRes');
+      if (pingRes.response?.ip == null) {
+        res['status'] = 500;
+      }
+      res['ping'] = pingRes.response;
+      /* if (shouldGetReq(url) ||
+          !!PlaylistUtil().isDyHyDlProxyUrl(url)['platformHit']) {
+        res['status'] = await get(url, cancelToken);
+      } */
+      res['status'] = await head(url, cancelToken);
+    } catch (e) {
+      res['status'] = 500;
     }
-    return head(url);
+    return res;
   }
 
-  Future<int> head(String url) async {
+  Future<int> head(String url, CancelToken cancelToken) async {
     try {
-      final resp = await headDio.head(url);
+      final resp = await headDio.head(url, cancelToken: cancelToken);
       return resp.statusCode ?? 500;
     } on DioException catch (e) {
       final status = e.response?.statusCode ?? 422;
@@ -100,11 +118,10 @@ class PlaylistCheckReq {
     }
   }
 
-  Future<int> get(String url) async {
+  Future<int> get(String url, CancelToken cancelToken) async {
     try {
-      CancelToken token = CancelToken();
       int receivedBytes = 0;
-      final resp = await dio.get(url, cancelToken: token);
+      final resp = await dio.get(url, cancelToken: cancelToken);
 
       // 创建可读流
       final stream = resp.data.stream;
@@ -116,7 +133,7 @@ class PlaylistCheckReq {
         print('====' + value.length.toString());
         // 如果超过，则取消请求
         if (receivedBytes > 1) {
-          token.cancel('canceled');
+          cancelToken.cancel('canceled');
           // debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
           break;
         }
