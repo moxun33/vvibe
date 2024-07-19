@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'dart:async';
-import 'dart:math';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:vvibe/utils/playlist/playlist_util.dart';
 
 class LimitedConnectionAdapter implements HttpClientAdapter {
   final int maxConnections;
@@ -65,15 +63,15 @@ class PlaylistCheckReq {
           'User-Agent': DEF_REQ_UA,
         },
         receiveTimeout: Duration(seconds: 5)));
-    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 5);
+    dio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 3);
     dio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     headDio = Dio(new BaseOptions(
         responseType: ResponseType.stream,
         headers: {
           'User-Agent': DEF_REQ_UA,
         },
-        receiveTimeout: Duration(seconds: 10)));
-    headDio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
+        receiveTimeout: Duration(seconds: 5)));
+    headDio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 3);
   }
   bool shouldGetReq(String url) {
     return url.indexOf('/udp/') > -1 ||

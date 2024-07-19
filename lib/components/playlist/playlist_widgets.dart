@@ -353,6 +353,7 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '超时',
         );
+      case 401:
       case 403:
         return Tooltip(
           child: Icon(
@@ -371,6 +372,7 @@ class _PlUrlTileState extends State<PlUrlTile>
           ),
           message: '无法检测',
         );
+      case 405:
       case 422:
         return Tooltip(
           child: pingRes?.time != null

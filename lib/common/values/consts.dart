@@ -6,7 +6,7 @@ const PLAYLIST_BAR_WIDTH = 220.0;
 const DEF_REQ_UA = 'VVibe Windows ZTE';
 
 //默认epg地址
-const DEF_EPG_URL = 'https://epg.112114.xyz';
+const DEF_EPG_URL = 'http://epg.51zmt.top:8000';
 
 //默认弹幕字体大小
 const DEF_DM_FONT_SIZE = 20;
