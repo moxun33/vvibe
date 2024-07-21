@@ -332,7 +332,7 @@ class _PlUrlTileState extends State<PlUrlTile>
   }
 
   Widget _getIcon(int? status) {
-    final pingTime = pingRes?.time?.inMilliseconds;
+    final pingTime = pingRes?.time?.inMilliseconds ?? 0;
     final okIcon = Icon(
       Icons.check,
       size: 10,
@@ -361,7 +361,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.pink,
           ),
-          message: '禁止访问',
+          message: '禁止访问 ${pingTime}ms',
         );
       case 400:
         return Tooltip(
@@ -370,7 +370,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.lightGreen[200],
           ),
-          message: '无法检测',
+          message: '无法检测 ${pingTime}ms',
         );
       case 405:
       case 422:
@@ -382,7 +382,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                   size: 8,
                   color: Colors.yellow[200],
                 ),
-          message: pingRes?.time != null ? '${pingTime}ms' : '拒绝连接',
+          message: '拒绝连接 ${pingTime}ms',
         );
       case 500:
       case 502:
@@ -392,7 +392,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.red,
           ),
-          message: '不可用',
+          message: '不可用 ${pingTime}ms',
         );
       case 503:
         return Tooltip(
@@ -401,7 +401,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.cyan[200],
           ),
-          message: '限制连接数',
+          message: '限制连接 ${pingTime}ms',
         );
       case 404:
         return Tooltip(
@@ -410,7 +410,7 @@ class _PlUrlTileState extends State<PlUrlTile>
             size: 8,
             color: Colors.orange,
           ),
-          message: '不存在',
+          message: '不存在 ${pingTime}ms',
         );
       default:
         return loading
@@ -421,7 +421,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                   size: 8,
                   color: Colors.pink,
                 ),
-                message: '未知',
+                message: '未知 ${pingTime}ms',
               );
     }
   }

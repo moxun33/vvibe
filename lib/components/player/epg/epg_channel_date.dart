@@ -39,7 +39,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
         return;
       }
       EasyLoading.show(status: '正在加载节目单');
-      ChannelEpg? _data = await EpgUtil().getChannelDateEpg(name, widget.date);
+      ChannelEpg? _data = await EpgUtil().getChannelDateEpg(id??name, widget.date);
       setState(() {
         data = _data;
       });
