@@ -63,21 +63,12 @@ class HomePage extends GetView<HomeController> {
                                       playingUrl: controller.playingUrl,
                                       videoWidget: Center(
                                           child: AspectRatio(
-                                              aspectRatio: 16 / 9,
-                                              child:
-                                                  ValueListenableBuilder<int?>(
-                                                valueListenable:
-                                                    controller.player.textureId,
-                                                builder: (context, id, _) => id ==
-                                                        null
-                                                    ? const SizedBox.shrink()
-                                                    : Texture(
-                                                        textureId:
-                                                            id), /* Texture(
+                                        aspectRatio: 16 / 9,
+                                        child: Texture(
                                           textureId: controller.textureId!,
                                           filterQuality: FilterQuality.high,
-                                        ), */
-                                              ))),
+                                        ),
+                                      )),
                                       fvp: controller.player,
                                       togglePlayList: controller.togglePlayList,
                                       stopPlayer: controller.stopPlayer,

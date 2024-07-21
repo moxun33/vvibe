@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-21 21:03:35
+ * @LastEditTime: 2024-07-21 21:29:17
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -213,7 +213,7 @@ class HomeController extends GetxController with WindowListener {
       }
       player.media = url;
       player.state = PlaybackState.playing;
-      updateTexture();
+
       if (!playback) {
         playingUrl = item;
         update();
@@ -272,7 +272,7 @@ class HomeController extends GetxController with WindowListener {
     barrageWallController.disable();
     update();
     VWindow().setWindowTitle('vvibe');
-    player.dispose();
+    //player.dispose();
     return 1;
   }
 
@@ -289,11 +289,10 @@ class HomeController extends GetxController with WindowListener {
   void updateWindowTitle(PlayListItem item) async {
     final info = await player.mediaInfo;
     debugPrint(info.toString());
-    /*   final ratio = info['video']['codec']['width'].toString() +
-        'x' +
-        info['video']['codec']['height'].toString();
-    final title = '${item.name} [${ratio}]'; */
-    //VWindow().setWindowTitle('');
+    final ratio =
+        '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
+    final title = '${item.name} [${ratio}]';
+    VWindow().setWindowTitle(title);
   }
 
   //获取当前弹幕区域尺寸
