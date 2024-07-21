@@ -39,7 +39,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   final TextEditingController _searchController = TextEditingController();
 
   Map<String, bool> expanded = new Map();
-  Map<String, String> playerSettings = new Map();
+  Map<String, dynamic> playerSettings = new Map();
   String expandKey = '';
   String searchKey = '';
   List<PlayListItem> playlist = [];
@@ -81,10 +81,10 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   _init() async {
-    Map<String, String> plSettings =
-        await LoacalStorage().getJSON(PLAYER_SETTINGS) as Map<String, String>;
+    Map<String, dynamic> plSettings =
+        await LoacalStorage().getJSON(PLAYER_SETTINGS) as Map<String, dynamic>;
     setState(() {
-      plSettings = plSettings;
+      playerSettings = plSettings;
       playlist = widget.data;
     });
   }
@@ -175,7 +175,7 @@ class PlUrlListView extends StatefulWidget {
       required this.forceRefreshPlaylist})
       : super(key: key);
   final List<PlayListItem> data;
-  final Map<String, String> playerSetting;
+  final Map<String, dynamic> playerSetting;
   final void Function(PlayListItem item) onUrlTap;
   final void Function() forceRefreshPlaylist;
   @override
