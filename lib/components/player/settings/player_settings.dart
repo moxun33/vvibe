@@ -79,7 +79,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
               _buldInputRow(_uaTextCtl,
                   label: 'User-Agent',
                   decoration: InputDecoration(
-                      hintText: '全局请求User-Agent，默认  VVibe Windows ZTE')),
+                      hintText: '全局请求User-Agent，默认  ${DEF_REQ_UA}')),
               SizedBox(
                 width: 50,
               ),
