@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-09-17 16:43:03
+ * @LastEditTime: 2024-07-21 21:03:35
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -11,7 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:fvp/fvp.dart';
+import 'package:fvp/mdk.dart';
 import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
@@ -28,7 +28,7 @@ import 'package:vvibe/window/window.dart';
 import 'package:window_manager/window_manager.dart';
 
 class HomeController extends GetxController with WindowListener {
-  Fvp player = Fvp();
+  late final player = Player();
 
   int? textureId; //fvp播放时的渲染id
   bool playListShowed = false;
@@ -58,7 +58,7 @@ class HomeController extends GetxController with WindowListener {
   }
 
   void playerConfig() async {
-    await player.setProperty('http_persistent', '0');
+    player.setProperty('http_persistent', '0');
   }
 
 //hack chat init
@@ -182,7 +182,7 @@ class HomeController extends GetxController with WindowListener {
     if (textureId != null) {
       await stopPlayer();
     }
-    int ttId = await player.createTexture();
+    int ttId = await player.updateTexture();
 
     print('textureId: $ttId');
 
@@ -205,34 +205,36 @@ class HomeController extends GetxController with WindowListener {
 
         return;
       }
-      tip = '正在打开';
+      tip = '正在打开${item.name ?? ''}';
       update();
       final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
       if (settings != null) {
-        await player.setUserAgent(settings['ua'] ?? DEF_REQ_UA);
+        player.setProperty('user-agent', settings['ua'] ?? DEF_REQ_UA);
       }
-      await player.setMedia(url);
-
+      player.media = url;
+      player.state = PlaybackState.playing;
+      updateTexture();
       if (!playback) {
         playingUrl = item;
         update();
         LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
       }
 
-      player.onStateChanged((String state) {
+      player.onStateChanged((PlaybackState oldState, PlaybackState state) {
         debugPrint("-------------------接收到state改变 $state");
       });
-      player.onMediaStatusChanged((String status) {
+      player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         debugPrint("============接收到media status改变 $status");
         if (status == '-2147483648') {
           tip = '${item.name}播放失败';
           update();
         }
+        return false;
       });
-      player.onEvent((Map<String, dynamic> data) {
-        debugPrint("******接收到event改变 ${data}");
-        final value = data['error'].toInt();
-        switch (data['category']) {
+      player.onEvent((MediaEvent e) {
+        //print("******接收到event改变 ${e.category} ${e.detail} ${e.error}");
+        final value = e.error.toInt();
+        switch (e.category) {
           case 'reader.buffering':
             tip = value < 100 ? '缓冲 $value%' : '';
             update();
@@ -247,14 +249,14 @@ class HomeController extends GetxController with WindowListener {
             break;
         }
       });
-      player.onRenderCallback((msg) {
+      /*   player.onRenderCallback((msg) {
         // debugPrint('======render cb log $msg');
       });
       player.setLogHandler((msg) async {
         debugPrint('【log】 $msg');
-      });
+      }); */
     } catch (e) {
-      Logger.error(e.toString());
+      Logger.error('[error logs] ${e.toString()}');
     }
   }
 
@@ -262,7 +264,7 @@ class HomeController extends GetxController with WindowListener {
   Future<int> stopPlayer() async {
     if (textureId == null) return 0;
     debugPrint('close player');
-    await player.stop();
+    player.state = PlaybackState.stopped;
     EasyLoading.dismiss();
     textureId = null;
     playingUrl = null;
@@ -270,6 +272,7 @@ class HomeController extends GetxController with WindowListener {
     barrageWallController.disable();
     update();
     VWindow().setWindowTitle('vvibe');
+    player.dispose();
     return 1;
   }
 
@@ -284,14 +287,13 @@ class HomeController extends GetxController with WindowListener {
   }
 
   void updateWindowTitle(PlayListItem item) async {
-    final info = await player.getMediaInfo();
-    if (info == null) return;
-
-    final ratio = info['video']['codec']['width'].toString() +
+    final info = await player.mediaInfo;
+    debugPrint(info.toString());
+    /*   final ratio = info['video']['codec']['width'].toString() +
         'x' +
         info['video']['codec']['height'].toString();
-    final title = '${item.name} [${ratio}]';
-    VWindow().setWindowTitle(title);
+    final title = '${item.name} [${ratio}]'; */
+    //VWindow().setWindowTitle('');
   }
 
   //获取当前弹幕区域尺寸
@@ -321,11 +323,13 @@ class HomeController extends GetxController with WindowListener {
     windowManager.removeListener(this);
 
     hc?.close();
+    player.dispose();
   }
 
   @override
   void onWindowClose() async {
     await stopPlayer();
     hc?.close();
+    player.dispose();
   }
 }

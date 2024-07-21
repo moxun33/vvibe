@@ -70,6 +70,13 @@ class Global {
         child: Spinning(),
       );
     if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
+// set logger before registerWith()
+    /*    Logger.level = Level.ALL;
+    final df = DateFormat("HH:mm:ss.SSS");
+    Logger.onRecord.listen((record) {
+      print(
+          '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}');
+    }); */
 
     return genTheme();
   }

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fvp/fvp.dart';
+import 'package:fvp/mdk.dart';
 import 'package:vvibe/models/playlist_item.dart';
 
 // ignore: must_be_immutable
@@ -19,7 +19,7 @@ class FvpVideoFrame extends StatefulWidget {
       : super(key: key);
 
   final Widget videoWidget;
-  final Fvp fvp;
+  final Player fvp;
   //final bool isFullscreen;
   final Function togglePlayList;
   final Function toggleDanmaku;
@@ -39,7 +39,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   bool _displayTapped = false;
   Timer? _hideTimer;
   bool isPlaying = true;
-  Fvp get _fvp => widget.fvp;
+  Player get _fvp => widget.fvp;
   int? textureId;
 
   TextEditingController danmakuCtrl = new TextEditingController();
@@ -63,12 +63,12 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     if (FvpPlayState.playing == state) playPauseController.forward(); */
   }
 
-  Future<int> stop() async {
+  void stop() async {
     setState(() {
       textureId = null;
     });
     widget.stopPlayer();
-    return _fvp.stop();
+    _fvp.state = PlaybackState.stopped;
   }
 
   @override
@@ -80,8 +80,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void playOrPuase() async {
-    int state = await _fvp.getState();
-    bool toPause = FvpPlayState.paused == state;
+    bool toPause = PlaybackState.paused == _fvp.state;
     /* if (FvpPlayState.playing == state) {
       playPauseController.reverse();
     } else {
@@ -91,8 +90,10 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
       isPlaying = toPause;
     });
     print(
-        ' ${FvpPlayState.playing} ${state} ${FvpPlayState.playing == state} fvp state');
-    _fvp.playOrPause();
+        ' ${PlaybackState.playing} ${_fvp.state} ${PlaybackState.playing == _fvp.state} fvp state');
+    _fvp.state = _fvp.state == PlaybackState.playing
+        ? PlaybackState.paused
+        : PlaybackState.playing;
   }
 
   void _getMetaInfo() async {
@@ -339,7 +340,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
 }
 
 class VolumeControl extends StatefulWidget {
-  final Fvp? player;
+  final Player? player;
   final Color? thumbColor;
 
   const VolumeControl({
@@ -357,7 +358,7 @@ class _VolumeControlState extends State<VolumeControl> {
   bool _showVolume = false;
   double unmutedVolume = 1.0;
 
-  Fvp? get player => widget.player;
+  Player? get player => widget.player;
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +397,7 @@ class _VolumeControlState extends State<VolumeControl> {
                         value: volume.roundToDouble(),
                         onChanged: (v) {
                           print('volume $v');
-                          player?.setVolume(v);
+                          player?.volume = (v);
                           setState(() {
                             volume = v;
                           });
@@ -440,13 +441,13 @@ class _VolumeControlState extends State<VolumeControl> {
     final v = volume;
     if (v > 0) {
       unmutedVolume = v;
-      player?.setMute(true);
+      player?.mute = (true);
       setState(() {
         volume = 0;
       });
     } else {
-      player?.setMute(false);
-      player?.setVolume(unmutedVolume);
+      player?.mute = (false);
+      player?.volume = (unmutedVolume);
 
       setState(() {
         volume = unmutedVolume;

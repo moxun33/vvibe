@@ -1,11 +1,10 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:fvp/fvp.dart';
-import 'package:vvibe/pages/home/home_model.dart';
+import 'package:fvp/mdk.dart';
 
 class FvpController extends GetxController {
   final count = 0.obs;
-  final _fvpPlugin = Fvp();
+  late final _fvpPlugin = Player();
   int? textureId;
 
   @override
@@ -19,7 +18,9 @@ class FvpController extends GetxController {
   }
 
   @override
-  void onClose() {}
+  void onClose() {
+    _fvpPlugin.dispose();
+  }
 
 // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initFvp() async {
@@ -30,9 +31,9 @@ class FvpController extends GetxController {
 
   Future<int> updateTexture() async {
     if (textureId != null) {
-      await stop();
+      stop();
     }
-    int ttId = await _fvpPlugin.createTexture();
+    int ttId = await _fvpPlugin.updateTexture();
 
     print('textureId: $ttId');
 
@@ -45,18 +46,19 @@ class FvpController extends GetxController {
   void play(url) async {
     EasyLoading.show(status: '正在加载');
     updateTexture();
-    await _fvpPlugin.setMedia(url);
-    _fvpPlugin.onStateChanged((String state) {
+    _fvpPlugin.media = (url);
+    _fvpPlugin.onStateChanged((PlaybackState oState, PlaybackState state) {
       print("-------------------接收到state改变 $state");
     });
-    _fvpPlugin.onMediaStatusChanged((String status) {
+    _fvpPlugin.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
       print("============接收到media改变 $status");
+      return true;
     });
-    _fvpPlugin.onEvent((Map<String, dynamic> data) {
-      print("******接收到event改变 ${data}");
-      switch (data['category']) {
+    _fvpPlugin.onEvent((MediaEvent e) {
+      print("******接收到event改变 ${e}");
+      switch (e.category) {
         case 'reader.buffering':
-          final percent = data['error'].toInt();
+          final percent = e.error.toInt();
           if (percent < 100) {
             EasyLoading.show(status: '缓冲 $percent%');
           } else {
@@ -71,18 +73,20 @@ class FvpController extends GetxController {
   }
 
   void playOrPause() {
-    _fvpPlugin.playOrPause();
+    _fvpPlugin.state = _fvpPlugin.state == PlaybackState.playing
+        ? PlaybackState.paused
+        : PlaybackState.playing;
     getMediaInfo();
   }
 
-  Future<int> stop() async {
+  void stop() async {
     textureId = null;
     update();
-    return _fvpPlugin.stop();
+    _fvpPlugin.state = PlaybackState.stopped;
   }
 
   void getMediaInfo() async {
-    final res = await _fvpPlugin.getMediaInfo();
+    final res = await _fvpPlugin.mediaInfo;
     print('当前视频的mediainfo $res');
     // _fvpPlugin.snapshot();
   }
