@@ -39,6 +39,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   final TextEditingController _searchController = TextEditingController();
 
   Map<String, bool> expanded = new Map();
+  Map<String, String> playerSettings = new Map();
   String expandKey = '';
   String searchKey = '';
   List<PlayListItem> playlist = [];
@@ -76,7 +77,14 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  _init() async {
+    Map<String, String> plSettings =
+        await LoacalStorage().getJSON(PLAYER_SETTINGS) as Map<String, String>;
     setState(() {
+      plSettings = plSettings;
       playlist = widget.data;
     });
   }
@@ -143,6 +151,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   },
                   body: expandKey == key
                       ? PlUrlListView(
+                          playerSetting: playerSettings,
                           data: urlList,
                           onUrlTap: widget.onUrlTap,
                           forceRefreshPlaylist: widget.forceRefreshPlaylist)
@@ -161,10 +170,12 @@ class PlUrlListView extends StatefulWidget {
   const PlUrlListView(
       {Key? key,
       required this.data,
+      required this.playerSetting,
       required this.onUrlTap,
       required this.forceRefreshPlaylist})
       : super(key: key);
   final List<PlayListItem> data;
+  final Map<String, String> playerSetting;
   final void Function(PlayListItem item) onUrlTap;
   final void Function() forceRefreshPlaylist;
   @override
@@ -208,6 +219,8 @@ class _PlUrlListViewState extends State<PlUrlListView> {
           itemBuilder: (context, index) {
             final e = widget.data[index];
             return PlUrlTile(
+                checkAllive:
+                    widget.playerSetting['checkAlive'].toString() == 'true',
                 index: index,
                 onSelectUrl: onSelectUrl,
                 selectedItem: selectedItem,
@@ -234,6 +247,7 @@ class PlUrlTile extends StatefulWidget {
   const PlUrlTile(
       {Key? key,
       required this.url,
+      required this.checkAllive,
       required this.index,
       required this.onSelectUrl,
       required this.forceRefreshPlaylist,
@@ -241,6 +255,7 @@ class PlUrlTile extends StatefulWidget {
       : super(key: key);
   final PlayListItem url;
   final int index;
+  final bool checkAllive;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
   final void Function() forceRefreshPlaylist;
@@ -266,7 +281,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       urlItem = widget.url;
     }); */
 
-    _checkUrlAccessible();
+    if (widget.checkAllive) _checkUrlAccessible();
   }
 
   void _selectUrl(PlayListItem url) {
@@ -451,9 +466,15 @@ class _PlUrlTileState extends State<PlUrlTile>
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: 1.0,
                 children: [
-                  _getIcon(urlStatus),
+                  widget.checkAllive
+                      ? _getIcon(urlStatus)
+                      : SizedBox(
+                          width: 0,
+                        ),
                   SizedBox(
-                    width: PLAYLIST_BAR_WIDTH - 38,
+                    width: widget.checkAllive
+                        ? PLAYLIST_BAR_WIDTH - 38
+                        : PLAYLIST_BAR_WIDTH,
                     child: Text(
                       e.name?.trim() ?? '未知名称',
                       maxLines: 1,

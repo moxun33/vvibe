@@ -15,7 +15,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
   final TextEditingController _uaTextCtl = TextEditingController();
   final TextEditingController _epgUrlTextCtl = TextEditingController();
   final TextEditingController _danmuFSizeTextCtl = TextEditingController();
-
+  bool _checkAlive = true;
   @override
   void initState() {
     super.initState();
@@ -29,6 +29,9 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       _uaTextCtl.text = v['ua'] ?? '';
       _epgUrlTextCtl.text = v['epg'] ?? '';
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
+      setState(() {
+        _checkAlive = v['checkAlive'].toString() == 'false' ? false : true;
+      });
     }
   }
 
@@ -59,6 +62,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'ua': ua.isNotEmpty ? ua : DEF_REQ_UA,
       'epg': epg.isNotEmpty ? epg : DEF_EPG_URL,
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
+      'checkAlive': _checkAlive.toString()
     };
     LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
@@ -87,6 +91,29 @@ class _PlayerSettingsState extends State<PlayerSettings> {
           ),
           Row(
             children: [
+              Row(
+                children: [
+                  SizedBox(
+                      width: 60,
+                      child:
+                          Text('实时检测', style: TextStyle(color: Colors.purple))),
+                  SizedBox(
+                    width: 150,
+                    child: Switch(
+                      value: _checkAlive, //当前状态
+                      onChanged: (value) {
+                        //重新构建页面
+                        setState(() {
+                          _checkAlive = value;
+                        });
+                      },
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                width: 290,
+              ),
               _buldInputRow(_danmuFSizeTextCtl,
                   label: '弹幕大小',
                   decoration: InputDecoration(hintText: '弹幕字体大小，默认20')),
