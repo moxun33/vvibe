@@ -11,9 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
 //import 'package:extended_list/extended_list.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -303,6 +305,10 @@ class _PlUrlTileState extends State<PlUrlTile>
       case '强制刷新列表':
         widget.forceRefreshPlaylist();
         break;
+
+      case '用vlc打开':
+        launchUrlString('vlc://${widget.url.url}');
+        break;
       default:
     }
   }
@@ -456,6 +462,7 @@ class _PlUrlTileState extends State<PlUrlTile>
           menuItems: [
             MenuItem(title: '复制链接'),
             MenuItem(title: '强制刷新列表'),
+            MenuItem(title: '用vlc打开'),
           ],
           child: TextButton(
             onPressed: () {
