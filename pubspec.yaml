@@ -74,7 +74,6 @@ dependencies:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding
 #      path: plugins/window_size
-  ffi: ^2.1.2
   collection: ^1.18.0
   dropdown_button2: ^2.3.9
   flutter_barrage: ^0.5.5

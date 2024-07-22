@@ -63,8 +63,8 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: "zip"
-          filename: vvibe-${{github.ref_name}}-windows.zip
-          directory: build/windows/runner/Release
+          filename: vvibe-${{github.ref_name}}-windows-x64.zip
+          directory: build/windows/x64/runner/Release
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -74,7 +74,7 @@ jobs:
           prerelease: true
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            build/windows/runner/Release/vvibe-${{github.ref_name}}-windows.zip
+            build/windows/x64/runner/Release/vvibe-${{github.ref_name}}-windows-x64.zip
 
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3

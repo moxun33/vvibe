@@ -53,7 +53,7 @@
   
 ## 致谢
 
-- [mdk-sdk](https://github.com/wang-bin/mdk-sdk)
+- [fvp](https://github.com/wang-bin/fvp)([mdk-sdk](https://github.com/wang-bin/mdk-sdk))
 
 ## 备注
 
@@ -72,5 +72,5 @@
 ```bash
 http://epg.aptvapp.com/xml
 http://epg.51zmt.top:8000/e.xml.gz
-https://epg.112114.xyz/e.xml.gz
+https://assets.livednow.com/e.xml
 ```
