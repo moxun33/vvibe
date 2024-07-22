@@ -18,7 +18,7 @@
 - 播放本地文件``m3u``或``txt``播放列表
 - 订阅远程``m3u``或``txt``播放列表
 - 支持三大平台的实时弹幕 （条件：1、m3u文件的``group-title``分别为（或包含）平台中文名或拼音, ``tvg-id``为真实房间id；2、代理地址，格式为``/douyu.php?id={roomid}``或pathname以``/douyu/{roomid}``结尾）
-- 发送匿名弹幕 [hack.chat](https://hack.chat)🤩🤩🤩
+- 发送匿名弹幕 [hack.chat](https://hack.chat)🤩🤩🤩 (科学上网)
 - 播放列表管理，分组、搜索和实时检测
 - 打开单个网络链接
 - 单个网络链接也支持弹幕(条件同播放列表)。
