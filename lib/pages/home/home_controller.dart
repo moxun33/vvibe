@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-21 21:29:17
+ * @LastEditTime: 2024-07-21 21:35:59
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -175,6 +175,7 @@ class HomeController extends GetxController with WindowListener {
 
   void initPlayer() async {
     await updateTexture();
+    player.setDecoders(MediaType.video, ["MFT:d3d=11", "D3D11", "FFmpeg"]);
     update();
   }
 
