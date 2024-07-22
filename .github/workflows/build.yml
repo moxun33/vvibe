@@ -70,7 +70,7 @@ jobs:
           directory: build/windows/x64/runner/Release
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{github.ref_name}}
           draft: true
