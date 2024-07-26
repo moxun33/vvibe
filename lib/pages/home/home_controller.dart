@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-21 21:35:59
+ * @LastEditTime: 2024-07-26 22:56:57
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -226,14 +226,15 @@ class HomeController extends GetxController with WindowListener {
       });
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         debugPrint("============接收到media status改变 $status");
-        if (status == '-2147483648') {
+        if (status.toString() == 'MediaStatus(+invalid)') {
           tip = '${item.name}播放失败';
+          stopPlayer();
           update();
         }
-        return false;
+        return true;
       });
       player.onEvent((MediaEvent e) {
-        //print("******接收到event改变 ${e.category} ${e.detail} ${e.error}");
+        print("******接收到event改变 ${e.category} ${e.detail} ${e.error}");
         final value = e.error.toInt();
         switch (e.category) {
           case 'reader.buffering':

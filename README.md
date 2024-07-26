@@ -72,5 +72,8 @@
 ```bash
 http://epg.aptvapp.com/xml
 http://epg.51zmt.top:8000/e.xml.gz
-https://assets.livednow.com/e.xml
+https://assets.livednow.com/e.xml.gz
+https://live.fanmingming.com/e.xml.gz
+https://epg.v1.mk/fy.xml.gz
+
 ```

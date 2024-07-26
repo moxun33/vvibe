@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2023-02-12 14:16:04
+ * @LastEditTime: 2024-07-26 22:49:04
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -89,12 +89,17 @@ class HomePage extends GetView<HomeController> {
                                           children: [
                                             SizedBox(
                                                 width: 200,
-                                                child: Image.asset(
-                                                    'assets/logo.png')),
-                                            Text('这里空空如也😊',
+                                                child: controller.playingUrl
+                                                            ?.tvgLogo !=
+                                                        null
+                                                    ? Image.network(controller
+                                                        .playingUrl!.tvgLogo!)
+                                                    : Image.asset(
+                                                        'assets/logo.png')),
+                                            /*  Text('这里空空如也😊',
                                                 style: TextStyle(
                                                     color: Colors.purple[300],
-                                                    fontSize: 40))
+                                                    fontSize: 40)) */
                                           ],
                                         ),
                                       ),

@@ -475,13 +475,16 @@ class _PlUrlTileState extends State<PlUrlTile>
                 children: [
                   widget.checkAllive
                       ? _getIcon(urlStatus)
-                      : SizedBox(
-                          width: 0,
-                        ),
+                      : widget.url.tvgLogo != null
+                          ? SizedBox(
+                              width: 14,
+                              child: Image.network(widget.url.tvgLogo!),
+                            )
+                          : SizedBox(
+                              width: 0,
+                            ),
                   SizedBox(
-                    width: widget.checkAllive
-                        ? PLAYLIST_BAR_WIDTH - 38
-                        : PLAYLIST_BAR_WIDTH,
+                    width: PLAYLIST_BAR_WIDTH - 42,
                     child: Text(
                       e.name?.trim() ?? '未知名称',
                       maxLines: 1,

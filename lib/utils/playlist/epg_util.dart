@@ -85,6 +85,10 @@ class EpgUtil {
   Future<String?> getEpgXmlUrl() async {
     try {
       String url = await getEpgUrl();
+      if (url.endsWith('.xml.gz') || url.endsWith('.xml')) {
+        return url;
+      }
+
       if (url.contains('epg.aptvapp.com'))
         return Uri.parse(url).origin + '/xml';
       var resp = await client.get(url);
@@ -200,7 +204,7 @@ class EpgUtil {
       }
       final epg = await pickChannelEpgJson(channel, d);
       map['epg'] = epg;
-      if (!(epg != null && epg.isNotEmpty)) {
+      if ((epg == null || epg.isNotEmpty)) {
         return getChannelApiEpg(channel, d);
       }
       return ChannelEpg.fromJson(map);
@@ -268,6 +272,7 @@ class EpgUtil {
           .where((e) =>
               e['display-name'] == channel ||
               channel.contains(e['display-name']) ||
+              e['id'] == (channel) ||
               e['id'] == int.tryParse(channel))
           .toList();
       if (myChannels.isEmpty) {
@@ -278,8 +283,7 @@ class EpgUtil {
       final List epg = programmes
           .where((e) =>
               e['channel'].toString() == tvgId.toString() &&
-              e['start'].startsWith(date) &&
-              e['stop'].startsWith(date))
+              ((e['start'].startsWith(date) && e['stop'].startsWith(date))))
           .toList();
       return List<Map<String, dynamic>>.from(epg);
     } catch (e) {
@@ -301,7 +305,11 @@ class EpgUtil {
 
   Future<dynamic> unzipEpg() async {
     final gzPath = await getZipPath();
-    return unzip(gzPath, await getXmlFilePath());
+    final res = await unzip(gzPath, await getXmlFilePath());
+    if (res == false) {
+      downloadEpgData(text: true);
+      print('重新下载epg文本内容');
+    }
   }
 
   void parseXml() async {
@@ -321,16 +329,24 @@ class EpgUtil {
     }
   }
 
-  Future downloadEpgData() async {
+// 下载epg数据
+  Future downloadEpgData({text = false}) async {
     final url = await getEpgXmlUrl();
     if (url == null || !url.contains('xml')) return;
-    final savePath = await getZipPath();
-    final dlRes = await downloadFile(url, savePath);
+    final savePath = text ? await getXmlFilePath() : await getZipPath();
+    final dlRes = await downloadFile(
+      url,
+      savePath,
+    );
 
     if (dlRes != null) {
       print("下载epg成功 " + url + ' ' + dlRes.path);
-      final unziped = await unzipEpg();
-      if (unziped) {
+      if (!text) {
+        final unziped = await unzipEpg();
+        if (unziped) {
+          parseXml();
+        }
+      } else {
         parseXml();
       }
     } else {
