@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
 class PlayerSettings extends StatefulWidget {
@@ -50,7 +51,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
     );
   }
 
-  void save() {
+  void save() async {
     final ua = _uaTextCtl.text,
         epg = _epgUrlTextCtl.text,
         dmFSize = _danmuFSizeTextCtl.text;
@@ -64,8 +65,9 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
       'checkAlive': _checkAlive.toString()
     };
-    LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
+    await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
+    EpgUtil().downloadEpgDataIsolate();
   }
 
   @override
@@ -85,8 +87,8 @@ class _PlayerSettingsState extends State<PlayerSettings> {
               ),
               _buldInputRow(_epgUrlTextCtl,
                   label: 'EPG地址',
-                  decoration: InputDecoration(
-                      hintText: 'EPG地址，默认 https://epg.112114.xyz')),
+                  decoration:
+                      InputDecoration(hintText: 'EPG地址，默认 ${DEF_EPG_URL}')),
             ],
           ),
           Row(

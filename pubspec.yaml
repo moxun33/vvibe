@@ -90,6 +90,7 @@ dependencies:
   ip2region_plus: ^1.0.2
   dart_ping: ^9.0.1
   url_launcher: ^6.3.0
+  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

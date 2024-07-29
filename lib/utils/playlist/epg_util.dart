@@ -141,7 +141,7 @@ class EpgUtil {
     ];
   }
 
-//根据[tvg-id、tvg-name、name和dates 远程获取节目单
+//根据[tvg-id、tvg-name、name和dates 远程获取节目单json数据
   Future<ChannelEpg?> getChannelApiEpg(String channel, [String? date]) async {
     final d = date ?? getToday();
     final params = {
@@ -149,10 +149,17 @@ class EpgUtil {
       'date': DateFormat('yyyy-MM-dd').format(DateTime.parse(d))
     };
     try {
-      final resp = await client.get(await getEpgUrl(),
+      var resp = await client.get('https://epg.112114.eu.org',
           queryParameters: params,
           options: Options(responseType: ResponseType.json));
-
+      print(
+        '实时获取 ${channel} ${date} 的epg ',
+      );
+      if (resp.data == null) {
+        resp = await client.get('https://epg.v1.mk/json',
+            queryParameters: params,
+            options: Options(responseType: ResponseType.json));
+      }
       if (resp.data != null && resp.data is Map) {
         final Map<String, dynamic> map = {
           'date': resp.data['date'] ?? d,
@@ -204,7 +211,7 @@ class EpgUtil {
       }
       final epg = await pickChannelEpgJson(channel, d);
       map['epg'] = epg;
-      if ((epg == null || epg.isNotEmpty)) {
+      if ((epg == null || epg.isEmpty)) {
         return getChannelApiEpg(channel, d);
       }
       return ChannelEpg.fromJson(map);
@@ -343,9 +350,8 @@ class EpgUtil {
       print("下载epg成功 " + url + ' ' + dlRes.path);
       if (!text) {
         final unziped = await unzipEpg();
-        if (unziped) {
-          parseXml();
-        }
+
+        parseXml();
       } else {
         parseXml();
       }

@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-26 22:56:57
+ * @LastEditTime: 2024-07-29 20:57:13
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -294,7 +294,7 @@ class HomeController extends GetxController with WindowListener {
     final ratio =
         '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
     final title = '${item.name} [${ratio}]';
-    VWindow().setWindowTitle(title);
+    VWindow().setWindowTitle(title, item.tvgLogo);
   }
 
   //获取当前弹幕区域尺寸

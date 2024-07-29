@@ -20,10 +20,18 @@ class VWindow {
     });
   }
 
-//设置window熟悉
-  void setWindowTitle(String? title) {
+//设置window title
+  void setWindowTitle(String? title, [String? icon]) {
     final _title = title ?? 'VVibe';
     appWindow.title = _title;
     eventBus.emit('set-window-title', _title);
+    setWindowIcon(icon);
+  }
+
+//设置window icon
+  void setWindowIcon(
+    String? icon,
+  ) {
+    eventBus.emit('set-window-icon', icon ?? '');
   }
 }

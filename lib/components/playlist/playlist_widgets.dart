@@ -5,6 +5,7 @@
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -478,7 +479,8 @@ class _PlUrlTileState extends State<PlUrlTile>
                       : widget.url.tvgLogo != null
                           ? SizedBox(
                               width: 14,
-                              child: Image.network(widget.url.tvgLogo!),
+                              child: CachedNetworkImage(
+                                  imageUrl: widget.url.tvgLogo!),
                             )
                           : SizedBox(
                               width: 0,
