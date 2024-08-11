@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-29 20:59:57
+ * @LastEditTime: 2024-07-29 21:37:36
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -90,20 +90,17 @@ class HomePage extends GetView<HomeController> {
                                           children: [
                                             SizedBox(
                                                 width: 200,
-                                                child: controller.playingUrl
-                                                            ?.tvgLogo !=
-                                                        null
-                                                    ? CachedNetworkImage(
-                                                        imageUrl: controller
-                                                            .playingUrl!
-                                                            .tvgLogo!,
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            Image.asset(
-                                                                'assets/logo.png'),
-                                                      )
-                                                    : Image.asset(
-                                                        'assets/logo.png')),
+                                                child: CachedNetworkImage(
+                                                  imageUrl: controller
+                                                          .playingUrl
+                                                          ?.tvgLogo ??
+                                                      '',
+                                                  errorWidget: (context, url,
+                                                          error) =>
+                                                      Image.asset(
+                                                          'assets/logo.png'),
+                                                ))
+
                                             /*  Text('这里空空如也😊',
                                                 style: TextStyle(
                                                     color: Colors.purple[300],

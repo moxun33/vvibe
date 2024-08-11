@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-29 20:57:13
+ * @LastEditTime: 2024-08-11 15:51:30
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -59,6 +59,9 @@ class HomeController extends GetxController with WindowListener {
 
   void playerConfig() async {
     player.setProperty('http_persistent', '0');
+    player.setDecoders(MediaType.video,
+        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]);
+    player.setProperty('video.avfilter', 'yadif');
   }
 
 //hack chat init
@@ -175,7 +178,7 @@ class HomeController extends GetxController with WindowListener {
 
   void initPlayer() async {
     await updateTexture();
-    player.setDecoders(MediaType.video, ["MFT:d3d=11", "D3D11", "FFmpeg"]);
+
     update();
   }
 

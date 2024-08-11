@@ -85,14 +85,12 @@ class _WindowTitleState extends State<WindowTitle> {
   Widget BarIcon() {
     final defIcon = Image.asset(
       'assets/logo.png',
-      height: 15,
-      width: 20,
+      height: 25,
     );
-
+    if (icon.isEmpty) return defIcon;
     return CachedNetworkImage(
       imageUrl: icon,
-      height: 16,
-      width: 20,
+      height: 30,
       errorWidget: (context, url, error) => defIcon,
     );
   }
@@ -100,8 +98,12 @@ class _WindowTitleState extends State<WindowTitle> {
   @override
   Widget build(BuildContext context) {
     return Wrap(children: [
-      BarIcon(),
-      Text(title, style: TextStyle(color: Colors.white)),
+      Padding(
+          padding: const EdgeInsets.only(left: 5, top: 1), child: BarIcon()),
+      Container(
+        padding: const EdgeInsets.only(left: 10, top: 7),
+        child: Text(title, style: TextStyle(color: Colors.white)),
+      )
     ]);
   }
 }
@@ -119,12 +121,8 @@ Widget WindowTitleBar({String title = 'VVibe'}) {
         direction: Axis.horizontal,
         children: [
           Expanded(
-              child: Container(
-            padding: const EdgeInsets.only(
-              left: 10,
-            ),
             child: WindowTitle(title: title),
-          )),
+          ),
           WindowButtons()
         ],
       ),
