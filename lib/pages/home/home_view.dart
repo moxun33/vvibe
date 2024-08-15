@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-07-29 21:37:36
+ * @LastEditTime: 2024-08-15 21:10:15
  * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description: 
  * @qmj
@@ -53,29 +53,10 @@ class HomePage extends GetView<HomeController> {
                             massiveMode: true,
                             speedCorrectionInMilliseconds: 10000,
                             bullets: [],
-                            child: controller.textureId != null
-                                ? Container(
-                                    color: Colors.black,
-                                    child: FvpVideoFrame(
-                                      toggleDanmaku:
-                                          controller.toggleDanmakuVisible,
-                                      toggleEpgDialog:
-                                          controller.toggleEpgDialog,
-                                      playingUrl: controller.playingUrl,
-                                      videoWidget: Center(
-                                          child: AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: Texture(
-                                          textureId: controller.textureId!,
-                                          filterQuality: FilterQuality.high,
-                                        ),
-                                      )),
-                                      fvp: controller.player,
-                                      togglePlayList: controller.togglePlayList,
-                                      stopPlayer: controller.stopPlayer,
-                                      sendDanmaku: controller.sendDanmaku,
-                                    ))
-                                : GestureDetector(
+                            child: ValueListenableBuilder<int?>(
+                              valueListenable: controller.player.textureId,
+                              builder: (context, id, _) => id == null
+                                  ?   GestureDetector(
                                     onTap: () {
                                       controller.togglePlayList();
                                     },
@@ -109,7 +90,30 @@ class HomePage extends GetView<HomeController> {
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  )
+                                  : Container(
+                                    color: Colors.black,
+                                    child: FvpVideoFrame(
+                                      toggleDanmaku:
+                                          controller.toggleDanmakuVisible,
+                                      toggleEpgDialog:
+                                          controller.toggleEpgDialog,
+                                      playingUrl: controller.playingUrl,
+                                      videoWidget: Center(
+                                          child: AspectRatio(
+                                        aspectRatio: 16 / 9,
+                                        child: Texture(
+                                          textureId: id,
+                                          filterQuality: FilterQuality.high,
+                                        ),
+                                      )),
+                                      fvp: controller.player,
+                                      togglePlayList: controller.togglePlayList,
+                                      stopPlayer: controller.stopPlayer,
+                                      sendDanmaku: controller.sendDanmaku,
+                                    )),
+                            ),
+                            
                             controller: controller.barrageWallController),
                       ),
                     ),

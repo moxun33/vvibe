@@ -461,10 +461,10 @@ packages:
     dependency: "direct main"
     description:
       name: json_theme
-      sha256: "5e70afe87fbe8519abaa4e4131a1405b567353e1b9074d97a62043e5fced018e"
+      sha256: "1d07544d1de3acb730c32e21397d387af3165352726a5d88eafddf435acde725"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "6.5.0+1"
+    version: "6.5.0"
   json_theme_annotation:
     dependency: transitive
     description:

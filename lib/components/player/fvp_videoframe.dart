@@ -260,7 +260,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   _toggleDanmakuShow();
                                 },
                               ),
-                              Focus(
+                              /*     Focus(
                                   focusNode: textFocusNode,
                                   onFocusChange: onTextFocusChange,
                                   child: Container(
@@ -294,7 +294,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                         )
                                       ],
                                     ),
-                                  )),
+                                  )), */
                               const Expanded(
                                   flex: 9, child: SizedBox(width: 8)),
                             ],

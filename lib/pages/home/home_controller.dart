@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-11 15:51:30
+ * @LastEditTime: 2024-08-15 21:22:42
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -53,7 +53,7 @@ class HomeController extends GetxController with WindowListener {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-    initHackchat();
+   // initHackchat();
     playerConfig();
   }
 
@@ -176,33 +176,11 @@ class HomeController extends GetxController with WindowListener {
     DanmakuService().stop();
   }
 
-  void initPlayer() async {
-    await updateTexture();
-
-    update();
-  }
-
-  Future<int> updateTexture() async {
-    if (textureId != null) {
-      await stopPlayer();
-    }
-    int ttId = await player.updateTexture();
-
-    print('textureId: $ttId');
-
-    textureId = ttId;
-
-    update();
-    return ttId;
-  }
-
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
+      player.state = PlaybackState.stopped;
       debugPrint('start play ${item.toJson()}');
-      stopPlayer();
-      if (textureId == null) {
-        initPlayer();
-      }
+
       final url = item.ext?['playUrl'] ?? item.url;
       if (!(url != null && url!.isNotEmpty)) {
         EasyLoading.showError('播放地址错误');
@@ -217,7 +195,7 @@ class HomeController extends GetxController with WindowListener {
       }
       player.media = url;
       player.state = PlaybackState.playing;
-
+      player.updateTexture();
       if (!playback) {
         playingUrl = item;
         update();
@@ -234,7 +212,7 @@ class HomeController extends GetxController with WindowListener {
           stopPlayer();
           update();
         }
-        return true;
+        return false;
       });
       player.onEvent((MediaEvent e) {
         print("******接收到event改变 ${e.category} ${e.detail} ${e.error}");
@@ -284,7 +262,7 @@ class HomeController extends GetxController with WindowListener {
   //播放url改变
   void onPlayUrlChange(PlayListItem item) async {
     if (item.url == null) return;
-    await stopPlayer();
+    // await stopPlayer();
 
     final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
     item.ext = _item.ext ?? {};
