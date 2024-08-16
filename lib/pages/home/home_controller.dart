@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-15 21:22:42
+ * @LastEditTime: 2024-08-16 23:07:33
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -38,7 +38,7 @@ class HomeController extends GetxController with WindowListener {
   PlayListItem? playingUrl;
 
   bool danmakuManualShow = true;
-  String tip = ''; //左上角的文字提示
+  List<String> msgs = []; //左上角的文字提示列表
   Hackchat? hc;
   @override
   void onInit() {
@@ -53,7 +53,7 @@ class HomeController extends GetxController with WindowListener {
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
     }
-   // initHackchat();
+    // initHackchat();
     playerConfig();
   }
 
@@ -187,7 +187,7 @@ class HomeController extends GetxController with WindowListener {
 
         return;
       }
-      tip = '正在打开${item.name ?? ''}';
+      msgs = ['正在打开${item.name ?? ''}'];
       update();
       final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
       if (settings != null) {
@@ -208,7 +208,7 @@ class HomeController extends GetxController with WindowListener {
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         debugPrint("============接收到media status改变 $status");
         if (status.toString() == 'MediaStatus(+invalid)') {
-          tip = '${item.name}播放失败';
+          msgs = ['${item.name}播放失败'];
           stopPlayer();
           update();
         }
@@ -219,7 +219,7 @@ class HomeController extends GetxController with WindowListener {
         final value = e.error.toInt();
         switch (e.category) {
           case 'reader.buffering':
-            tip = value < 100 ? '缓冲 $value%' : '';
+            msgs = value < 100 ? ['缓冲 $value%'] : [];
             update();
             break;
           case 'render.video':
@@ -245,7 +245,6 @@ class HomeController extends GetxController with WindowListener {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
-    if (textureId == null) return 0;
     debugPrint('close player');
     player.state = PlaybackState.stopped;
     EasyLoading.dismiss();
@@ -269,13 +268,40 @@ class HomeController extends GetxController with WindowListener {
     startPlay(item);
   }
 
-  void updateWindowTitle(PlayListItem item) async {
-    final info = await player.mediaInfo;
+  void updateWindowTitle(PlayListItem item) {
+    final info = player.mediaInfo;
     debugPrint(info.toString());
     final ratio =
         '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
     final title = '${item.name} [${ratio}]';
     VWindow().setWindowTitle(title, item.tvgLogo);
+  }
+
+// 显隐媒体元数据
+  void toggleMediaInfo([show = false]) {
+    if (show) {
+      final info = player.mediaInfo;
+      final vc = info.video?[0].codec;
+      final ac = info.audio?[0].codec;
+      final _msgs = [
+        'Video: ${vc?.codec}/ ${info.format}',
+        '   Frame Rate: ${vc?.frameRate} fps',
+        '   Resolution: ${vc?.width} x ${vc?.height}',
+        '   Format: ${vc?.formatName}',
+        '   Bitrate: ${vc?.bitRate} kbps',
+        '   ',
+        'Audio: ${ac?.codec}  ',
+        '   Channels: ${ac?.channels}',
+        '   Sample Rate: ${ac?.sampleRate} Hz',
+        '   Bitrate: ${ac?.bitRate ?? 0 / 1000} kbps',
+      ];
+      msgs = _msgs;
+
+      print(info.toString());
+    } else {
+      msgs = [];
+    }
+    update();
   }
 
   //获取当前弹幕区域尺寸

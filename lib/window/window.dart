@@ -20,6 +20,10 @@ class VWindow {
     });
   }
 
+  get size {
+    return appWindow.size;
+  }
+
 //设置window title
   void setWindowTitle(String? title, [String? icon]) {
     final _title = title ?? 'VVibe';

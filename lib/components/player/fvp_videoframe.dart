@@ -14,6 +14,7 @@ class FvpVideoFrame extends StatefulWidget {
       required this.toggleDanmaku,
       required this.stopPlayer,
       required this.toggleEpgDialog,
+      required this.toggleMediaInfo,
       this.sendDanmaku,
       this.playingUrl})
       : super(key: key);
@@ -22,6 +23,7 @@ class FvpVideoFrame extends StatefulWidget {
   final Player fvp;
   //final bool isFullscreen;
   final Function togglePlayList;
+  final Function toggleMediaInfo;
   final Function toggleDanmaku;
   final Function stopPlayer;
   final Function toggleEpgDialog;
@@ -41,7 +43,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   bool isPlaying = true;
   Player get _fvp => widget.fvp;
   int? textureId;
-
+  bool mediaInfoShowed = false;
   TextEditingController danmakuCtrl = new TextEditingController();
 
   //late StreamSubscription<FvpPlayState>? playPauseStream;
@@ -79,6 +81,10 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     super.dispose();
   }
 
+  void reload() {
+    _fvp.state = PlaybackState.stopped;
+  }
+
   void playOrPuase() async {
     bool toPause = PlaybackState.paused == _fvp.state;
     /* if (FvpPlayState.playing == state) {
@@ -97,7 +103,10 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
   }
 
   void _getMetaInfo() async {
-    // final info = await _fvp.getMediaInfo();
+    widget.toggleMediaInfo(!mediaInfoShowed);
+    setState(() {
+      mediaInfoShowed = !mediaInfoShowed;
+    });
   }
 
   void _toggleDanmakuShow() {
@@ -215,16 +224,16 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                   },
                                 ),
                               ),
-                              /*  IconButton(
+                              /* IconButton(
                                 tooltip: '重新加载',
                                 color: Colors.white,
                                 icon: Icon(Icons.rotate_right_outlined),
                                 onPressed: () {
-                                  playOrPuase();
+                                  reload();
                                 },
                               ), */
                               SizedBox(
-                                width: 20,
+                                width: 10,
                               ),
                               IconButton(
                                 tooltip: '停止',
@@ -235,31 +244,9 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                                 },
                               ),
                               SizedBox(
-                                width: 20,
+                                width: 10,
                               ),
-                              IconButton(
-                                tooltip: '元数据',
-                                color: Colors.white,
-                                iconSize: 20,
-                                icon: Icon(Icons.info_outline),
-                                onPressed: () {
-                                  _getMetaInfo();
-                                },
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              IconButton(
-                                tooltip: '点击${showDanmaku ? '关闭' : '显示'}弹幕',
-                                color: Colors.white,
-                                iconSize: 20,
-                                icon: Icon(showDanmaku
-                                    ? Icons.subtitles_outlined
-                                    : Icons.subtitles_off_sharp),
-                                onPressed: () {
-                                  _toggleDanmakuShow();
-                                },
-                              ),
+
                               /*     Focus(
                                   focusNode: textFocusNode,
                                   onFocusChange: onTextFocusChange,
@@ -300,7 +287,21 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                             ],
                           )),
                       Positioned(
-                        right: 150,
+                          right: 220,
+                          bottom: 10,
+                          child: IconButton(
+                            tooltip: '点击${showDanmaku ? '关闭' : '显示'}弹幕',
+                            color: Colors.white,
+                            iconSize: 20,
+                            icon: Icon(showDanmaku
+                                ? Icons.subtitles_outlined
+                                : Icons.subtitles_off_sharp),
+                            onPressed: () {
+                              _toggleDanmakuShow();
+                            },
+                          )),
+                      Positioned(
+                        right: 160,
                         bottom: 10,
                         child: VolumeControl(
                           player: _fvp,
@@ -308,7 +309,20 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                         ),
                       ),
                       Positioned(
-                        right: 80,
+                          right: 110,
+                          bottom: 10,
+                          child: IconButton(
+                            tooltip: '元数据',
+                            color: Colors.white,
+                            iconSize: 20,
+                            icon: Icon(Icons.info_outline),
+                            onPressed: () {
+                              _getMetaInfo();
+                            },
+                          )),
+
+                      Positioned(
+                        right: 60,
                         bottom: 10,
                         child: IconButton(
                           tooltip: '节目单',
