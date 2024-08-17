@@ -26,34 +26,33 @@ dependencies:
 
 
   # ios 图标库
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.8
 
   # ui kit
   # getx
   get: 4.6.6
 
   # 日期格式
-  intl: ^0.17.0
+  intl: ^0.19.0
 
   # loaing
   flutter_easyloading: ^3.0.5
 
   # http
-  dio: ^5.4.3
+  dio: ^5.6.0
   #cookie_jar: ^3.0.1
   #dio_cookie_manager: ^2.0.0
 
   # storage + cache
-  shared_preferences: ^2.0.6
+  shared_preferences: ^2.3.2
   #cached_network_image: ^3.0.0
 
   # webview
   #webview_flutter: ^2.0.8
 
   #flutter_cache_manager: ^3.1.0
-  web_socket_channel: ^2.3.0
-  #url_launcher: ^6.1.5
-  html: ^0.15.2
+  web_socket_channel: ^2.4.5
+  html: ^0.15.4
   fvp: 0.23.0
   #fvp:
   #  git:
@@ -70,18 +69,18 @@ dependencies:
 #    git:
 #      url: https://github.com/google/flutter-desktop-embedding
 #      path: plugins/window_size
-  collection: ^1.18.0
+  collection: 1.18.0
   dropdown_button2: ^2.3.9
   flutter_barrage: ^0.5.5
-  json_theme: 6.5.0
-  uuid: ^3.0.6
+  #json_theme: 6.5.0
+  uuid: ^3.0.7
   native_context_menu: ^0.2.2+5
   # dio cache
   dio_cache_interceptor: ^3.5.0
   shortid: ^0.1.2
   bitsdojo_window: ^0.1.6
-  window_manager: 0.3.9
-  synchronized: ^3.1.0+1
+  window_manager: 0.4.0
+  synchronized: ^3.2.0
   xml2json: ^6.2.3
   ip2region_plus: ^1.0.2
   dart_ping: ^9.0.1
@@ -98,11 +97,10 @@ dev_dependencies:
   flutter_launcher_icons: ^0.10.0
   
 dependency_overrides: 
-  dio: ^5.2.1
   flutter_launcher_icons: ^0.13.1
   flutter_easyloading: ^3.0.3
   intl: 0.18.0
-
+  meta: 1.12.0
 flutter_icons:
   image_path: "assets//logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21

@@ -52,7 +52,6 @@ class HomePage extends GetView<HomeController> {
                 Container(
                     child: Row(
                   children: <Widget>[
-
                     Expanded(
                       flex: 4,
                       child: Container(

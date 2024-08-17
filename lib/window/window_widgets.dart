@@ -101,7 +101,7 @@ class _WindowTitleState extends State<WindowTitle> {
       Padding(
           padding: const EdgeInsets.only(left: 5, top: 1), child: BarIcon()),
       Container(
-        padding: const EdgeInsets.only(left: 10, top: 7),
+        padding: const EdgeInsets.only(left: 10, top: 3),
         child: Text(title, style: TextStyle(color: Colors.white)),
       )
     ]);

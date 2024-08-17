@@ -116,6 +116,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
               return ExpansionPanel(
                   canTapOnHeader: true,
                   backgroundColor: Colors.white10,
+                  highlightColor: Colors.white10,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
                       child: ListTile(
@@ -147,7 +148,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                             : SizedBox(height: 0, width: 0),
                         textColor: isExpanded ? Colors.white70 : Colors.white,
                       ),
-                      height: isExpanded ? 60 : 20,
+                      height: isExpanded ? 70 : 20,
                     );
                   },
                   body: expandKey == key
@@ -491,10 +492,10 @@ class _PlUrlTileState extends State<PlUrlTile>
                       softWrap: false,
                       overflow: TextOverflow.clip,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: e.url == widget.selectedItem?.url
                             ? FontWeight.bold
-                            : FontWeight.w300,
+                            : FontWeight.normal,
                         color: e.url == widget.selectedItem?.url
                             ? Colors.purple
                             : Colors.white,

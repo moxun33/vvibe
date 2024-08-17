@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-06-16 17:06:17
+ * @LastEditTime: 2024-08-17 14:56:34
  * @FilePath: \vvibe\lib\main.dart
  * @Description: 
  * @qmj
@@ -32,7 +32,7 @@ void main(List<String> args) async {
     VWindow().initWindow();
     Global.init(shouldSetSize: false).then((theme) {
       runApp(LiveSniffWin(
-        theme: theme,
+        theme: theme ?? ThemeData(),
         windowController: WindowController.fromWindowId(windowId),
         args: argument,
       ));
@@ -40,7 +40,7 @@ void main(List<String> args) async {
   } else {
     Global.init().then((theme) {
       VWindow().initWindow();
-      runApp(MyApp(theme: theme));
+      runApp(MyApp(theme: theme ?? ThemeData()));
     });
   }
 }
