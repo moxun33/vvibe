@@ -1,12 +1,12 @@
 import 'dart:io';
+import 'package:logging/logging.dart';
 
-import 'package:mixin_logger/mixin_logger.dart';
+class MyLogger {
+  static MyLogger _instance = new MyLogger._();
+  factory MyLogger() => _instance;
 
-class Logger {
-  static Logger _instance = new Logger._();
-  factory Logger() => _instance;
-
-  Logger._();
+  MyLogger._();
+  static final log = Logger('MyLogger');
 
   String _date() {
     final now = DateTime.now();
@@ -24,28 +24,28 @@ class Logger {
 
   init() async {
     final dir = await _createDir();
-    await initLogger(
+    /*  await initLogger(
       dir.path,
-    );
+    ); */
   }
 
   static info(String message) {
-    i(message);
+    log.info(message);
   }
 
   static error(String message) {
-    e(message);
+    log.fine(message);
   }
 
   static debug(String message) {
-    d(message);
+    log.shout(message);
   }
 
   static verbose(String message) {
-    v(message);
+    log.severe(message);
   }
 
   static warn(String message) {
-    w(message);
+    log.warning(message);
   }
 }

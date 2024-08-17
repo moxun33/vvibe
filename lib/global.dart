@@ -1,13 +1,13 @@
 import 'dart:io';
-//import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
 import 'package:vvibe/theme.dart';
-import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -32,14 +32,17 @@ class Global {
     WidgetsFlutterBinding.ensureInitialized();
 
     await windowManager.ensureInitialized();
-
+// set logger before registerWith()
+    //  Logger.root.level = Level.ALL;
+    final df = DateFormat("HH:mm:ss.SSS");
+    Logger.root.onRecord.listen((record) {
+      print(
+          '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}');
+    });
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化
     await LoacalStorage.init();
-
-    //日志
-    await Logger().init();
 
     //播放列表截图目录
     await PlaylistUtil().getSnapshotDir();
@@ -70,13 +73,6 @@ class Global {
         child: Spinning(),
       );
     if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
-// set logger before registerWith()
-    /*    Logger.level = Level.ALL;
-    final df = DateFormat("HH:mm:ss.SSS");
-    Logger.onRecord.listen((record) {
-      print(
-          '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}');
-    }); */
 
     return genTheme();
   }

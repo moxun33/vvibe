@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-16 23:07:33
+ * @LastEditTime: 2024-08-17 13:49:41
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -39,6 +39,7 @@ class HomeController extends GetxController with WindowListener {
 
   bool danmakuManualShow = true;
   List<String> msgs = []; //左上角的文字提示列表
+  Map<String, String> extraMetaInfo = {}; //额外的元数据
   Hackchat? hc;
   @override
   void onInit() {
@@ -59,8 +60,8 @@ class HomeController extends GetxController with WindowListener {
 
   void playerConfig() async {
     player.setProperty('http_persistent', '0');
-    player.setDecoders(MediaType.video,
-        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]);
+    /*   player.setDecoders(MediaType.video,
+        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]); */
     player.setProperty('video.avfilter', 'yadif');
   }
 
@@ -190,9 +191,8 @@ class HomeController extends GetxController with WindowListener {
       msgs = ['正在打开${item.name ?? ''}'];
       update();
       final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
-      if (settings != null) {
-        player.setProperty('user-agent', settings['ua'] ?? DEF_REQ_UA);
-      }
+
+      player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
@@ -215,12 +215,14 @@ class HomeController extends GetxController with WindowListener {
         return false;
       });
       player.onEvent((MediaEvent e) {
-        print("******接收到event改变 ${e.category} ${e.detail} ${e.error}");
+        print(
+            "!!!接收到event改变 ${e.category} ,detail: ${e.detail} ，error: ${e.error}");
         final value = e.error.toInt();
+        extraMetaInfo[e.category] = e.detail;
         switch (e.category) {
           case 'reader.buffering':
             msgs = value < 100 ? ['缓冲 $value%'] : [];
-            update();
+
             break;
           case 'render.video':
             if (value > 0) {
@@ -231,6 +233,7 @@ class HomeController extends GetxController with WindowListener {
           default:
             break;
         }
+        update();
       });
       /*   player.onRenderCallback((msg) {
         // debugPrint('======render cb log $msg');
@@ -239,7 +242,7 @@ class HomeController extends GetxController with WindowListener {
         debugPrint('【log】 $msg');
       }); */
     } catch (e) {
-      Logger.error('[error logs] ${e.toString()}');
+      MyLogger.error('[error logs] ${e.toString()}');
     }
   }
 
@@ -288,12 +291,12 @@ class HomeController extends GetxController with WindowListener {
         '   Frame Rate: ${vc?.frameRate} fps',
         '   Resolution: ${vc?.width} x ${vc?.height}',
         '   Format: ${vc?.formatName}',
-        '   Bitrate: ${vc?.bitRate} kbps',
+        '   Bitrate: ${(vc?.bitRate ?? 0) / 1000} kbps',
         '   ',
         'Audio: ${ac?.codec}  ',
         '   Channels: ${ac?.channels}',
         '   Sample Rate: ${ac?.sampleRate} Hz',
-        '   Bitrate: ${ac?.bitRate ?? 0 / 1000} kbps',
+        '   Bitrate: ${(ac?.bitRate ?? 0) / 1000} kbps',
       ];
       msgs = _msgs;
 

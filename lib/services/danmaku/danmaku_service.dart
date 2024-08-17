@@ -54,7 +54,7 @@ class DanmakuService {
         _hy?.connect();
       }
     } catch (e) {
-      Logger.error(e.toString());
+      MyLogger.error(e.toString());
     }
   }
 

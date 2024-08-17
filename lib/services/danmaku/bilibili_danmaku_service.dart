@@ -140,7 +140,7 @@ class BilibiliDanmakuService {
         default:
       }
     } catch (e) {
-      Logger.error('解析bili弹幕异常 ${e.toString()}');
+      MyLogger.error('解析bili弹幕异常 ${e.toString()}');
     }
   }
 

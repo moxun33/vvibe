@@ -29,18 +29,18 @@ void main(List<String> args) async {
         ? const {}
         : jsonDecode(args[2]) as Map<String, dynamic>;
     print(argument);
+    VWindow().initWindow();
     Global.init(shouldSetSize: false).then((theme) {
       runApp(LiveSniffWin(
         theme: theme,
         windowController: WindowController.fromWindowId(windowId),
         args: argument,
       ));
-      VWindow().initWindow();
     });
   } else {
     Global.init().then((theme) {
-      runApp(MyApp(theme: theme));
       VWindow().initWindow();
+      runApp(MyApp(theme: theme));
     });
   }
 }

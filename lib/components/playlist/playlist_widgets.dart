@@ -15,8 +15,6 @@ import 'package:native_context_menu/native_context_menu.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
-//import 'package:extended_list/extended_list.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/utils.dart';

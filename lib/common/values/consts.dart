@@ -3,7 +3,7 @@
 const PLAYLIST_BAR_WIDTH = 220.0;
 
 //默认请求头
-const DEF_REQ_UA = 'VVibe Windows ZTE okhttp/3';
+const DEF_REQ_UA = 'VVibe/0.7 Windows ZTE OTT';
 
 //默认epg地址
 const DEF_EPG_URL = 'https://epg.v1.mk/fy.xml.gz';

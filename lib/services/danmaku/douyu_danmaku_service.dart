@@ -164,13 +164,13 @@ class DouyuDnamakuService {
                 name: nickname, msg: content, uid: uid, ext: ext, color: color);
           }
         } catch (e) {
-          Logger.error('斗鱼弹幕解析异常: $e');
+          MyLogger.error('斗鱼弹幕解析异常: $e');
           decodedMsgLen = totalLength; //ignore this message data
         }
       }
       return danmaku;
     } catch (e) {
-      Logger.error('斗鱼弹幕解析ERROR: $e');
+      MyLogger.error('斗鱼弹幕解析ERROR: $e');
     }
   }
 

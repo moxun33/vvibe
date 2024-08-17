@@ -1,6 +1,6 @@
 //hack.chat 连接
 import 'dart:convert';
-import 'package:vvibe/utils/logger.dart';
+import 'package:vvibe/utils/Logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class Hackchat {
@@ -22,7 +22,7 @@ class Hackchat {
   String? _sessionId;
   //初始化
   init() {
-    Logger.info('开始连接hackchat');
+    MyLogger.info('开始连接hackchat');
     _ws = IOWebSocketChannel.connect('wss://hack.chat/chat-ws',
         connectTimeout: const Duration(seconds: 30),
         headers: {
@@ -30,7 +30,7 @@ class Hackchat {
           'User-Agent':
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
         });
-    Logger.info('连接hackchat成功');
+    MyLogger.info('连接hackchat成功');
     startSession();
     _setListener();
   }
@@ -55,7 +55,7 @@ class Hackchat {
 
       _ws!.sink.add(jsonEncode(data));
     } catch (e) {
-      Logger.error('hackchat sending error:' + e.toString());
+      MyLogger.error('hackchat sending error:' + e.toString());
     }
   }
 
@@ -78,7 +78,7 @@ class Hackchat {
     _ws!.stream.listen(
       _onReceive,
       onDone: () {
-        Logger.warn('hackchat连接关闭');
+        MyLogger.warn('hackchat连接关闭');
         close();
 
         if (onClose != null) {
@@ -86,7 +86,7 @@ class Hackchat {
         }
       },
       onError: (error) {
-        Logger.error('hackchat发生错误 $error');
+        MyLogger.error('hackchat发生错误 $error');
         if (onError != null) {
           onError!();
         }
@@ -122,7 +122,7 @@ class Hackchat {
     if (msgData != null) {
       msgData!(obj);
     }
-    //Logger.info("收到hackchat数据:" + msg);
+    //MyLogger.info("收到hackchat数据:" + msg);
   }
 
   _onChatReceive(Map<String, dynamic> data) {
@@ -150,6 +150,6 @@ class Hackchat {
   _onWarn(Map<String, dynamic> data) {
     final text = data['text'];
     if (text == null) return;
-    Logger.warn('hackchat $text');
+    MyLogger.warn('hackchat $text');
   }
 }
