@@ -154,11 +154,13 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                       height: isExpanded ? 70 : 20,
                     );
                   },
-                  body: PlUrlListView(
-                      playerSetting: playerSettings,
-                      data: urlList,
-                      onUrlTap: widget.onUrlTap,
-                      forceRefreshPlaylist: widget.forceRefreshPlaylist),
+                  body: expandKey == key
+                      ? PlUrlListView(
+                          playerSetting: playerSettings,
+                          data: urlList,
+                          onUrlTap: widget.onUrlTap,
+                          forceRefreshPlaylist: widget.forceRefreshPlaylist)
+                      : SizedBox(height: 0, width: 0),
                   isExpanded: expandKey == key // expanded[key] ?? false,
                   );
             }).toList()));
