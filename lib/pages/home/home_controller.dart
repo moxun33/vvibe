@@ -38,7 +38,8 @@ class HomeController extends GetxController with WindowListener {
   PlayListItem? playingUrl;
 
   bool danmakuManualShow = true;
-  List<String> msgs = []; //左上角的文字提示列表
+  String tip = ''; //左上角的单个文字提示，如成功、失败
+  List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   Map<String, String> extraMetaInfo = {}; //额外的元数据
   Hackchat? hc;
   @override
@@ -188,7 +189,7 @@ class HomeController extends GetxController with WindowListener {
 
         return;
       }
-      msgs = ['正在打开${item.name ?? ''}'];
+      tip = '正在打开${item.name ?? ''}';
       update();
       final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
 
@@ -208,7 +209,7 @@ class HomeController extends GetxController with WindowListener {
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         debugPrint("============接收到media status改变 $status");
         if (status.toString() == 'MediaStatus(+invalid)') {
-          msgs = ['${item.name}播放失败'];
+          tip = '${item.name}播放失败';
           stopPlayer();
           update();
         }
@@ -221,7 +222,7 @@ class HomeController extends GetxController with WindowListener {
         extraMetaInfo[e.category] = e.detail;
         switch (e.category) {
           case 'reader.buffering':
-            msgs = value < 100 ? ['缓冲 $value%'] : [];
+            tip = value < 100 ? '缓冲 $value%' : '';
 
             break;
           case 'render.video':

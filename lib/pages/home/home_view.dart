@@ -25,7 +25,7 @@ class HomePage extends GetView<HomeController> {
   HomePage({Key? key}) : super(key: key);
   // 信息展示
   Widget OsdMsg() {
-    final msgs = controller.msgs;
+    final msgs = [controller.tip] + controller.msgs;
     return Container(
         padding: const EdgeInsets.all(10),
         width: controller.getDanmakuSize().width,
@@ -36,7 +36,10 @@ class HomePage extends GetView<HomeController> {
             children: msgs.map((txt) {
               return Text(
                 txt,
-                style: TextStyle(color: Colors.amber[600], fontSize: 20),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    overflow: TextOverflow.ellipsis),
               );
             }).toList()));
   }
