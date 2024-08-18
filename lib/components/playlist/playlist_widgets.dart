@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
 
@@ -501,7 +502,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                             ? FontWeight.bold
                             : FontWeight.normal,
                         color: e.url == widget.selectedItem?.url
-                            ? Colors.purple
+                            ? AppColors.primaryColor
                             : Colors.white,
                       ),
                     ),
