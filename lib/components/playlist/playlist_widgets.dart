@@ -489,8 +489,10 @@ class _PlUrlTileState extends State<PlUrlTile>
                               child: CachedNetworkImage(
                                 imageUrl: widget.url.tvgLogo!,
                                 errorWidget: (context, url, error) => Icon(
-                                    Icons.movie_creation_outlined,
-                                    size: 14),
+                                  Icons.movie_creation_outlined,
+                                  size: 14,
+                                  color: Colors.grey[500],
+                                ),
                               ),
                             )
                           : SizedBox(

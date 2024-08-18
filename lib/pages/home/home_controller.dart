@@ -30,7 +30,6 @@ import 'package:window_manager/window_manager.dart';
 class HomeController extends GetxController with WindowListener {
   late final player = Player();
 
-  int? textureId; //fvp播放时的渲染id
   bool playListShowed = false;
   int playerId = 0;
 
@@ -189,7 +188,7 @@ class HomeController extends GetxController with WindowListener {
 
         return;
       }
-      tip = '正在打开${item.name ?? ''}';
+      tip = '正在打开 ${item.name ?? ''}';
       update();
       final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
 
@@ -209,7 +208,7 @@ class HomeController extends GetxController with WindowListener {
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         debugPrint("============接收到media status改变 $status");
         if (status.toString() == 'MediaStatus(+invalid)') {
-          tip = '${item.name}播放失败';
+          tip = '${item.name} 播放失败';
           stopPlayer();
           update();
         }
@@ -251,8 +250,8 @@ class HomeController extends GetxController with WindowListener {
   Future<int> stopPlayer() async {
     debugPrint('close player');
     player.state = PlaybackState.stopped;
+
     EasyLoading.dismiss();
-    textureId = null;
     playingUrl = null;
     stopDanmakuSocket();
     barrageWallController.disable();

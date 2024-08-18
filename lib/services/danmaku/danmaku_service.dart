@@ -60,10 +60,12 @@ class DanmakuService {
 
 //断开所有弹幕连接
   void stop() {
-    _dy?.dispose();
+    try {
+      _dy?.dispose();
 
-    _bl?.displose();
+      _bl?.displose();
 
-    _hy?.displose();
+      _hy?.displose();
+    } catch (e) {}
   }
 }
