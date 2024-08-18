@@ -256,16 +256,17 @@ class HomeController extends GetxController with WindowListener {
     playingUrl = null;
     stopDanmakuSocket();
     barrageWallController.disable();
-    update();
+
     VWindow().setWindowTitle('vvibe');
     //player.dispose();
+    update();
     return 1;
   }
 
   //播放url改变
   void onPlayUrlChange(PlayListItem item) async {
     if (item.url == null) return;
-    // await stopPlayer();
+    stopPlayer();
 
     final _item = await PlaylistUtil().parseSingleUrlAsync(item.url!);
     item.ext = _item.ext ?? {};
@@ -279,6 +280,7 @@ class HomeController extends GetxController with WindowListener {
         '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
     final title = '${item.name} [${ratio}]';
     VWindow().setWindowTitle(title, item.tvgLogo);
+    update();
   }
 
 // 显隐媒体元数据

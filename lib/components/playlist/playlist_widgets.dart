@@ -6,6 +6,7 @@
  */
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -212,13 +213,18 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     });
   }
 
+  double get maxHeight {
+    return getDeviceHeight(context) - 50;
+  }
+
   Widget _buildList() {
     if (widget.data.length != 0) {
+      final h = widget.data.length * 20.0;
       return ListView.builder(
           shrinkWrap: false,
           itemCount: widget.data.length,
           itemExtent: 20.0,
-          cacheExtent: widget.data.length * 20.0,
+          cacheExtent: h > maxHeight ? maxHeight : h,
           itemBuilder: (context, index) {
             final e = widget.data[index];
             return PlUrlTile(
@@ -238,8 +244,9 @@ class _PlUrlListViewState extends State<PlUrlListView> {
 
   @override
   Widget build(BuildContext context) {
+    final h = widget.data.length * 20.0 + 2;
     return Container(
-        height: widget.data.length * 20.0 + 2,
+        height: h > maxHeight ? maxHeight : h,
         color: Colors.white10,
         child: _buildList());
   }

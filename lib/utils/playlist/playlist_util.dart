@@ -192,10 +192,12 @@ class PlaylistUtil {
 
   //根据单个打开的url解析 异步
   Future<PlayListItem> parseSingleUrlAsync(String url, {String? name}) async {
-    final _info = parseUrlExtInfos(url), ext = _info['ext'] ?? {};
-    if (ext['platformHit'] == true) {
+    final _info = await compute(parseUrlExtInfos, url),
+        ext = _info['ext'] ?? {};
+    /* if (ext['platformHit'] == true) {
       ext['playUrl'] = await parseProxyTargetUrl(url);
-    }
+    } */
+    ext['playUrl'] = url;
     final PlayListItem item = PlayListItem.fromJson({
       'url': url,
       'name': name ?? 'vvibe',

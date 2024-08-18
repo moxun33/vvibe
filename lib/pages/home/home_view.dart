@@ -15,8 +15,6 @@ import 'package:vvibe/components/player/fvp_videoframe.dart';
 
 import 'package:vvibe/pages/home/home_controller.dart';
 import 'package:get/get.dart';
-//import 'package:dart_vlc/dart_vlc.dart';
-//import 'package:vvibe/components/player/vlc_videoframe.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
 
 import 'package:vvibe/components/player/player_context_menu.dart';
