@@ -99,8 +99,8 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
       menuItems: [
         MenuItem(title: '打开链接'),
         MenuItem(title: '播放列表'),
-        MenuItem(title: '扫描直播源'),
-        MenuItem(title: '检测直播源'),
+        /*   MenuItem(title: '扫描直播源'),
+        MenuItem(title: '检测直播源'), */
         MenuItem(title: '应用设置'),
         MenuItem(title: '关于应用'),
       ],

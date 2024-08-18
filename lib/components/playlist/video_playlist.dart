@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:native_context_menu/native_context_menu.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
@@ -171,7 +172,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
               ? Icons.insert_link_outlined
               : Icons.file_present_outlined,
           size: 12,
-          color: Colors.purple,
+          color: AppColors.primaryColor,
         ),
       ),
       SizedBox(
@@ -180,9 +181,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
           v['name'],
           //overflow: TextOverflow.ellipsis,
           maxLines: 1, overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.purple,
+            color: AppColors.primaryColor,
           ),
         ),
       )
@@ -196,7 +197,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
         Container(
             height: 30,
             width: PLAYLIST_BAR_WIDTH,
-            padding: const EdgeInsets.fromLTRB(5, 2, 5, 0),
+            padding: const EdgeInsets.fromLTRB(5, 1, 5, 0),
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
@@ -204,8 +205,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
-                hint:
-                    Text('选择播放列表', style: TextStyle(color: Colors.purple[100])),
+                hint: Text('选择播放列表',
+                    style: TextStyle(color: AppColors.primaryBackground)),
                 value: selectedFilename,
                 iconStyleData:
                     IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),

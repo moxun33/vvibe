@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-17 14:56:34
+ * @LastEditTime: 2024-08-18 13:07:35
  * @FilePath: \vvibe\lib\main.dart
  * @Description: 
  * @qmj
@@ -29,18 +29,18 @@ void main(List<String> args) async {
         ? const {}
         : jsonDecode(args[2]) as Map<String, dynamic>;
     print(argument);
-    VWindow().initWindow();
     Global.init(shouldSetSize: false).then((theme) {
       runApp(LiveSniffWin(
         theme: theme ?? ThemeData(),
         windowController: WindowController.fromWindowId(windowId),
         args: argument,
       ));
+      VWindow().initWindow();
     });
   } else {
     Global.init().then((theme) {
-      VWindow().initWindow();
       runApp(MyApp(theme: theme ?? ThemeData()));
+      VWindow().initWindow();
     });
   }
 }

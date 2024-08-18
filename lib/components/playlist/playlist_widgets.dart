@@ -108,7 +108,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
         keyList = groups.keys.toList();
     return SingleChildScrollView(
         child: ExpansionPanelList(
-            expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+            expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             expansionCallback: (i, expanded) =>
                 toggleExpand(i, expanded, keyList[i]),
             children: keyList.map<ExpansionPanel>((String key) {
@@ -116,10 +116,13 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
               return ExpansionPanel(
                   canTapOnHeader: true,
                   backgroundColor: Colors.white10,
-                  highlightColor: Colors.white10,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
                       child: ListTile(
+                        dense: false,
+                        hoverColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
                         title: Tooltip(
                           child: Text(
                             key,
@@ -146,21 +149,16 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                                 }),
                               )
                             : SizedBox(height: 0, width: 0),
-                        textColor: isExpanded ? Colors.white70 : Colors.white,
+                        textColor: Colors.white,
                       ),
                       height: isExpanded ? 70 : 20,
                     );
                   },
-                  body: expandKey == key
-                      ? PlUrlListView(
-                          playerSetting: playerSettings,
-                          data: urlList,
-                          onUrlTap: widget.onUrlTap,
-                          forceRefreshPlaylist: widget.forceRefreshPlaylist)
-                      : SizedBox(
-                          height: 0,
-                          width: 0,
-                        ),
+                  body: PlUrlListView(
+                      playerSetting: playerSettings,
+                      data: urlList,
+                      onUrlTap: widget.onUrlTap,
+                      forceRefreshPlaylist: widget.forceRefreshPlaylist),
                   isExpanded: expandKey == key // expanded[key] ?? false,
                   );
             }).toList()));
@@ -214,10 +212,10 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   Widget _buildList() {
     if (widget.data.length != 0) {
       return ListView.builder(
-          shrinkWrap: true,
+          shrinkWrap: false,
           itemCount: widget.data.length,
           itemExtent: 20.0,
-          cacheExtent: getDeviceHeight(context) - 50.0,
+          cacheExtent: widget.data.length * 20.0,
           itemBuilder: (context, index) {
             final e = widget.data[index];
             return PlUrlTile(
@@ -238,7 +236,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: getDeviceHeight(context) - 50,
+        height: widget.data.length * 20.0 + 2,
         color: Colors.white10,
         child: _buildList());
   }
@@ -477,9 +475,13 @@ class _PlUrlTileState extends State<PlUrlTile>
                       ? _getIcon(urlStatus)
                       : widget.url.tvgLogo != null
                           ? SizedBox(
-                              width: 14,
+                              width: 16,
                               child: CachedNetworkImage(
-                                  imageUrl: widget.url.tvgLogo!),
+                                imageUrl: widget.url.tvgLogo!,
+                                errorWidget: (context, url, error) => Icon(
+                                    Icons.movie_creation_outlined,
+                                    size: 14),
+                              ),
                             )
                           : SizedBox(
                               width: 0,

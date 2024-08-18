@@ -54,6 +54,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+          flutter-version: pubspec.yaml
           cache: true
 
       - name: Build

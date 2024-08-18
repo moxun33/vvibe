@@ -7,7 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/pages/login/login_model.dart';
-//import 'package:vvibe/theme.dart';
+import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -74,7 +74,7 @@ class Global {
       );
     if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
 
-    return null; //genTheme();
+    return genTheme();
   }
 
   // 持久化 用户信息

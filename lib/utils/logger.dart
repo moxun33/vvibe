@@ -23,8 +23,8 @@ class MyLogger {
   }
 
   init() async {
-    final dir = await _createDir();
-    /*  await initLogger(
+    /* final dir = await _createDir();
+      await initLogger(
       dir.path,
     ); */
   }

@@ -45,102 +45,97 @@ class HomePage extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GetBuilder<HomeController>(builder: (_) {
-        return GestureDetector(
-            onDoubleTap: () => controller.togglePlayList(),
-            child: Stack(
-              children: [
-                Container(
-                    child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        child: BarrageWall(
-                            debug: false, //!Global.isRelease,
-                            safeBottomHeight: Get.height ~/
-                                4 *
-                                3, // do not send bullets to the safe area
-                            speed: 10,
-                            massiveMode: true,
-                            speedCorrectionInMilliseconds: 10000,
-                            bullets: [],
-                            child: ValueListenableBuilder<int?>(
-                              valueListenable: controller.player.textureId,
-                              builder: (context, id, _) => id == null
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        controller.togglePlayList();
-                                      },
-                                      child: Container(
-                                        color: Colors.black,
-                                        child: Center(
-                                          child: Wrap(
-                                            direction: Axis.vertical,
-                                            crossAxisAlignment:
-                                                WrapCrossAlignment.center,
-                                            spacing: 50,
-                                            children: [
-                                              SizedBox(
-                                                  width: 200,
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: controller
-                                                            .playingUrl
-                                                            ?.tvgLogo ??
-                                                        '',
-                                                    errorWidget: (context, url,
-                                                            error) =>
+        return Stack(
+          children: [
+            Container(
+                child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 4,
+                  child: Container(
+                    child: BarrageWall(
+                        debug: false, //!Global.isRelease,
+                        safeBottomHeight: Get.height ~/
+                            4 *
+                            3, // do not send bullets to the safe area
+                        speed: 10,
+                        massiveMode: true,
+                        speedCorrectionInMilliseconds: 10000,
+                        bullets: [],
+                        child: ValueListenableBuilder<int?>(
+                          valueListenable: controller.player.textureId,
+                          builder: (context, id, _) => id == null
+                              ? GestureDetector(
+                                  onTap: () {
+                                    controller.togglePlayList();
+                                  },
+                                  child: Container(
+                                    color: Colors.black,
+                                    child: Center(
+                                      child: Wrap(
+                                        direction: Axis.vertical,
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        spacing: 50,
+                                        children: [
+                                          SizedBox(
+                                              width: 200,
+                                              child: CachedNetworkImage(
+                                                imageUrl: controller
+                                                        .playingUrl?.tvgLogo ??
+                                                    '',
+                                                errorWidget:
+                                                    (context, url, error) =>
                                                         Image.asset(
                                                             'assets/logo.png'),
-                                                  ))
-                                            ],
-                                          ),
-                                        ),
+                                              ))
+                                        ],
                                       ),
-                                    )
-                                  : Container(
-                                      color: Colors.black,
-                                      child: FvpVideoFrame(
-                                        toggleMediaInfo:
-                                            controller.toggleMediaInfo,
-                                        toggleDanmaku:
-                                            controller.toggleDanmakuVisible,
-                                        toggleEpgDialog:
-                                            controller.toggleEpgDialog,
-                                        playingUrl: controller.playingUrl,
-                                        videoWidget: Center(
-                                            child: AspectRatio(
-                                          aspectRatio: 16 / 9,
-                                          child: Texture(
-                                            textureId: id,
-                                            filterQuality: FilterQuality.high,
-                                          ),
-                                        )),
-                                        fvp: controller.player,
-                                        togglePlayList:
-                                            controller.togglePlayList,
-                                        stopPlayer: controller.stopPlayer,
-                                        sendDanmaku: controller.sendDanmaku,
-                                      )),
-                            ),
-                            controller: controller.barrageWallController),
-                      ),
-                    ),
-                    Container(
-                        width:
-                            controller.playListShowed ? PLAYLIST_BAR_WIDTH : 0,
-                        child: VideoPlaylist(
-                          visible: controller.playListShowed,
-                          onUrlTap: controller.onPlayUrlChange,
-                        )),
-                  ],
-                )),
-                PlayerContextMenu(
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  color: Colors.black,
+                                  child: FvpVideoFrame(
+                                    toggleMediaInfo: controller.toggleMediaInfo,
+                                    toggleDanmaku:
+                                        controller.toggleDanmakuVisible,
+                                    toggleEpgDialog: controller.toggleEpgDialog,
+                                    playingUrl: controller.playingUrl,
+                                    videoWidget: Center(
+                                        child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: Texture(
+                                        textureId: id,
+                                        filterQuality: FilterQuality.high,
+                                      ),
+                                    )),
+                                    fvp: controller.player,
+                                    togglePlayList: controller.togglePlayList,
+                                    stopPlayer: controller.stopPlayer,
+                                    sendDanmaku: controller.sendDanmaku,
+                                  )),
+                        ),
+                        controller: controller.barrageWallController),
+                  ),
+                ),
+                Container(
+                    width: controller.playListShowed ? PLAYLIST_BAR_WIDTH : 0,
+                    child: VideoPlaylist(
+                      visible: controller.playListShowed,
+                      onUrlTap: controller.onPlayUrlChange,
+                    )),
+              ],
+            )),
+            GestureDetector(
+                onDoubleTap: () => controller.togglePlayList(),
+                child: PlayerContextMenu(
                     onOpenUrl: controller.onOpenOneUrl,
                     showPlaylist: controller.togglePlayList,
                     playListShowed: controller.playListShowed,
-                    child: OsdMsg()),
-              ],
-            ));
+                    child: OsdMsg())),
+          ],
+        );
       }),
     );
   }

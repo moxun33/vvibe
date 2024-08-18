@@ -1,6 +1,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/color_util.dart';
@@ -15,8 +16,8 @@ class WindowButtons extends StatefulWidget {
 class _WindowButtonsState extends State<WindowButtons> {
   final buttonColors = WindowButtonColors(
       iconNormal: Colors.white,
-      mouseOver: Colors.purple,
-      mouseDown: Colors.purple[400],
+      mouseOver: AppColors.primaryColor,
+      mouseDown: AppColors.primaryColor,
       iconMouseOver: Colors.white,
       iconMouseDown: Colors.white);
 

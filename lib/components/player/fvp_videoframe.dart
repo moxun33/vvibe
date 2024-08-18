@@ -209,21 +209,19 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                           bottom: 8,
                           child: Row(
                             children: [
-                              Expanded(
-                                flex: 1,
-                                child: IconButton(
-                                  color: Colors.white,
-                                  splashRadius: 12,
-                                  iconSize: 28,
-                                  tooltip: isPlaying == true ? '正在播放' : '已暂停',
-                                  icon: Icon(isPlaying == true
-                                      ? Icons.pause
-                                      : Icons.play_arrow),
-                                  onPressed: () {
-                                    playOrPuase();
-                                  },
-                                ),
+                              IconButton(
+                                color: Colors.white,
+                                splashRadius: 12,
+                                iconSize: 28,
+                                tooltip: isPlaying == true ? '正在播放' : '已暂停',
+                                icon: Icon(isPlaying == true
+                                    ? Icons.pause
+                                    : Icons.play_arrow),
+                                onPressed: () {
+                                  playOrPuase();
+                                },
                               ),
+
                               /* IconButton(
                                 tooltip: '重新加载',
                                 color: Colors.white,

@@ -2,7 +2,7 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-17 13:49:41
+ * @LastEditTime: 2024-08-18 13:17:13
  * @FilePath: \vvibe\lib\pages\home\home_controller.dart
  * @Description: 
  * @qmj
@@ -322,7 +322,6 @@ class HomeController extends GetxController with WindowListener {
   void onOpenOneUrl(String url) async {
     debugPrint('打开链接 $url');
     if (url.isEmpty) return;
-    await stopPlayer();
     final item = await PlaylistUtil().parseSingleUrlAsync(url);
     startPlay(item);
   }
