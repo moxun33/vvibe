@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:vvibe/models/huya_room_profile.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/utils/dart_tars_protocol/tarscodec.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:web_socket_channel/io.dart';
 
 class HuyaDanmakuService {
@@ -24,14 +25,14 @@ class HuyaDanmakuService {
   int totleTime = 0;
 
   void connect() async {
-    debugPrint("虎牙登录弹幕");
+    MyLogger.info("虎牙登录弹幕");
 
     _channel = IOWebSocketChannel.connect("wss://cdnws.api.huya.com");
 
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       heartBeat();
-      debugPrint("huya时间: $totleTime s");
+      MyLogger.info("huya时间: $totleTime s");
     });
     await login();
     setListener();
@@ -59,8 +60,9 @@ class HuyaDanmakuService {
         .get(
       'https://m.huya.com/$roomId',
     )
+        // ignore: body_might_complete_normally_catch_error
         .catchError((e) {
-      debugPrint(e);
+      MyLogger.info(e);
     });
     String value = resp.data;
     var dataLive = parse(value);
@@ -78,7 +80,7 @@ class HuyaDanmakuService {
       if (danmakuId == null) return null;
       Uint8List regData = regDataEncode(danmakuId);
       _channel?.sink.add(regData);
-      debugPrint("虎牙login");
+      MyLogger.info("虎牙login");
       Uint8List heartbeat = huyaWsHeartbeat();
       //print("heartbeat");
       _channel?.sink.add(heartbeat);
@@ -95,7 +97,7 @@ class HuyaDanmakuService {
     String message = danmaku[1];
     //TODO: 屏蔽词功能
     if (message != '') {
-      debugPrint('虎牙弹幕 --> $nickname: $message');
+      MyLogger.info('虎牙弹幕 --> $nickname: $message');
       // addDanmaku(LiveDanmakuItem(nickname, message));
       onDanmaku(LiveDanmakuItem(name: nickname, msg: message, uid: ''));
     }
@@ -105,6 +107,6 @@ class HuyaDanmakuService {
     timer?.cancel();
     _channel?.sink.close();
     _channel = null;
-    debugPrint('关闭虎牙ws');
+    MyLogger.info('关闭虎牙ws');
   }
 }

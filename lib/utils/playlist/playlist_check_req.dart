@@ -6,6 +6,7 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vvibe/utils/logger.dart';
 
 class LimitedConnectionAdapter implements HttpClientAdapter {
   final int maxConnections;
@@ -86,7 +87,7 @@ class PlaylistCheckReq {
       final uri = Uri.parse(url);
       final pingRes =
           await Ping(uri.host, count: 1, forceCodepage: true).stream.first;
-      debugPrint('pingRes ${uri.host} $pingRes');
+      MyLogger.info('pingRes ${uri.host} $pingRes');
       if (pingRes.response?.ip == null) {
         res['status'] = 500;
       }
@@ -108,10 +109,10 @@ class PlaylistCheckReq {
       return resp.statusCode ?? 500;
     } on DioException catch (e) {
       final status = e.response?.statusCode ?? 422;
-      debugPrint(e.toString() + url);
+      MyLogger.info(e.toString() + url);
       return status;
     } catch (e) {
-      debugPrint(e.toString());
+      MyLogger.info(e.toString());
       return 500;
     }
   }
@@ -132,11 +133,12 @@ class PlaylistCheckReq {
         // 如果超过，则取消请求
         if (receivedBytes > 1) {
           cancelToken.cancel('canceled');
-          // debugPrint(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
+          // MyLogger.info(url + ' 检测完成，请求已取消: ' +'字节数为 '+ receivedBytes.toString());
           break;
         }
       }
-      debugPrint(url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}');
+      MyLogger.info(
+          url + ' 检测完成 接收字节数为 $receivedBytes  状态码：${resp.statusCode}');
 
       return receivedBytes > 0 ? 200 : resp.statusCode ?? 500;
     } on DioException catch (e) {
@@ -158,7 +160,7 @@ class PlaylistCheckReq {
         default:
           break;
       }
-      debugPrint('检查 可访问性出错：  $num  $msg ${e.type}  $url ');
+      MyLogger.error('检查 可访问性出错：  $num  $msg ${e.type}  $url ');
       if (msg.indexOf('拒绝网络连接') > -1) {
         num = 500;
       }
@@ -169,10 +171,10 @@ class PlaylistCheckReq {
       return num;
     } on SocketException catch (e) {
       // 网络连接错误
-      debugPrint('网络连接错误: ${e.message}');
+      MyLogger.error('网络连接错误: ${e.message}');
       return 500;
     } catch (e) {
-      debugPrint('检查异常：$e   $url ');
+      MyLogger.error('检查异常：$e   $url ');
       return 500;
     }
   }

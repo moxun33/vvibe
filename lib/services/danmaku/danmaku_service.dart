@@ -4,7 +4,6 @@ import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/services/services.dart';
 import 'package:vvibe/utils/logger.dart';
-import 'package:flutter/foundation.dart';
 
 class DanmakuService {
   static DanmakuService _instance = new DanmakuService._();
@@ -35,7 +34,7 @@ class DanmakuService {
 
       if (!(item.tvgId != null && item.tvgId!.isNotEmpty)) return;
       final String rid = item.tvgId!;
-      debugPrint('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
+      MyLogger.info('即将登录弹幕 ${item.group} ${item.name} ${item.tvgId}');
       final ext = item.ext ?? {};
       if (canConnDanmaku(
               item, DanmakuType.douyuGroupReg, DanmakuType.douyuProxyUrlReg) ||

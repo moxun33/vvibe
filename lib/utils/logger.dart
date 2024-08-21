@@ -6,7 +6,7 @@ class MyLogger {
   factory MyLogger() => _instance;
 
   MyLogger._();
-  static final log = Logger('MyLogger');
+  static final log = Logger('VVibe');
 
   String _date() {
     final now = DateTime.now();

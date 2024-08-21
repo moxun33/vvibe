@@ -23,12 +23,16 @@ import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/live_sniff_win.dart';
 
 void main(List<String> args) async {
-  if (args.firstOrNull == 'multi_window') {
+  Global.init().then((theme) {
+    runApp(MyApp(theme: theme ?? ThemeData()));
+    VWindow().initWindow();
+  });
+  /* if (args.firstOrNull == 'multi_window') {
     final windowId = int.parse(args[1]);
     final argument = args[2].isEmpty
         ? const {}
         : jsonDecode(args[2]) as Map<String, dynamic>;
-    print(argument);
+    MyLogger.info('multi window argument $argument');
     Global.init(shouldSetSize: false).then((theme) {
       runApp(LiveSniffWin(
         theme: theme ?? ThemeData(),
@@ -42,7 +46,7 @@ void main(List<String> args) async {
       runApp(MyApp(theme: theme ?? ThemeData()));
       VWindow().initWindow();
     });
-  }
+  } */
 }
 
 class MyApp extends StatelessWidget {

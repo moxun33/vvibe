@@ -19,6 +19,7 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
 
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
 
 //播放列表的分组折叠面板
@@ -95,7 +96,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   @override
   void didUpdateWidget(covariant PlGroupPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // debugPrint('PlGroupPanel didUpdateWidget ${widget.data.length}');
+    // MyLogger.info('PlGroupPanel didUpdateWidget ${widget.data.length}');
 
     setState(() {
       playlist = searchKey.isNotEmpty
@@ -335,7 +336,7 @@ class _PlUrlTileState extends State<PlUrlTile>
 
     final res = await PlaylistUtil().checkUrlAccessible(url.url!, _cancelToken);
 
-    debugPrint(
+    MyLogger.info(
         '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应 $res');
     if (mounted) {
       setState(() {

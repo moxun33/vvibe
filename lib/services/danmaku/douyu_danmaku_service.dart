@@ -53,13 +53,13 @@ class DouyuDnamakuService {
           onDanmaku(danmaku);
         }
       } catch (e) {
-        debugPrint(e.toString());
+        MyLogger.info(e.toString());
       }
     });
   }
 
   void login() {
-    debugPrint("斗鱼 登录弹幕");
+    MyLogger.info("斗鱼 登录弹幕");
     String roomID = roomId.toString();
     String login =
         "type@=loginreq/room_id@=$roomID/dfl@=sn@A=105@Sss@A=1/username@=61609154/uid@=61609154/ver@=20190610/aver@=218101901/ct@=0/";
@@ -148,7 +148,7 @@ class DouyuDnamakuService {
 
           if (byteDatas.startsWith("type@=chatmsg")) {
             final msgMap = parseMsg(byteDatas);
-            //debugPrint(msgMap.toString());
+            //MyLogger.info(msgMap.toString());
             final nickname = msgMap['nn'] ?? '';
             final uid = msgMap['uid'] ?? '';
             final content = msgMap['txt'] ?? '';
@@ -157,7 +157,7 @@ class DouyuDnamakuService {
             final Map<String, dynamic> ext = {
               'avatar': "https://apic.douyucdn.cn/upload/${ic}_big.jpg"
             };
-            debugPrint(
+            MyLogger.info(
                 '斗鱼弹幕-->$uid $nickname: $content  $color ${msgMap['col']}');
             //  print(msgMap);
             danmaku = LiveDanmakuItem(

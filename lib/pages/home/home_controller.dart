@@ -60,9 +60,19 @@ class HomeController extends GetxController with WindowListener {
 
   void playerConfig() async {
     player.setProperty('http_persistent', '0');
-    /*   player.setDecoders(MediaType.video,
-        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]); */
-    player.setProperty('video.avfilter', 'yadif');
+    /* player.setDecoders(MediaType.video, [
+      "MFT:d3d=11:copy=1",
+      "hap",
+      "D3D11",
+      "DXVA",
+      "CUDA",
+      "FFmpeg",
+      "dav1d"
+    ]); */
+    player.setProperty('video.reconnect', '1');
+    player.setProperty('video.reconnect_delay_max', '7');
+    player.setProperty('demux.buffer.range', '7');
+    player.setProperty('buffer', '2000+600000');
   }
 
 //hack chat init
@@ -179,8 +189,9 @@ class HomeController extends GetxController with WindowListener {
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
-      player.state = PlaybackState.stopped;
-      debugPrint('start play ${item.toJson()}');
+      if (player.state == PlaybackState.playing)
+        player.state = PlaybackState.stopped;
+      MyLogger.info('start play ${item.toJson()}');
 
       final url = item.ext?['playUrl'] ?? item.url;
       if (!(url != null && url!.isNotEmpty)) {
@@ -196,6 +207,7 @@ class HomeController extends GetxController with WindowListener {
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
+      playerConfig();
       if (!playback) {
         playingUrl = item;
         update();
@@ -203,19 +215,32 @@ class HomeController extends GetxController with WindowListener {
       }
 
       player.onStateChanged((PlaybackState oldState, PlaybackState state) {
-        debugPrint("-------------------接收到state改变 $state");
+        MyLogger.info("-------------------接收到state改变 $state");
       });
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
-        debugPrint("============接收到media status改变 $status");
-        if (status.toString() == 'MediaStatus(+invalid)') {
-          tip = '${item.name} 播放失败';
-          stopPlayer();
-          update();
+        final s = status.toString();
+        MyLogger.info("============接收到media status改变 $status");
+        switch (s) {
+          case 'MediaStatus(+invalid)':
+            tip = '${item.name} 播放失败';
+            stopPlayer();
+            update();
+            break;
+          case 'MediaStatus(+buffering)':
+            break;
+          case 'MediaStatus(+loaded)':
+            break;
+          case 'MediaStatus(+playing)':
+            player.updateTexture();
+            break;
+          case 'MediaStatus(+paused)':
+            break;
         }
+
         return false;
       });
       player.onEvent((MediaEvent e) {
-        print(
+        MyLogger.info(
             "!!!接收到event改变 ${e.category} ,detail: ${e.detail} ，error: ${e.error}");
         final value = e.error.toInt();
         extraMetaInfo[e.category] = e.detail;
@@ -228,6 +253,7 @@ class HomeController extends GetxController with WindowListener {
             if (value > 0) {
               startDanmakuSocket(item);
               updateWindowTitle(item);
+              player.updateTexture();
             }
             break;
           default:
@@ -236,10 +262,10 @@ class HomeController extends GetxController with WindowListener {
         update();
       });
       /*   player.onRenderCallback((msg) {
-        // debugPrint('======render cb log $msg');
+        // MyLogger.info('======render cb log $msg');
       });
       player.setLogHandler((msg) async {
-        debugPrint('【log】 $msg');
+        MyLogger.info('【log】 $msg');
       }); */
     } catch (e) {
       MyLogger.error('[error logs] ${e.toString()}');
@@ -248,11 +274,14 @@ class HomeController extends GetxController with WindowListener {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
-    debugPrint('close player');
+    if (player.state == PlaybackState.stopped) {
+      return 0;
+    }
+    MyLogger.info('set playback to stopped');
     player.state = PlaybackState.stopped;
-
+    player.updateTexture();
     EasyLoading.dismiss();
-    playingUrl = null;
+//    playingUrl = null;
     stopDanmakuSocket();
     barrageWallController.disable();
 
@@ -274,7 +303,7 @@ class HomeController extends GetxController with WindowListener {
 
   void updateWindowTitle(PlayListItem item) {
     final info = player.mediaInfo;
-    debugPrint(info.toString());
+    MyLogger.info(info.toString());
     final ratio =
         '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
     final title = '${item.name} [${ratio}]';
@@ -302,7 +331,7 @@ class HomeController extends GetxController with WindowListener {
       ];
       msgs = _msgs;
 
-      print(info.toString());
+      MyLogger.info(info.toString());
     } else {
       msgs = [];
     }
@@ -322,7 +351,7 @@ class HomeController extends GetxController with WindowListener {
 
 //打开单个播放url
   void onOpenOneUrl(String url) async {
-    debugPrint('打开链接 $url');
+    MyLogger.info('打开链接 $url');
     if (url.isEmpty) return;
     final item = await PlaylistUtil().parseSingleUrlAsync(url);
     startPlay(item);

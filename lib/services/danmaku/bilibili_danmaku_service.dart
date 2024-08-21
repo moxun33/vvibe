@@ -25,11 +25,11 @@ class BilibiliDanmakuService {
 
   //开始连接
   void connect() {
-    debugPrint('b站登录弹幕');
+    MyLogger.info('b站登录弹幕');
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       //sendXinTiaoBao();
-      debugPrint("bilibili时间: $totleTime s");
+      MyLogger.info("bilibili时间: $totleTime s");
       // _channel!.sink.close();
       // initLive();
       sendHeartBeat();
@@ -61,7 +61,7 @@ class BilibiliDanmakuService {
         "\"type\":2,"
         "\"key\":\""
         "\"}";
-    debugPrint('B站login');
+    MyLogger.info('B站login');
     _channel?.sink.add(encode(7, msg: msg));
     sendHeartBeat();
   }
@@ -87,7 +87,7 @@ class BilibiliDanmakuService {
 
       switch (op) {
         case 8:
-          debugPrint("B站进入房间");
+          MyLogger.info("B站进入房间");
           break;
         case 5:
           int offset = 0;
@@ -120,7 +120,7 @@ class BilibiliDanmakuService {
                 /*  Color color =
                     ColorUtil.fromDecimal(extMap['color']?.toString()); */
                 // addDanmaku(LiveDanmakuItem(name, msg));
-                debugPrint('B站弹幕--> $uid $name: $msg ');
+                MyLogger.info('B站弹幕--> $uid $name: $msg ');
                 onDanmaku(LiveDanmakuItem(
                   name: name,
                   msg: msg,
@@ -135,7 +135,7 @@ class BilibiliDanmakuService {
           break;
         case 3:
           //int people = readInt(list, headerLen, 4);
-          //debugPrint("B站房间人气: $people");
+          //MyLogger.info("B站房间人气: $people");
           break;
         default:
       }
