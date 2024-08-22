@@ -231,7 +231,6 @@ class HomeController extends GetxController with WindowListener {
           case 'MediaStatus(+loaded)':
             break;
           case 'MediaStatus(+playing)':
-            player.updateTexture();
             break;
           case 'MediaStatus(+paused)':
             break;

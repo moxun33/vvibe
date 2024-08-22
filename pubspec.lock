@@ -365,10 +365,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: "19a605fb32c2ee7a0b594ed51a2dd5fd5e8326bfa287ffd88c3e1ef0289d9afc"
+      sha256: "89f7d6ce1a6e6761a8e07d9d6c17238e57219d8c22248b436ac6f77a79aadc3b"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.23.0"
+    version: "0.24.0"
   get:
     dependency: "direct main"
     description:
