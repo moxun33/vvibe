@@ -25,7 +25,7 @@ import 'package:vvibe/window/live_sniff_win.dart';
 void main(List<String> args) async {
   Global.init().then((theme) {
     runApp(MyApp(theme: theme ?? ThemeData()));
-    //  VWindow().initWindow();
+    VWindow().initWindow();
   });
   /* if (args.firstOrNull == 'multi_window') {
     final windowId = int.parse(args[1]);
