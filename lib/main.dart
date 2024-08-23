@@ -4,7 +4,7 @@
  * @LastEditors: moxun33
  * @LastEditTime: 2024-08-18 13:07:35
  * @FilePath: \vvibe\lib\main.dart
- * @Description: 
+ * @Description:
  * @qmj
  */
 import 'dart:convert';
@@ -25,7 +25,7 @@ import 'package:vvibe/window/live_sniff_win.dart';
 void main(List<String> args) async {
   Global.init().then((theme) {
     runApp(MyApp(theme: theme ?? ThemeData()));
-    VWindow().initWindow();
+    //  VWindow().initWindow();
   });
   /* if (args.firstOrNull == 'multi_window') {
     final windowId = int.parse(args[1]);

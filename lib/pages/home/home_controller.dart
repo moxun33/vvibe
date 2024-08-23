@@ -189,8 +189,8 @@ class HomeController extends GetxController with WindowListener {
 
   void startPlay(PlayListItem item, {bool? first, playback = false}) async {
     try {
-      if (player.state == PlaybackState.playing)
-        player.state = PlaybackState.stopped;
+      player.state = PlaybackState.stopped;
+      player.waitFor(PlaybackState.stopped);
       MyLogger.info('start play ${item.toJson()}');
 
       final url = item.ext?['playUrl'] ?? item.url;
@@ -252,7 +252,6 @@ class HomeController extends GetxController with WindowListener {
             if (value > 0) {
               startDanmakuSocket(item);
               updateWindowTitle(item);
-              player.updateTexture();
             }
             break;
           default:
@@ -283,7 +282,7 @@ class HomeController extends GetxController with WindowListener {
 //    playingUrl = null;
     stopDanmakuSocket();
     barrageWallController.disable();
-
+    player.waitFor(PlaybackState.stopped);
     VWindow().setWindowTitle('vvibe');
     //player.dispose();
     update();

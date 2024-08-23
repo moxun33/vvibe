@@ -9,7 +9,7 @@ class VWindow {
 
   VWindow._();
 //初始化window熟悉
-  void initWindow() {
+  void initWindow() async {
     doWhenWindowReady(() {
       final initialSize = Size(1280, 720 + CUS_WIN_TITLEBAR_HEIGHT);
       appWindow.minSize = initialSize;
