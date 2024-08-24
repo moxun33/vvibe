@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fvp/mdk.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -60,7 +61,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
     /* playPauseController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
       playPauseStream = player?.playbackStream
-        .listen((event) => setPlaybackMode(event.isPlaying)); 
+        .listen((event) => setPlaybackMode(event.isPlaying));
     int state = await _fvp.getState();
     if (FvpPlayState.playing == state) playPauseController.forward(); */
   }
@@ -204,7 +205,7 @@ class _FvpVideoFrameState extends State<FvpVideoFrame>
                         ),
                       ),
                       Positioned(
-                          left: 0,
+                          left: 10,
                           right: 0,
                           bottom: 8,
                           child: Row(

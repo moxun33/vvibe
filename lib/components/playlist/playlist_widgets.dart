@@ -1,12 +1,11 @@
 /*
- * @Author: Moxx 
- * @Date: 2022-09-03 16:32:43 
+ * @Author: Moxx
+ * @Date: 2022-09-03 16:32:43
  * @Last Modified by: Moxx
  * @Last Modified time: 2022-09-10 00:09:36
  */
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:collection/collection.dart';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
-
+import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -488,6 +487,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                           ? SizedBox(
                               width: 16,
                               child: CachedNetworkImage(
+                                fit: BoxFit.contain,
                                 imageUrl: widget.url.tvgLogo!,
                                 errorWidget: (context, url, error) => Icon(
                                   Icons.movie_creation_outlined,
@@ -531,4 +531,48 @@ class _PlUrlTileState extends State<PlUrlTile>
     _cancelToken.cancel("Request cancelled");
     super.dispose();
   }
+}
+
+Widget DanmakuRender(LiveDanmakuItem? data,
+    {double fontSize = 20.0, isHackchat = false}) {
+  return Tooltip(
+      message: data?.name ?? '',
+      child: isHackchat
+          ? BorderText(text: data?.msg ?? '', fontSize: fontSize)
+          : Text(
+              data?.msg ?? '',
+              style: TextStyle(
+                  color: data?.color ?? Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: fontSize),
+            ) /* Row(
+              children: [
+                CachedNetworkImage(
+                    imageUrl: data != null && data.ext != null
+                        ? data.ext!['avatar']
+                        : '',
+                    errorWidget: (context, url, error) => SizedBox(width: 0),
+                    imageBuilder: (context, imageProvider) => Padding(
+                          padding: EdgeInsets.only(right: 10),
+                          child: Container(
+                            width: fontSize,
+                            height: fontSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: imageProvider, fit: BoxFit.cover),
+                            ),
+                          ),
+                        )),
+                Expanded(
+                    child: Text(
+                  data?.msg ?? '',
+                  style: TextStyle(
+                      color: data?.color ?? Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: fontSize),
+                ))
+              ],
+            ) */
+      );
 }

@@ -4,7 +4,7 @@
  * @LastEditors: moxun33
  * @LastEditTime: 2023-02-17 15:51:05
  * @FilePath: \vvibe\lib\models\playlist_item.dart
- * @Description: 
+ * @Description:
  * @qmj
  */
 // To parse this JSON data, do
@@ -50,7 +50,7 @@ class PlayListItem {
   String? catchup;
   String? catchupSource;
   Map<String, dynamic>?
-      ext; //平台代理配置{ 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
+      ext; //平台代理配置{'bakUrls':['备用链接列表'] 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
       name: json["name"],

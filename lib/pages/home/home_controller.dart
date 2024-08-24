@@ -15,7 +15,7 @@ import 'package:fvp/mdk.dart';
 import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
-import 'package:vvibe/components/widgets.dart';
+import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -114,26 +114,16 @@ class HomeController extends GetxController with WindowListener {
 //发送弹幕到屏幕
   void renderDanmaku(LiveDanmakuItem? data, {isHackchat = false}) async {
     if (!danmakuManualShow) return;
-    if (data?.msg != null && !barrageWallController.isEnabled) {
+    if (data?.msg != null) {
       barrageWallController.enable();
     }
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fontSize =
         settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
     barrageWallController.send([
-      new Bullet(
-          child: Tooltip(
-        message: data?.name ?? '',
-        child: isHackchat
-            ? BorderText(text: data?.msg ?? '', fontSize: fontSize)
-            : Text(
-                data?.msg ?? '',
-                style: TextStyle(
-                    color: data?.color ?? Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: fontSize),
-              ),
-      ))
+      Bullet(
+          child:
+              DanmakuRender(data, fontSize: fontSize, isHackchat: isHackchat))
     ]);
   }
 
@@ -142,9 +132,11 @@ class HomeController extends GetxController with WindowListener {
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
       danmakuManualShow = false;
+      stopDanmakuSocket();
     } else {
       barrageWallController.enable();
       danmakuManualShow = true;
+      if (playingUrl != null) startDanmakuSocket(playingUrl!);
     }
   }
 
@@ -174,7 +166,7 @@ class HomeController extends GetxController with WindowListener {
 
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
-    // stopDanmakuSocket();
+    stopDanmakuSocket();
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
     }

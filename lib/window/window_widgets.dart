@@ -91,6 +91,7 @@ class _WindowTitleState extends State<WindowTitle> {
     );
     if (icon.isEmpty) return defIcon;
     return CachedNetworkImage(
+      fit: BoxFit.contain,
       imageUrl: icon,
       height: 30,
       errorWidget: (context, url, error) => defIcon,

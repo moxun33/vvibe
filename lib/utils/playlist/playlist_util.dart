@@ -4,17 +4,18 @@
  * @LastEditors: moxun33
  * @LastEditTime: 2024-06-30 16:55:11
  * @FilePath: \vvibe\lib\utils\playlist\playlist_util.dart
- * @Description: 
+ * @Description:
  * @qmj
  */
 import 'dart:io';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:collection/collection.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
 import 'package:vvibe/services/danmaku/danmaku_type.dart';
 import 'package:vvibe/utils/local_storage.dart';
@@ -151,10 +152,13 @@ class PlaylistUtil {
 
 //根据url解析分组、tvgId等信息
   Map<String, dynamic> parseUrlExtInfos(String url) {
+    final allUrls = url.split('#');
+
     final map = {
       'group': '未分组',
       'tvgId': '',
-      'ext': Map<String, dynamic>.from({})
+      'ext': Map<String, dynamic>.from(
+          {'bakUrls': allUrls.length > 1 ? allUrls.sublist(1) : []})
     };
     final uri = Uri.parse(url.trim()),
         matches = isDyHyDlProxyUrl(url),
@@ -164,6 +168,7 @@ class PlaylistUtil {
     if (matchDy) map['group'] = DanmakuType.douyuCN;
     if (matchHy) map['group'] = DanmakuType.huyaCN;
     if (matchBl) map['group'] = DanmakuType.bilibiliCN;
+
     if (matches['platformHit'] == true) {
       final queryId = uri.queryParameters['id'], pathSegs = uri.pathSegments;
       if (queryId != null && queryId.isNotEmpty) {
@@ -173,6 +178,7 @@ class PlaylistUtil {
       }
       map['ext'] = matches;
     }
+
     return map;
   }
 

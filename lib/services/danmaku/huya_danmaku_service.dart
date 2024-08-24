@@ -88,7 +88,7 @@ class HuyaDanmakuService {
       if (danmakuId == null) return null;
       Uint8List regData = regDataEncode(danmakuId);
       _channel?.sink.add(regData);
-      MyLogger.info("虎牙弹幕 login success");
+      //  MyLogger.info("虎牙弹幕 login success");
       Uint8List heartbeat = huyaWsHeartbeat();
       //print("heartbeat");
       _channel?.sink.add(heartbeat);
