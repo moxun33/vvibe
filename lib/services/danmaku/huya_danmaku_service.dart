@@ -1,14 +1,15 @@
 /*
- * @Author: Moxx 
- * @Date: 2022-09-08 10:27:05 
+ * @Author: Moxx
+ * @Date: 2022-09-08 10:27:05
  * @Last Modified by: Moxx
  * @Last Modified time: 2022-09-08 12:22:40
  */
 import 'dart:async';
 import 'dart:convert';
-import 'package:html/parser.dart' show parse;
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:html/parser.dart' show parse;
 import 'package:vvibe/models/huya_room_profile.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/utils/dart_tars_protocol/tarscodec.dart';
@@ -32,7 +33,7 @@ class HuyaDanmakuService {
     timer = Timer.periodic(const Duration(seconds: 30), (callback) {
       totleTime += 30;
       heartBeat();
-      MyLogger.info("huya时间: $totleTime s");
+      MyLogger.info("huya弹幕时间: $totleTime s");
     });
     await login();
     setListener();
@@ -52,7 +53,7 @@ class HuyaDanmakuService {
     });
   }
 
-  Future<HuyaRoomGlobalProfile> _getChatInfo(String roomId) async {
+  Future<Map<String, dynamic>?> _getChatInfo(String roomId) async {
     var resp = await Dio(new BaseOptions(headers: {
       'User-Agent':
           'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
@@ -62,29 +63,36 @@ class HuyaDanmakuService {
     )
         // ignore: body_might_complete_normally_catch_error
         .catchError((e) {
-      MyLogger.info(e);
+      MyLogger.error('huya弹幕错误：' + e);
     });
     String value = resp.data;
     var dataLive = parse(value);
     var body = dataLive.getElementsByTagName('body')[0];
-    var script = body.getElementsByTagName('script')[3];
-    String jsonStr = script.text.replaceAll('window.HNF_GLOBAL_INIT = ', '');
+    var script = body.getElementsByTagName('script').where((s) {
+      return s.text.contains('indow.HNF_GLOBAL_INIT');
+    });
+    String jsonStr =
+        script.first.text.replaceAll('window.HNF_GLOBAL_INIT = ', '').trim();
+    jsonStr = jsonStr.substring(0, jsonStr.indexOf(',"tLiveStreamInf')) + '}}}';
+    //  debugPrint('弹幕srt ' + jsonStr);
     final json = jsonDecode(jsonStr);
-    return HuyaRoomGlobalProfile.fromJson(json);
+    return json;
+    //HuyaRoomGlobalProfile.fromJson(json);
   }
 
   Future<HuyaRoomGlobalProfile?> login() async {
     try {
-      final HuyaRoomGlobalProfile globalProfile = await _getChatInfo(roomId);
-      final int? danmakuId = globalProfile.roomProfile.lUid;
+      // final HuyaRoomGlobalProfile globalProfile = await _getChatInfo(roomId);
+      final globalProfile = await _getChatInfo(roomId);
+      final int? danmakuId = globalProfile?['roomProfile']['lUid'];
       if (danmakuId == null) return null;
       Uint8List regData = regDataEncode(danmakuId);
       _channel?.sink.add(regData);
-      MyLogger.info("虎牙login");
+      MyLogger.info("虎牙弹幕 login success");
       Uint8List heartbeat = huyaWsHeartbeat();
       //print("heartbeat");
       _channel?.sink.add(heartbeat);
-      return globalProfile;
+      //return globalProfile;
     } catch (e) {
       return null;
     }

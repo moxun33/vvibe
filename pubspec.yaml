@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.7.7
+version: 0.7.8
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    
+
 
   # ios 图标库
   cupertino_icons: ^1.0.8
@@ -60,7 +60,7 @@ dependencies:
   #    ref: dev
 
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
-  desktop_multi_window: 
+  desktop_multi_window:
     #path: E:\source-code\flutter-src\flutter-plugins\packages\desktop_multi_window
     git:
       url: https://github.com/MixinNetwork/flutter-plugins
@@ -95,8 +95,8 @@ dev_dependencies:
   freezed: ^2.1.0+1
   #替换图标
   flutter_launcher_icons: ^0.10.0
-  
-dependency_overrides: 
+
+dependency_overrides:
   flutter_launcher_icons: ^0.13.1
   flutter_easyloading: ^3.0.3
   intl: 0.18.0
