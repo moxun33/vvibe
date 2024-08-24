@@ -87,6 +87,7 @@ dependencies:
   url_launcher: ^6.3.0
   cached_network_image: ^3.3.1
   logging: ^1.2.0
+  chinese_font_library: ^1.2.0
 
 dev_dependencies:
   flutter_test:

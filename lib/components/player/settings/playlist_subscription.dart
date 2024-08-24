@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:uuid/uuid.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/utils/utils.dart';
-import 'package:uuid/uuid.dart';
 
 //订阅播放列表
 class PlaylistSubscription extends StatefulWidget {
@@ -134,7 +134,6 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         SizedBox(
           width: 20,
         ),
-        // 登录按钮
         SizedBox(
           width: 130,
           child: Row(
@@ -179,18 +178,24 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         Expanded(
             child: ListView.builder(
                 itemCount: urls.length,
-                itemExtent: 60.0,
+                itemExtent: 70.0,
                 itemBuilder: (BuildContext context, int index) {
                   final item = urls[index];
                   return ListTile(
                     title: Row(children: [
-                      Text(item['name']),
+                      SelectableText(
+                        item['name'],
+                        style: TextStyle(fontSize: 16),
+                      ),
                       SizedBox(
                         width: 50,
                       ),
                       Tooltip(
                         child: IconButton(
-                          icon: Icon(Icons.edit_outlined),
+                          icon: Icon(
+                            Icons.edit_outlined,
+                            size: 18,
+                          ),
                           onPressed: () {
                             _onEdit(item);
                           },
@@ -201,6 +206,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
                         child: IconButton(
                           icon: Icon(
                             Icons.delete_forever_outlined,
+                            size: 18,
                             color: Colors.red,
                           ),
                           onPressed: () {
@@ -210,7 +216,11 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
                         message: '删除',
                       )
                     ]),
-                    subtitle: Text(item['url']),
+                    subtitle: SelectableText(
+                      item['url'],
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    contentPadding: EdgeInsets.all(0),
                   );
                 })),
       ],

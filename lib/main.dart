@@ -7,20 +7,16 @@
  * @Description:
  * @qmj
  */
-import 'dart:convert';
-
-import 'package:collection/collection.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/pages/Index/Index_view.dart';
 import 'package:vvibe/pages/Index/index_binding.dart';
 import 'package:vvibe/router/app_pages.dart';
-import 'package:get/get.dart';
-import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:vvibe/window/window.dart';
-import 'package:vvibe/window/live_sniff_win.dart';
 
 void main(List<String> args) async {
   Global.init().then((theme) {
@@ -57,7 +53,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'VVibe',
-      theme: theme,
+      theme: theme.useSystemChineseFont(Brightness.light),
       home: IndexPage(),
       initialBinding: IndexBinding(),
       debugShowCheckedModeBanner: false,
