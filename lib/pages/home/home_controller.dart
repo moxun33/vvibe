@@ -60,15 +60,8 @@ class HomeController extends GetxController with WindowListener {
 
   void playerConfig() async {
     player.setProperty('http_persistent', '0');
-    /* player.setDecoders(MediaType.video, [
-      "MFT:d3d=11:copy=1",
-      "hap",
-      "D3D11",
-      "DXVA",
-      "CUDA",
-      "FFmpeg",
-      "dav1d"
-    ]); */
+    player.setDecoders(MediaType.video,
+        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]);
     player.setProperty('video.reconnect', '1');
     player.setProperty('video.reconnect_delay_max', '7');
     player.setProperty('demux.buffer.range', '7');
