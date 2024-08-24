@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 
+/* 自定义窗口外观 */
 class VWindow {
   static VWindow _instance = new VWindow._();
   factory VWindow() => _instance;

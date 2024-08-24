@@ -5,6 +5,7 @@ import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/color_util.dart';
+import 'package:window_manager/window_manager.dart';
 
 class WindowButtons extends StatefulWidget {
   const WindowButtons({Key? key}) : super(key: key);
@@ -132,19 +133,56 @@ Widget WindowTitleBar({String title = 'VVibe'}) {
 }
 
 //统一窗口包裹器
-Widget WindowScaffold(Widget child,
-    {String title = 'VVibe', String icon = ''}) {
-  return Scaffold(
-    body: WindowBorder(
-        color: Colors.transparent,
-        width: 0,
-        child: Column(
-          children: [
-            WindowTitleBar(
-              title: title,
-            ),
-            Expanded(child: child)
-          ],
-        )),
-  );
+class WindowScaffold extends StatefulWidget {
+  WindowScaffold(
+      {super.key,
+      required Widget this.child,
+      String title = 'VVibe',
+      String icon = ''});
+  final Widget child;
+  final String? title = 'VVibe';
+  final String? icon = '';
+  @override
+  State<WindowScaffold> createState() => _WindowScaffoldState();
+}
+
+class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void onWindowBlur() {
+    windowManager.blur();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowEvent(String e) async {
+    // MyLogger.info('window event ${e.toString()}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: WindowBorder(
+          color: Colors.transparent,
+          width: 0,
+          child: Column(
+            children: [
+              WindowTitleBar(
+                title: widget.title ?? 'VVibe',
+              ),
+              Expanded(child: widget.child)
+            ],
+          )),
+    );
+  }
 }
