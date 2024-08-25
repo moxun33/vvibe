@@ -62,3 +62,5 @@ flutter_rust_bridge_codegen.exe
 
 .vs/
 assets/epg/*
+assets/ffmpeg/*
+assets/logs/*

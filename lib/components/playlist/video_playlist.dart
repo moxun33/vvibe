@@ -1,19 +1,19 @@
 /*
- * @Author: Moxx 
- * @Date: 2022-09-02 16:32:16 
+ * @Author: Moxx
+ * @Date: 2022-09-02 16:32:16
  * @Last Modified by: Moxx
  * @Last Modified time: 2022-09-10 00:55:23
  */
 import 'dart:convert';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:native_context_menu/native_context_menu.dart';
-import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
 class VideoPlaylist extends StatefulWidget {
@@ -107,6 +107,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       data = await PlaylistUtil().parsePlaylistFile(map['name']);
     }
     setState(() {
+      if (!mounted) return;
       if (value == selectedFilename) playlist = data;
       loading = false;
     });
@@ -168,11 +169,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       Padding(
         padding: const EdgeInsets.only(top: 3, right: 4),
         child: Icon(
-          v['url'] != null
-              ? Icons.insert_link_outlined
-              : Icons.file_present_outlined,
+          v['url'] != null ? Icons.link_outlined : Icons.file_present_outlined,
           size: 12,
-          color: AppColors.primaryColor,
+          color: Colors.white,
         ),
       ),
       SizedBox(
@@ -183,7 +182,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
           maxLines: 1, overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.primaryColor,
+            color: Colors.white,
           ),
         ),
       )
@@ -201,20 +200,29 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             color: Colors.black87,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
-                dropdownStyleData: DropdownStyleData(width: 250),
+                dropdownStyleData: DropdownStyleData(
+                  width: 220,
+                  decoration: BoxDecoration(
+                      color: ColorUtil.fromHex('#3D3D3D'),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white24,
+                          spreadRadius: 0,
+                          blurRadius: 10,
+                        ),
+                      ]),
+                ),
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
-                hint: Text('选择播放列表',
-                    style: TextStyle(color: AppColors.primaryBackground)),
+                hint: Text('选择播放列表', style: TextStyle(color: Colors.white)),
                 value: selectedFilename,
                 iconStyleData:
                     IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),
                 onChanged: (String? value) {
-                  // This is called when the user selects an item.
                   onPlayFileChange(value);
                 },
-                menuItemStyleData: MenuItemStyleData(height: 22),
+                menuItemStyleData: MenuItemStyleData(height: 20),
                 //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {

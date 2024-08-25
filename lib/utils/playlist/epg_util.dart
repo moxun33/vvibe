@@ -4,12 +4,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:intl/intl.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/channel_epg.dart';
 import 'package:vvibe/utils/gzip.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:xml2json/xml2json.dart';
 
 // Global options
@@ -105,7 +106,7 @@ class EpgUtil {
       }
       return url + '/e.xml.gz';
     } catch (e) {
-      print('getEpgXmlUrl 出错：' + e.toString());
+      MyLogger.error('getEpgXmlUrl errors：' + e.toString());
       return null;
     }
   }
@@ -152,8 +153,8 @@ class EpgUtil {
       var resp = await client.get('https://epg.112114.eu.org',
           queryParameters: params,
           options: Options(responseType: ResponseType.json));
-      print(
-        '实时获取 ${channel} ${date} 的epg ',
+      MyLogger.info(
+        'now get ${channel} ${date}  epg ',
       );
       if (resp.data == null) {
         resp = await client.get('https://epg.v1.mk/json',
@@ -181,7 +182,7 @@ class EpgUtil {
         return null;
       }
     } catch (e) {
-      print('加载节目单出错 $params ${e.toString()}');
+      MyLogger.error('load epg errors $params ${e.toString()}');
       return null;
     }
   }
@@ -192,7 +193,7 @@ class EpgUtil {
     if (res != null) {
       return res;
     } else {
-      print('获取 $channel 的节目单失败 ');
+      MyLogger.error('get $channel epg errors ');
       return null;
     }
   }
@@ -216,7 +217,7 @@ class EpgUtil {
       }
       return ChannelEpg.fromJson(map);
     } catch (e) {
-      print('获取 $channel $d 的节目单失败 $e');
+      MyLogger.info('get $channel $d errors $e');
       return null;
     }
   }
@@ -257,12 +258,12 @@ class EpgUtil {
  */
       return dateTime;
     } catch (e) {
-      print('parseEpgTime出错$e $date');
+      MyLogger.error('parseEpgTimeerrors$e $date');
       return DateTime.now();
     }
   }
 
-// 从下载的epg文件提取频道、日期的epg数据
+// 从download的epg文件提取频道、日期的epg数据
   Future<List<Map<String, dynamic>>?> pickChannelEpgJson(
       String channel, String date) async {
     try {
@@ -294,7 +295,7 @@ class EpgUtil {
           .toList();
       return List<Map<String, dynamic>>.from(epg);
     } catch (e) {
-      print('pickChannelEpgJson 出错： $e');
+      MyLogger.error('pickChannelEpgJson errors： $e');
       return null;
     }
   }
@@ -305,17 +306,17 @@ class EpgUtil {
       final file = File(p);
       return file.readAsString();
     } catch (e) {
-      print('读取epg json出错 $e');
+      MyLogger.error('read epg jsonerrors $e');
       return null;
     }
   }
 
   Future<dynamic> unzipEpg() async {
     final gzPath = await getZipPath();
-    final res = await unzip(gzPath, await getXmlFilePath());
+    final res = await unzipGzip(gzPath, await getXmlFilePath());
     if (res == false) {
       downloadEpgData(text: true);
-      print('重新下载epg文本内容');
+      MyLogger.info('re download epg texts');
     }
   }
 
@@ -330,13 +331,13 @@ class EpgUtil {
       var json = transformer.toOpenRally();
       File jsonFile = File(jsonPath);
       await jsonFile.writeAsString(json);
-      print('解析epg $xmlPath 完成，生成json $jsonPath');
+      MyLogger.info('parseepg $xmlPath success，generating json $jsonPath');
     } catch (e) {
-      print('解析epg $xmlPath 失败 $e');
+      MyLogger.error('parseepg $xmlPath failed $e');
     }
   }
 
-// 下载epg数据
+// downloadepg数据
   Future downloadEpgData({text = false}) async {
     final url = await getEpgXmlUrl();
     if (url == null || !url.contains('xml')) return;
@@ -347,7 +348,7 @@ class EpgUtil {
     );
 
     if (dlRes != null) {
-      print("下载epg成功 " + url + ' ' + dlRes.path);
+      MyLogger.info("download epg success " + url + ' ' + dlRes.path);
       if (!text) {
         final unziped = await unzipEpg();
 
@@ -356,26 +357,33 @@ class EpgUtil {
         parseXml();
       }
     } else {
-      print("下载epg失败" + url);
+      MyLogger.error("download epg failed" + url);
     }
   }
 
-  Future<File?> downloadFile(String downLoadUrl, String savePath) async {
+  Future<File?> downloadFile(String downloadUrl, String savePath) async {
     DateTime timeStart = DateTime.now();
-    print('开始下载～当前时间：$timeStart');
+    MyLogger.info('start downloading epg～now time：$timeStart');
     try {
       Dio dio = Dio();
-      var resp = await dio.get(downLoadUrl,
-          options: Options(responseType: ResponseType.bytes));
-      var file = File(savePath);
+      var resp = await dio.download(downloadUrl, savePath,
+          onReceiveProgress: (received, total) {
+        /*  if (total != -1) {
+          final currentProgress = received / total;
+          MyLogger.info(
+              '当前downloadepg的进度：${(currentProgress * 100).toStringAsFixed(0)}%');
+        } */
+      });
       if (resp.statusCode != 200) {
-        print(downLoadUrl + '下载epg失败 ' + resp.statusMessage.toString());
+        MyLogger.error(downloadUrl +
+            'downloadepg failed ' +
+            resp.statusMessage.toString());
         return null;
       }
-      print('$downLoadUrl epg文件下载成功 $savePath');
-      return file.writeAsBytes(resp.data, flush: true); // Added flush: true
+      MyLogger.info('$downloadUrl epg file downloaded $savePath');
+      return File(savePath); // Added flush: true
     } catch (e) {
-      print("downloadFile报错：$e");
+      MyLogger.error("downloadFile errors：$e");
       return null;
     }
   }

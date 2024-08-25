@@ -476,51 +476,50 @@ class _PlUrlTileState extends State<PlUrlTile>
             onPressed: () {
               _selectUrl(e);
             },
-            child: Tooltip(
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 1.0,
-                children: [
-                  widget.checkAllive
-                      ? _getIcon(urlStatus)
-                      : widget.url.tvgLogo != null
-                          ? SizedBox(
-                              width: 16,
-                              child: CachedNetworkImage(
-                                fit: BoxFit.contain,
-                                imageUrl: widget.url.tvgLogo!,
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.movie_creation_outlined,
-                                  size: 14,
-                                  color: Colors.grey[500],
-                                ),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 1.0,
+              children: [
+                widget.checkAllive
+                    ? _getIcon(urlStatus)
+                    : widget.url.tvgLogo != null
+                        ? SizedBox(
+                            width: 16,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.contain,
+                              imageUrl: widget.url.tvgLogo!,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.movie_creation_outlined,
+                                size: 14,
+                                color: Colors.grey[500],
                               ),
-                            )
-                          : SizedBox(
-                              width: 0,
                             ),
-                  SizedBox(
+                          )
+                        : SizedBox(
+                            width: 0,
+                          ),
+                SizedBox(
                     width: PLAYLIST_BAR_WIDTH - 42,
-                    child: Text(
-                      e.name?.trim() ?? '未知名称',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: e.url == widget.selectedItem?.url
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: e.url == widget.selectedItem?.url
-                            ? AppColors.primaryColor
-                            : Colors.white,
+                    child: Tooltip(
+                      child: Text(
+                        e.name?.trim() ?? '未知名称',
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.clip,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: e.url == widget.selectedItem?.url
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: e.url == widget.selectedItem?.url
+                              ? AppColors.primaryColor
+                              : Colors.white,
+                        ),
                       ),
-                    ),
-                  )
-                ],
-              ),
-              message: e.name,
-              waitDuration: const Duration(seconds: 1),
+                      message: e.name,
+                      waitDuration: const Duration(seconds: 1),
+                    ))
+              ],
             ),
           ),
         ));

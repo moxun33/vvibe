@@ -17,6 +17,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
   final TextEditingController _epgUrlTextCtl = TextEditingController();
   final TextEditingController _danmuFSizeTextCtl = TextEditingController();
   bool _checkAlive = true;
+  bool _fullFfmpeg = false;
   @override
   void initState() {
     super.initState();
@@ -32,6 +33,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
       setState(() {
         _checkAlive = v['checkAlive'].toString() == 'false' ? false : true;
+        _fullFfmpeg = v['fullFfmpeg'].toString() == 'true' ? true : false;
       });
     }
   }
@@ -63,7 +65,8 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'ua': ua.isNotEmpty ? ua : DEF_REQ_UA,
       'epg': epg.isNotEmpty ? epg : DEF_EPG_URL,
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
-      'checkAlive': _checkAlive.toString()
+      'checkAlive': _checkAlive.toString(),
+      'fullFfmpeg': _fullFfmpeg.toString()
     };
     await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
@@ -122,6 +125,28 @@ class _PlayerSettingsState extends State<PlayerSettings> {
               SizedBox(
                 width: 50,
               ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                  width: 60,
+                  child:
+                      Text('FFmpeg', style: TextStyle(color: Colors.purple))),
+              SizedBox(
+                width: 150,
+                child: Switch(
+                  value: _fullFfmpeg, //当前状态
+                  onChanged: (value) {
+                    //重新构建页面
+                    setState(() {
+                      _fullFfmpeg = value;
+                    });
+                  },
+                ),
+              ),
+              Expanded(
+                  child: Text('默认是裁剪版ffmpeg。开启后自动下载完整版ffmpeg，支持开启反交错等滤镜。重启生效。'))
             ],
           ),
           SizedBox(

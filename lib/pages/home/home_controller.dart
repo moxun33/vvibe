@@ -21,6 +21,7 @@ import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/services.dart';
+import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -59,11 +60,21 @@ class HomeController extends GetxController with WindowListener {
   }
 
   void playerConfig() async {
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final fullFfmpeg = settings['fullFfmpeg'] == 'true';
     player.setProperty('http_persistent', '0');
-    player.setDecoders(MediaType.video,
-        ["MFT:d3d=11", "hap", "D3D11", "DXVA", "CUDA", "FFmpeg", "dav1d"]);
+    player.setDecoders(MediaType.video, [
+      "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
+      "hap",
+      "D3D11",
+      "DXVA",
+      "CUDA",
+      "FFmpeg",
+      "dav1d"
+    ]);
+    if (fullFfmpeg) player.setProperty('video.avfilter', 'yadif');
     player.setProperty('video.reconnect', '1');
-    player.setProperty('video.reconnect_delay_max', '7');
+    player.setProperty('video.reconnect_delay_max', '3');
     player.setProperty('demux.buffer.range', '7');
     player.setProperty('buffer', '2000+600000');
   }
@@ -200,11 +211,11 @@ class HomeController extends GetxController with WindowListener {
       }
 
       player.onStateChanged((PlaybackState oldState, PlaybackState state) {
-        MyLogger.info("-------------------接收到state改变 $state");
+        MyLogger.info("fvp player state改变 $state");
       });
       player.onMediaStatus((MediaStatus oldStatus, MediaStatus status) {
         final s = status.toString();
-        MyLogger.info("============接收到media status改变 $status");
+        MyLogger.info("fvp player  media status改变 $status");
         switch (s) {
           case 'MediaStatus(+invalid)':
             tip = '${item.name} 播放失败';
@@ -225,7 +236,7 @@ class HomeController extends GetxController with WindowListener {
       });
       player.onEvent((MediaEvent e) {
         MyLogger.info(
-            "!!!接收到event改变 ${e.category} ,detail: ${e.detail} ，error: ${e.error}");
+            "fvp player event  ${e.category} ,detail: ${e.detail} ，error: ${e.error}");
         final value = e.error.toInt();
         extraMetaInfo[e.category] = e.detail;
         switch (e.category) {
@@ -257,17 +268,13 @@ class HomeController extends GetxController with WindowListener {
 
   //停止播放、销毁实例
   Future<int> stopPlayer() async {
-    if (player.state == PlaybackState.stopped) {
-      return 0;
-    }
     MyLogger.info('set playback to stopped');
     player.state = PlaybackState.stopped;
+    player.waitFor(PlaybackState.stopped);
     player.updateTexture();
     EasyLoading.dismiss();
-//    playingUrl = null;
+    playingUrl = null;
     stopDanmakuSocket();
-    barrageWallController.disable();
-    player.waitFor(PlaybackState.stopped);
     VWindow().setWindowTitle('vvibe');
     //player.dispose();
     update();
@@ -328,6 +335,7 @@ class HomeController extends GetxController with WindowListener {
   //播放列表菜单显示
   void togglePlayList() {
     playListShowed = !playListShowed;
+    LogFile.log('app log');
 
     update();
   }
