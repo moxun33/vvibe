@@ -115,10 +115,14 @@ class VVFFmpeg {
             : Directory(Platform.resolvedExecutable).parent.path;
         final originDllPth = '${appDir}/${filename}';
         final originDllBakPth = originDllPth + '.bak';
-        if (rollback && File(originDllBakPth).existsSync()) {
-          await File(originDllBakPth).copy(originDllPth);
+        final oFfmpegDllBak = File(originDllBakPth);
+        if (rollback && oFfmpegDllBak.existsSync()) {
+          await oFfmpegDllBak.copy(originDllPth);
           MyLogger.info('rollback ${appDir}/${filename}success');
-          await File(originDllBakPth).delete();
+          await oFfmpegDllBak.delete();
+          return true;
+        }
+        if (oFfmpegDllBak.existsSync()) {
           return true;
         }
         if (File(originDllPth).existsSync()) {
