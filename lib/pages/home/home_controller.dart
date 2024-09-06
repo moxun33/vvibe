@@ -73,6 +73,7 @@ class HomeController extends GetxController with WindowListener {
       "dav1d"
     ]);
     if (fullFfmpeg) player.setProperty('video.avfilter', 'yadif');
+    player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
     player.setProperty('video.reconnect', '1');
     player.setProperty('video.reconnect_delay_max', '3');
     player.setProperty('demux.buffer.range', '7');
@@ -197,13 +198,11 @@ class HomeController extends GetxController with WindowListener {
       }
       tip = '正在打开 ${item.name ?? ''}';
       update();
-      final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
-
-      player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
+      playerConfig();
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
-      playerConfig();
+
       if (!playback) {
         playingUrl = item;
         update();

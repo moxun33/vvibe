@@ -201,14 +201,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.8"
   dart_ping:
     dependency: "direct main"
     description:
@@ -373,10 +365,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: "89f7d6ce1a6e6761a8e07d9d6c17238e57219d8c22248b436ac6f77a79aadc3b"
+      sha256: "040aa12beccd5bc60631259f27a481c4abc11a389aa4f57a47b643f58fe0b060"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.24.0"
+    version: "0.26.1"
   get:
     dependency: "direct main"
     description:
@@ -886,22 +878,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.4"
-  video_player_android:
-    dependency: transitive
-    description:
-      name: video_player_android
-      sha256: fdc0331ce9f808cc2714014cb8126bd6369943affefd54f8fdab0ea0bb617b7f
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.5.2"
-  video_player_avfoundation:
-    dependency: transitive
-    description:
-      name: video_player_avfoundation
-      sha256: d1e9a824f2b324000dc8fb2dcb2a3285b6c1c7c487521c63306cc5b394f68a7c
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.6.1"
   video_player_platform_interface:
     dependency: transitive
     description:

@@ -96,6 +96,7 @@ class HuyaDanmakuService {
     } catch (e) {
       return null;
     }
+    return null;
   }
 
   //对消息进行解码
