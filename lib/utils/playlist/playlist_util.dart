@@ -248,8 +248,7 @@ class PlaylistUtil {
   List<PlayListTextGroup> parseTxtGroups(List<String> lines) {
     List<PlayListTextGroup> groups = [];
     for (var line in lines) {
-      if (line.contains(',') &&
-          (line.contains('#genre#') || !line.contains('://'))) {
+      if (line.contains(',') && (line.contains('#genre#'))) {
         groups.add(PlayListTextGroup.fromJson(
             {'group': line.split(',').first, 'index': lines.indexOf(line)}));
       }
@@ -276,7 +275,7 @@ class PlaylistUtil {
               element.isNotEmpty &&
               element.contains(',') &&
               !element.contains('#genre#') &&
-              element.contains('://'))
+              element.split(',').length >= 2)
           .map((String e) {
             final List<String> arr = e.split(',');
 
