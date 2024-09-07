@@ -36,7 +36,8 @@ class Global {
 
     await windowManager.ensureInitialized();
 // set logger before registerWith()
-    if (!IS_RELEASE) Logger.root.level = Level.ALL;
+    // if (!IS_RELEASE) Logger.root.level = Level.ALL;
+
     final df = DateFormat("HH:mm:ss.SSS");
 
     Logger.root.onRecord.listen((record) {

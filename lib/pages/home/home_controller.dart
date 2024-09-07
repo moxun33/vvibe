@@ -119,9 +119,7 @@ class HomeController extends GetxController with WindowListener {
 //发送弹幕到屏幕
   void renderDanmaku(LiveDanmakuItem? data, {isHackchat = false}) async {
     if (!danmakuManualShow) return;
-    if (data?.msg != null) {
-      barrageWallController.enable();
-    }
+
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fontSize =
         settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
@@ -172,14 +170,16 @@ class HomeController extends GetxController with WindowListener {
 //开始连接斗鱼、忽悠、b站的弹幕
   void startDanmakuSocket(PlayListItem item) async {
     stopDanmakuSocket();
-    if (barrageWallController.isEnabled) {
-      barrageWallController.disable();
+    if (!danmakuManualShow) {
+      return;
     }
+    barrageWallController.enable();
     DanmakuService().start(item, renderDanmaku);
   }
 
 //断开所有弹幕连接
   void stopDanmakuSocket() {
+    barrageWallController.clear();
     barrageWallController.disable();
     DanmakuService().stop();
   }
@@ -199,10 +199,10 @@ class HomeController extends GetxController with WindowListener {
       tip = '正在打开 ${item.name ?? ''}';
       update();
       playerConfig();
+
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
-
       if (!playback) {
         playingUrl = item;
         update();
@@ -270,12 +270,11 @@ class HomeController extends GetxController with WindowListener {
     MyLogger.info('set playback to stopped');
     player.state = PlaybackState.stopped;
     player.waitFor(PlaybackState.stopped);
-    player.updateTexture();
     EasyLoading.dismiss();
     playingUrl = null;
     stopDanmakuSocket();
     VWindow().setWindowTitle('vvibe');
-    //player.dispose();
+    player.updateTexture(width: -1, height: -1);
     update();
     return 1;
   }

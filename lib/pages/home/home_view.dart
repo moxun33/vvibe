@@ -89,7 +89,7 @@ class HomePage extends GetView<HomeController> {
                                   debug: false, //!Global.isRelease,
                                   safeBottomHeight: Get.height ~/ 4 * 3,
                                   speed: 10,
-                                  massiveMode: true,
+                                  massiveMode: false,
                                   speedCorrectionInMilliseconds: 10000,
                                   bullets: [],
                                   controller: controller.barrageWallController,
