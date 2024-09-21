@@ -84,6 +84,10 @@ class PlaylistCheckReq {
     final res = {};
 
     try {
+      if (!url.startsWith('http')) {
+        res['status'] = 400;
+        return res;
+      }
       final uri = Uri.parse(url);
       final pingRes =
           await Ping(uri.host, count: 1, forceCodepage: true).stream.first;

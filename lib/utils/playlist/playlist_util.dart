@@ -368,9 +368,27 @@ class PlaylistUtil {
     return groupBy(list, (e) => e.group ?? "未分组");
   }
 
+// realtime url
+  bool isRtUrl(String url) {
+    const protols = [
+      'rtmp',
+      'rtsp',
+      'rtp',
+      'rtmpt',
+      'rtmpt',
+      'rtmps',
+      'gopher',
+      'mms'
+    ];
+    if (protols.contains(url.split('://')[0])) {
+      return true;
+    }
+    return false;
+  }
+
   //检查是否为真实有效的url
   bool validateUrl(String url) {
-    return Uri.tryParse(url)?.origin.isNotEmpty ?? false;
+    return Uri.tryParse(url)?.origin.isNotEmpty ?? isRtUrl(url);
   }
 
   Future<Map> checkUrlAccessible(String url, CancelToken cancelToken) async {

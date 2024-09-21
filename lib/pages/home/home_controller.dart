@@ -197,9 +197,9 @@ class HomeController extends GetxController with WindowListener {
         return;
       }
       tip = '正在打开 ${item.name ?? ''}';
-      update();
-      playerConfig();
 
+      playerConfig();
+      update();
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
@@ -241,7 +241,6 @@ class HomeController extends GetxController with WindowListener {
         switch (e.category) {
           case 'reader.buffering':
             tip = value < 100 ? '缓冲 $value%' : '';
-
             break;
           case 'render.video':
             if (value > 0) {
