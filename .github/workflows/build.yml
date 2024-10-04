@@ -17,7 +17,7 @@ env:
   FVP_DEPS_LATEST: 1
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  
+
   build-windows:
     permissions:
       contents: write
@@ -39,14 +39,14 @@ jobs:
           mkdir ffmpeg
           mv ffmpeg-*/* ffmpeg/
           Add-Content $env:GITHUB_ENV "FFMPEG_DIR=${pwd}\ffmpeg`n"
-          Add-Content $env:GITHUB_PATH "${pwd}\ffmpeg\bin`n"       
+          Add-Content $env:GITHUB_PATH "${pwd}\ffmpeg\bin`n"
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-          components: rustfmt, clippy  
+          components: rustfmt, clippy
       - name: Copy ffmpeg dll to cargo dir
         run: |
           cp ffmpeg/bin/*.dll C:\Users\runneradmin\.cargo\bin
@@ -54,7 +54,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.22.3
+          flutter-version: 3.24.3
           cache: true
 
       - name: Build

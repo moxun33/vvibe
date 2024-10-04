@@ -1,5 +1,6 @@
 //  download 完整的ffmpeg
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 
 import 'package:dio/dio.dart';
 import 'package:vvibe/common/values/consts.dart';
@@ -101,39 +102,68 @@ class VVFFmpeg {
     }
   }
 
+  Future<String> getFileMd5(String filePath) async {
+    final file = File(filePath);
+
+    if (!await file.exists()) {
+      throw Exception('File not found: $filePath');
+    }
+
+    final bytes = await file.readAsBytes();
+    final md5Hash = md5.convert(bytes);
+
+    return md5Hash.toString();
+  }
+
+// 比较文件 md5
+  Future<bool> compareFiles(String filePath1, String filePath2) async {
+    try {
+      final md5Value1 = await getFileMd5(filePath1);
+      final md5Value2 = await getFileMd5(filePath2);
+
+      return md5Value1 == md5Value2;
+    } catch (e) {
+      return false;
+    }
+  }
+
 //替换windows的ffmpeg dll
   Future<bool> replaceFfmpegDll(
       {String filename = 'ffmpeg-7.dll', rollback = false}) async {
     try {
-      if (Platform.isWindows) {
-        final zipName = await zipFileName();
-        final unzipDir = await getUnzipedDir();
-        final unzipPath = '${unzipDir}/${zipName}'.replaceAll('.zip', '');
-        final ffmpegDllPath = '$unzipPath/bin/x64/${filename}';
-        final appDir = IS_RELEASE
-            ? Directory.current.path
-            : Directory(Platform.resolvedExecutable).parent.path;
-        final originDllPth = '${appDir}/${filename}';
-        final originDllBakPth = originDllPth + '.bak';
-        final oFfmpegDllBak = File(originDllBakPth);
-        if (rollback && oFfmpegDllBak.existsSync()) {
-          await oFfmpegDllBak.copy(originDllPth);
-          MyLogger.info('rollback ${appDir}/${filename}success');
-          await oFfmpegDllBak.delete();
-          return true;
-        }
-        if (oFfmpegDllBak.existsSync()) {
-          return true;
-        }
-        if (File(originDllPth).existsSync()) {
-          await File(originDllPth).copy(originDllBakPth);
-          MyLogger.info('backup ${appDir}/${filename}success');
-        }
-        if (File(ffmpegDllPath).existsSync()) {
-          await File(ffmpegDllPath).copy(originDllPth);
-          MyLogger.info('replcing ${appDir}/${filename}success');
-        }
+      if (!Platform.isWindows) return false;
+      final zipName = await zipFileName();
+      final unzipDir = await getUnzipedDir();
+      final unzipPath = '${unzipDir}/${zipName}'.replaceAll('.zip', '');
+      final ffmpegDllPath = '$unzipPath/bin/x64/${filename}';
+      final appDir = IS_RELEASE
+          ? Directory.current.path
+          : Directory(Platform.resolvedExecutable).parent.path;
+      final originDllPth = '${appDir}/${filename}';
+      final originDllBakPth = originDllPth + '.raw.bak';
+      final oFfmpegDllBak = File(originDllBakPth);
+      if (rollback && oFfmpegDllBak.existsSync()) {
+        await oFfmpegDllBak.copy(originDllPth);
+        MyLogger.info('rollback ${appDir}/${filename}success');
+        await oFfmpegDllBak.delete();
+        return true;
       }
+
+      // 对比md5
+      final isSame = await compareFiles(originDllPth, originDllBakPth);
+      if (oFfmpegDllBak.existsSync() && !isSame) {
+        return true;
+      }
+      final oFfmpegDll = File(originDllPth);
+      if (oFfmpegDll.existsSync()) {
+        await oFfmpegDll.copy(originDllBakPth);
+        MyLogger.info('backup ${appDir}/${filename}success');
+      }
+      if (File(ffmpegDllPath).existsSync()) {
+        await File(ffmpegDllPath).copy(originDllPth);
+        MyLogger.info('replcing ${appDir}/${filename}success');
+      }
+
       return true;
     } catch (e) {
       MyLogger.error("replace ffmpeg dll errors：$e");

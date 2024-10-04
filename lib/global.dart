@@ -79,8 +79,10 @@ class Global {
         width: 40,
         child: Spinning(),
       );
-    if (shouldSetSize) EpgUtil().downloadEpgDataIsolate();
-    VVFFmpeg().downloadAync();
+    if (shouldSetSize) {
+      EpgUtil().downloadEpgDataIsolate();
+      VVFFmpeg().downloadAync();
+    }
     return genTheme();
   }
 

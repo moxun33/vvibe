@@ -40,6 +40,7 @@ class HomeController extends GetxController with WindowListener {
   bool danmakuManualShow = true;
   String tip = ''; //左上角的单个文字提示，如成功、失败
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
+  bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
   Hackchat? hc;
   @override
@@ -246,6 +247,7 @@ class HomeController extends GetxController with WindowListener {
             if (value > 0) {
               startDanmakuSocket(item);
               updateWindowTitle(item);
+              toggleMediaInfo(msgsShowed);
             }
             break;
           default:
@@ -300,6 +302,7 @@ class HomeController extends GetxController with WindowListener {
 
 // 显隐媒体元数据
   void toggleMediaInfo([show = false]) {
+    msgsShowed = show;
     if (show) {
       final info = player.mediaInfo;
       final vc = info.video?[0].codec;

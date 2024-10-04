@@ -54,7 +54,8 @@ class HomePage extends GetView<HomeController> {
                     child: Container(
                       child: ValueListenableBuilder<int?>(
                           valueListenable: controller.player.textureId,
-                          builder: (context, id, _) => id == null
+                          builder: (context, id, _) => id == null ||
+                                  controller.playingUrl == null
                               ? GestureDetector(
                                   onTap: () {
                                     controller.togglePlayList();
