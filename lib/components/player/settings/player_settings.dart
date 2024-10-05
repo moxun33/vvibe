@@ -70,7 +70,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
     };
     await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
-    EpgUtil().downloadEpgDataIsolate();
+    EpgUtil().downloadEpgDataAync();
   }
 
   @override

@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/config.dart';
 import 'package:vvibe/global.dart';
-import 'package:vvibe/utils/utils.dart';
 
 /*
   * http 操作类
@@ -62,7 +61,6 @@ class Request {
       // 错误交互处理
       switch (eInfo.code) {
         case 401: // 没有权限 重新登录
-          deleteTokenAndReLogin();
           break;
         default:
       }

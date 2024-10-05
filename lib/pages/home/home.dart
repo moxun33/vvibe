@@ -2,25 +2,28 @@
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
- * @LastEditTime: 2024-08-18 13:17:13
- * @FilePath: \vvibe\lib\pages\home\home_controller.dart
+ * @LastEditTime: 2024-08-17 00:54:54
+ * @FilePath: \vvibe\lib\pages\home\home_view.dart
  * @Description:
  * @qmj
  */
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/mdk.dart';
-import 'package:get/get.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
+import 'package:vvibe/components/player/fvp_videoframe.dart';
+import 'package:vvibe/components/player/player_context_menu.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
+import 'package:vvibe/components/playlist/video_playlist.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
-import 'package:vvibe/services/services.dart';
+import 'package:vvibe/services/event_bus.dart';
+import 'package:vvibe/services/hackchat/hackchat.dart';
 import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/logger.dart';
@@ -28,7 +31,12 @@ import 'package:vvibe/utils/utils.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:window_manager/window_manager.dart';
 
-class HomeController extends GetxController with WindowListener {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with WindowListener {
   late final player = Player();
 
   bool playListShowed = false;
@@ -43,24 +51,25 @@ class HomeController extends GetxController with WindowListener {
   bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
   Hackchat? hc;
+
   @override
-  void onInit() {
+  void initState() {
+    super.initState();
     windowManager.addListener(this);
 
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
-    if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
-      if (Global.isRelease) startPlay(PlayListItem.fromJson(lastPlayUrl));
-    }
     // initHackchat();
     playerConfig();
+    eventBus.on('play-last-video', (e) {
+      final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+      if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
+        if (Global.isRelease) {
+          startPlay(PlayListItem.fromJson(lastPlayUrl));
+        }
+      }
+    });
   }
 
-  void playerConfig() async {
+  playerConfig() async {
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fullFfmpeg = settings['fullFfmpeg'] == 'true';
     player.setProperty('http_persistent', '0');
@@ -73,7 +82,9 @@ class HomeController extends GetxController with WindowListener {
       "FFmpeg",
       "dav1d"
     ]);
-    if (fullFfmpeg) player.setProperty('video.avfilter', 'yadif');
+    if (fullFfmpeg) {
+      player.setProperty('video.avfilter', 'yadif');
+    }
     player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
     player.setProperty('video.reconnect', '1');
     player.setProperty('video.reconnect_delay_max', '3');
@@ -135,11 +146,15 @@ class HomeController extends GetxController with WindowListener {
   void toggleDanmakuVisible() {
     if (barrageWallController.isEnabled) {
       barrageWallController.disable();
-      danmakuManualShow = false;
+      setState(() {
+        danmakuManualShow = false;
+      });
       stopDanmakuSocket();
     } else {
       barrageWallController.enable();
-      danmakuManualShow = true;
+      setState(() {
+        danmakuManualShow = true;
+      });
       if (playingUrl != null) startDanmakuSocket(playingUrl!);
     }
   }
@@ -162,10 +177,14 @@ class HomeController extends GetxController with WindowListener {
   //显示、隐藏节目单
   void toggleEpgDialog() {
     if (playingUrl == null) return;
-    Get.dialog(EpgAlertDialog(
-      urlItem: playingUrl!,
-      doPlayback: doPlayback,
-    ));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EpgAlertDialog(
+            urlItem: playingUrl!,
+            doPlayback: doPlayback,
+          );
+        });
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
@@ -197,16 +216,18 @@ class HomeController extends GetxController with WindowListener {
 
         return;
       }
-      tip = '正在打开 ${item.name ?? ''}';
+      setState(() {
+        tip = '正在打开 ${item.name ?? ''}';
+      });
 
       playerConfig();
-      update();
       player.media = url;
       player.state = PlaybackState.playing;
       player.updateTexture();
       if (!playback) {
-        playingUrl = item;
-        update();
+        setState(() {
+          playingUrl = item;
+        });
         LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
       }
 
@@ -218,9 +239,10 @@ class HomeController extends GetxController with WindowListener {
         MyLogger.info("fvp player  media status改变 $status");
         switch (s) {
           case 'MediaStatus(+invalid)':
-            tip = '${item.name} 播放失败';
             stopPlayer();
-            update();
+            setState(() {
+              tip = '${item.name} 播放失败';
+            });
             break;
           case 'MediaStatus(+buffering)':
             break;
@@ -241,7 +263,9 @@ class HomeController extends GetxController with WindowListener {
         extraMetaInfo[e.category] = e.detail;
         switch (e.category) {
           case 'reader.buffering':
-            tip = value < 100 ? '缓冲 $value%' : '';
+            setState(() {
+              tip = value < 100 ? '缓冲 $value%' : '';
+            });
             break;
           case 'render.video':
             if (value > 0) {
@@ -253,7 +277,6 @@ class HomeController extends GetxController with WindowListener {
           default:
             break;
         }
-        update();
       });
       /*   player.onRenderCallback((msg) {
         // MyLogger.info('======render cb log $msg');
@@ -272,11 +295,12 @@ class HomeController extends GetxController with WindowListener {
     player.state = PlaybackState.stopped;
     player.waitFor(PlaybackState.stopped);
     EasyLoading.dismiss();
-    playingUrl = null;
+    setState(() {
+      playingUrl = null;
+    });
     stopDanmakuSocket();
     VWindow().setWindowTitle('vvibe');
     player.updateTexture(width: -1, height: -1);
-    update();
     return 1;
   }
 
@@ -297,12 +321,13 @@ class HomeController extends GetxController with WindowListener {
         '${info.video?[0].codec.width}x${info.video?[0].codec.height}';
     final title = '${item.name} [${ratio}]';
     VWindow().setWindowTitle(title, item.tvgLogo);
-    update();
   }
 
 // 显隐媒体元数据
   void toggleMediaInfo([show = false]) {
-    msgsShowed = show;
+    setState(() {
+      msgsShowed = show;
+    });
     if (show) {
       final info = player.mediaInfo;
       final vc = info.video?[0].codec;
@@ -319,25 +344,31 @@ class HomeController extends GetxController with WindowListener {
         '   Sample Rate: ${ac?.sampleRate} Hz',
         '   Bitrate: ${(ac?.bitRate ?? 0) / 1000} kbps',
       ];
-      msgs = _msgs;
+      setState(() {
+        msgs = _msgs;
+      });
 
       MyLogger.info(info.toString());
     } else {
-      msgs = [];
+      setState(() {
+        msgs = [];
+      });
     }
-    update();
   }
 
   //获取当前弹幕区域尺寸
   Size getDanmakuSize() => Size(
-      playListShowed ? Get.width - PLAYLIST_BAR_WIDTH : Get.width, Get.height);
+      playListShowed
+          ? getDeviceWidth(context) - PLAYLIST_BAR_WIDTH
+          : getDeviceWidth(context),
+      getDeviceHeight(context));
 
   //播放列表菜单显示
   void togglePlayList() {
-    playListShowed = !playListShowed;
+    setState(() {
+      playListShowed = !playListShowed;
+    });
     LogFile.log('app log');
-
-    update();
   }
 
 //打开单个播放url
@@ -349,13 +380,125 @@ class HomeController extends GetxController with WindowListener {
   }
 
   @override
-  void onClose() async {
-    super.onClose();
+  void dispose() async {
     await stopPlayer();
     windowManager.removeListener(this);
-
     hc?.close();
     player.dispose();
+    super.dispose();
+  }
+
+  // 信息展示
+  Widget OsdMsg() {
+    final _msgs = [tip] + msgs;
+    return Container(
+        padding: const EdgeInsets.all(10),
+        width: getDanmakuSize().width,
+        height: getDanmakuSize().height - 100,
+        color: Colors.transparent,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _msgs.map((txt) {
+              return Text(
+                txt,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    overflow: TextOverflow.ellipsis),
+              );
+            }).toList()));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Stack(
+      children: [
+        Container(
+            child: Row(
+          children: <Widget>[
+            Expanded(
+                flex: 4,
+                child: Container(
+                  child: ValueListenableBuilder<int?>(
+                      valueListenable: player.textureId,
+                      builder: (context, id, _) => id == null ||
+                              playingUrl == null
+                          ? GestureDetector(
+                              onTap: () {
+                                togglePlayList();
+                              },
+                              child: Container(
+                                color: Colors.black,
+                                child: Center(
+                                  child: Wrap(
+                                    direction: Axis.vertical,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 50,
+                                    children: [
+                                      SizedBox(
+                                          width: 200,
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.contain,
+                                            imageUrl: playingUrl?.tvgLogo ?? '',
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                Image.asset('assets/logo.png'),
+                                          ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : BarrageWall(
+                              debug: false, //!Global.isRelease,
+                              safeBottomHeight:
+                                  getDeviceHeight(context) ~/ 4 * 3,
+                              speed: 10,
+                              massiveMode: false,
+                              speedCorrectionInMilliseconds: 10000,
+                              bullets: [],
+                              controller: barrageWallController,
+                              child: Container(
+                                  color: Colors.black,
+                                  child: FvpVideoFrame(
+                                    toggleMediaInfo: toggleMediaInfo,
+                                    toggleDanmaku: toggleDanmakuVisible,
+                                    toggleEpgDialog: toggleEpgDialog,
+                                    playingUrl: playingUrl,
+                                    videoWidget: Center(
+                                        child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: Texture(
+                                        textureId: id,
+                                        filterQuality: FilterQuality.high,
+                                      ),
+                                    )),
+                                    fvp: player,
+                                    togglePlayList: togglePlayList,
+                                    stopPlayer: stopPlayer,
+                                    sendDanmaku: sendDanmaku,
+                                  )),
+                            )),
+                )),
+            Container(
+                width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
+                child: VideoPlaylist(
+                  visible: playListShowed,
+                  onUrlTap: onPlayUrlChange,
+                )),
+          ],
+        )),
+        GestureDetector(
+            onDoubleTap: () => togglePlayList(),
+            child: PlayerContextMenu(
+                onOpenUrl: onOpenOneUrl,
+                showPlaylist: togglePlayList,
+                playListShowed: playListShowed,
+                child: OsdMsg())),
+      ],
+    ));
   }
 
   @override
@@ -363,5 +506,12 @@ class HomeController extends GetxController with WindowListener {
     await stopPlayer();
     hc?.close();
     player.dispose();
+  }
+
+  @override
+  void onWindowFocus() {
+    // Make sure to call once.
+    setState(() {});
+    // do something
   }
 }

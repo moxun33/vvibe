@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fvp/mdk.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/models/playlist_item.dart';
 
 // ignore: must_be_immutable
@@ -372,6 +374,15 @@ class _VolumeControlState extends State<VolumeControl> {
   double unmutedVolume = 1.0;
 
   Player? get player => widget.player;
+  void _onScroll(PointerScrollEvent event) {
+    // 根据滚轮的方向调整音量
+    final _volume = volume + event.scrollDelta.dy > 0 ? 0.05 : -0.05;
+
+    // 确保音量在 0.0 到 1.0 之间
+    setState(() {
+      volume = _volume.clamp(0.0, 1.0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +390,7 @@ class _VolumeControlState extends State<VolumeControl> {
       children: [
         AnimatedOpacity(
           duration: const Duration(milliseconds: 250),
-          opacity: _showVolume ? 0.8 : 0,
+          opacity: _showVolume ? 1 : 0,
           child: AbsorbPointer(
             absorbing: !_showVolume,
             child: MouseRegion(
@@ -400,6 +411,7 @@ class _VolumeControlState extends State<VolumeControl> {
                     quarterTurns: -1,
                     child: SliderTheme(
                       data: SliderThemeData(
+                        activeTrackColor: AppColors.primaryColor,
                         thumbColor: widget.thumbColor,
                       ),
                       child: Slider.adaptive(
@@ -435,7 +447,7 @@ class _VolumeControlState extends State<VolumeControl> {
             onPressed: () => muteUnmute(),
             icon: Icon(getIcon()),
           ),
-        ),
+        )
       ],
     );
   }

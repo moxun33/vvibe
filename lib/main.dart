@@ -10,13 +10,10 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
-import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:vvibe/global.dart';
-import 'package:vvibe/pages/Index/Index_view.dart';
-import 'package:vvibe/pages/Index/index_binding.dart';
-import 'package:vvibe/router/app_pages.dart';
+import 'package:vvibe/pages/home/home.dart';
 import 'package:vvibe/window/window.dart';
+import 'package:vvibe/window/window_widgets.dart';
 
 void main(List<String> args) async {
   Global.init().then((theme) {
@@ -51,19 +48,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       title: 'VVibe',
       theme: theme.useSystemChineseFont(Brightness.light),
-      home: IndexPage(),
-      initialBinding: IndexBinding(),
+      home: WindowScaffold(child: HomePage()),
       debugShowCheckedModeBanner: false,
-      enableLog: true,
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
-      unknownRoute: AppPages.unknownRoute,
       builder: EasyLoading.init(),
-      locale: TranslationService.locale,
-      fallbackLocale: TranslationService.fallbackLocale,
+      locale: Locale('zh', 'Hans'),
     );
   }
 }

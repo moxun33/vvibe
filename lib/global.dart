@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
-import 'package:vvibe/pages/login/login_model.dart';
+import 'package:vvibe/models/login_mode.dart';
 import 'package:vvibe/services/ffmpeg.dart';
 import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/LogFile.dart';
@@ -44,7 +44,7 @@ class Global {
       final content =
           '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}';
       print(content);
-      LogFile.log(content + '\n');
+      if (IS_RELEASE) LogFile.log(content + '\n');
     });
     // Ruquest 模块初始化
     Request();
@@ -80,8 +80,8 @@ class Global {
         child: Spinning(),
       );
     if (shouldSetSize) {
-      EpgUtil().downloadEpgDataIsolate();
-      VVFFmpeg().downloadAync();
+      EpgUtil().downloadEpgDataAync();
+      VVFFmpeg().checkFfmpegDllAync();
     }
     return genTheme();
   }

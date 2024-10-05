@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/common/langs/translation_service.dart';
 import 'package:desktop_multi_window/desktop_multi_window.dart';
 
 class SubWindow extends StatefulWidget {
@@ -53,7 +52,7 @@ class _SubWindowState extends State<SubWindow> {
       theme: widget.theme,
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
-      locale: TranslationService.locale,
+      locale: Locale('zh', 'Hans'),
     );
   }
 }

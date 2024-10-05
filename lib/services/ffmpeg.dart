@@ -1,10 +1,11 @@
 //  download 完整的ffmpeg
 import 'dart:io';
-import 'package:crypto/crypto.dart';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/common/values/storage.dart';
+import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/gzip.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/logger.dart';
@@ -14,7 +15,9 @@ class VVFFmpeg {
   factory VVFFmpeg() => _instance;
 
   VVFFmpeg._();
-
+  final appDir = IS_RELEASE
+      ? Directory.current.path
+      : Directory(Platform.resolvedExecutable).parent.path;
   String downloadUrl() {
     if (Platform.isWindows) {
       return 'https://gitdl.cn/https://github.com/moxun33/vvibe/releases/download/v0.7.9/ffmpeg-master-windows-desktop-vs2022-default.zip';
@@ -51,7 +54,11 @@ class VVFFmpeg {
     download('');
   }
 
-  void download(String? msg) async {
+  checkFfmpegDllAync() async {
+    await download('');
+  }
+
+  download(String? msg) async {
     try {
       final setting = await LoacalStorage().getJSON(PLAYER_SETTINGS);
       if (setting != null && setting['fullFfmpeg'] != 'true') {
@@ -127,6 +134,19 @@ class VVFFmpeg {
     }
   }
 
+// 是否已替换完整ffmpeg
+  Future<bool> isFullFFmpegReplaced({
+    String filename = 'ffmpeg-7.dll',
+  }) async {
+    try {
+      final originDllPth = '${appDir}/${filename}';
+      final originDllBakPth = originDllPth + '.raw.bak';
+      return compareFiles(originDllPth, originDllBakPth) != true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 //替换windows的ffmpeg dll
   Future<bool> replaceFfmpegDll(
       {String filename = 'ffmpeg-7.dll', rollback = false}) async {
@@ -136,15 +156,13 @@ class VVFFmpeg {
       final unzipDir = await getUnzipedDir();
       final unzipPath = '${unzipDir}/${zipName}'.replaceAll('.zip', '');
       final ffmpegDllPath = '$unzipPath/bin/x64/${filename}';
-      final appDir = IS_RELEASE
-          ? Directory.current.path
-          : Directory(Platform.resolvedExecutable).parent.path;
+
       final originDllPth = '${appDir}/${filename}';
       final originDllBakPth = originDllPth + '.raw.bak';
       final oFfmpegDllBak = File(originDllBakPth);
       if (rollback && oFfmpegDllBak.existsSync()) {
         await oFfmpegDllBak.copy(originDllPth);
-        MyLogger.info('rollback ${appDir}/${filename}success');
+        MyLogger.info('rollback ${appDir}/${filename} success');
         await oFfmpegDllBak.delete();
         return true;
       }
@@ -154,16 +172,17 @@ class VVFFmpeg {
       if (oFfmpegDllBak.existsSync() && !isSame) {
         return true;
       }
-      final oFfmpegDll = File(originDllPth);
-      if (oFfmpegDll.existsSync()) {
-        await oFfmpegDll.copy(originDllBakPth);
-        MyLogger.info('backup ${appDir}/${filename}success');
+      if (File(originDllPth).existsSync()) {
+        await File(originDllPth).copy(originDllBakPth);
+        MyLogger.info('backup ${appDir}/${filename} success');
       }
+      MyLogger.info(
+          'start replacing ${appDir}/${filename} with ${ffmpegDllPath}');
       if (File(ffmpegDllPath).existsSync()) {
         await File(ffmpegDllPath).copy(originDllPth);
-        MyLogger.info('replcing ${appDir}/${filename}success');
+        MyLogger.info('replacing ${appDir}/${filename} success');
       }
-
+      eventBus.emit('play-last-video');
       return true;
     } catch (e) {
       MyLogger.error("replace ffmpeg dll errors：$e");

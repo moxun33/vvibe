@@ -222,7 +222,7 @@ class EpgUtil {
     }
   }
 
-  downloadEpgDataIsolate() {
+  downloadEpgDataAync() {
     try {
       downloadEpgData();
     } catch (e) {}

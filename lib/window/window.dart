@@ -17,6 +17,9 @@ class VWindow {
       appWindow.size = initialSize;
       appWindow.alignment = Alignment.center;
       appWindow.title = 'VVibe';
+      WidgetsBinding.instance.scheduleFrameCallback((timeStamp) {
+        appWindow.size = initialSize + const Offset(0, 1);
+      });
       appWindow.show();
     });
   }

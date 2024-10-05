@@ -1,4 +1,4 @@
-import 'package:vvibe/pages/login/login_model.dart';
+import 'package:vvibe/models/login_mode.dart';
 import 'package:vvibe/utils/utils.dart';
 
 /// 用户

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-UserLoginResponseModel userLoginResponseModelFromJson(String str) => UserLoginResponseModel.fromJson(json.decode(str));
+UserLoginResponseModel userLoginResponseModelFromJson(String str) =>
+    UserLoginResponseModel.fromJson(json.decode(str));
 
-String userLoginResponseModelToJson(UserLoginResponseModel data) => json.encode(data.toJson());
+String userLoginResponseModelToJson(UserLoginResponseModel data) =>
+    json.encode(data.toJson());
 
 class UserLoginResponseModel {
   UserLoginResponseModel({
@@ -15,7 +17,8 @@ class UserLoginResponseModel {
   String? name;
   int? id;
 
-  factory UserLoginResponseModel.fromJson(Map<String, dynamic> json) => UserLoginResponseModel(
+  factory UserLoginResponseModel.fromJson(Map<String, dynamic> json) =>
+      UserLoginResponseModel(
         token: json["token"],
         name: json["name"],
         id: json["id"],

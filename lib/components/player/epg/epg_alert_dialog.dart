@@ -1,8 +1,8 @@
 //播放器的设置弹窗
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:vvibe/components/player/epg/epg_date_tabs.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/utils/utils.dart';
 
 class EpgAlertDialog extends StatefulWidget {
   const EpgAlertDialog(
@@ -25,7 +25,7 @@ class _EpgAlertDialogState extends State<EpgAlertDialog> {
       ],
       content: SizedBox(
         width: 1000,
-        height: Get.size.height,
+        height: getDeviceHeight(context),
         child: EpgDateTabsView(
           doPlayback: widget.doPlayback,
           urlItem: widget.urlItem,
