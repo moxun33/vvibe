@@ -164,12 +164,14 @@ class VVFFmpeg {
         await oFfmpegDllBak.copy(originDllPth);
         MyLogger.info('rollback ${appDir}/${filename} success');
         await oFfmpegDllBak.delete();
+        eventBus.emit('play-last-video');
         return true;
       }
 
       // 对比md5
       final isSame = await compareFiles(originDllPth, originDllBakPth);
       if (oFfmpegDllBak.existsSync() && !isSame) {
+        eventBus.emit('play-last-video');
         return true;
       }
       if (File(originDllPth).existsSync()) {
@@ -195,7 +197,7 @@ class VVFFmpeg {
     try {
       // if (!IS_RELEASE) return false;
       if (Platform.isWindows) {
-        await replaceFfmpegDll();
+        await replaceFfmpegDll(rollback:rollback);
       }
       return true;
     } catch (e) {
