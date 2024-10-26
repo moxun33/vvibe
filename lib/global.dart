@@ -14,6 +14,7 @@ import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:vvibe/utils/utils.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:fvp/fvp.dart' as fvp;
 
 /// 全局配置
 class Global {
@@ -46,6 +47,7 @@ class Global {
       print(content);
       if (IS_RELEASE) LogFile.log(content + '\n');
     });
+    fvp.registerWith();
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化

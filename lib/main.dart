@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/pages/home/home.dart';
+import 'package:vvibe/pages/home/vplayer.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/window_widgets.dart';
 
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'VVibe',
       theme: theme.useSystemChineseFont(Brightness.light),
-      home: WindowScaffold(child: HomePage()),
+      home: WindowScaffold(child: Vplayer()),
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
       locale: Locale('zh', 'Hans'),
