@@ -3,14 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
+import 'package:fvp/fvp.dart' as fvp;
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/login_mode.dart';
 import 'package:vvibe/services/ffmpeg.dart';
 import 'package:vvibe/theme.dart';
-import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:vvibe/utils/utils.dart';
 import 'package:window_manager/window_manager.dart';
@@ -37,14 +35,14 @@ class Global {
     await windowManager.ensureInitialized();
 // set logger before registerWith()
     // if (!IS_RELEASE) Logger.root.level = Level.ALL;
-
-    Logger.root.onRecord.listen((record) {
+    /*    Logger.root.onRecord.listen((record) {
       final df = DateFormat("HH:mm:ss.SSS");
       final content =
           '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}';
       print(content);
       //if (IS_RELEASE) LogFile.log(content + '\n');
-    });
+    }); */
+    fvp.registerWith();
     // Ruquest 模块初始化
     Request();
     // 本地存储初始化
