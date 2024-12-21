@@ -29,7 +29,7 @@ Future<bool> unzipZip(String gzPath, String extractPath) async {
   try {
     final inputStream = InputFileStream(gzPath);
 
-    final archive = ZipDecoder().decodeBuffer(inputStream);
+    final archive = ZipDecoder().decodeStream(inputStream);
     extractArchiveToDisk(archive, extractPath);
 
     MyLogger.info(gzPath + '解压完成！' + extractPath);
