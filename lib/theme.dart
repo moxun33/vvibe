@@ -23,6 +23,8 @@ Future<ThemeData> genTheme(
  */
 ThemeData genTheme() {
   return ThemeData(
+      scaffoldBackgroundColor: Colors.black12,
+      canvasColor: Colors.black12,
       primaryColor: ColorUtil.fromHex(' #A92EFD'),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent);

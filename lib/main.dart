@@ -11,7 +11,6 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/global.dart';
-import 'package:vvibe/pages/home/home.dart';
 import 'package:vvibe/pages/home/vplayer.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/window_widgets.dart';
@@ -50,9 +49,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      color: Colors.black12,
       title: 'VVibe',
-      theme: theme.useSystemChineseFont(Brightness.light),
-      home: WindowScaffold(child: Vplayer()),
+      theme: theme.useSystemChineseFont(Brightness.dark),
+      home: WindowScaffold(
+        child: Vplayer(),
+      ),
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
       locale: Locale('zh', 'Hans'),
