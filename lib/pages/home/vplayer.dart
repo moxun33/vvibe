@@ -15,7 +15,7 @@ class _VplayerState extends State<Vplayer> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.networkUrl(
-        Uri.parse('http://cfyy.cc/cdn/dyu/3870925.flv'));
+        Uri.parse('http://live.metshop.top/douyu/1377142'));
 
     _controller.addListener(() {
       setState(() {});
