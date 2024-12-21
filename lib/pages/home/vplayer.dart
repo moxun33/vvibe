@@ -4,7 +4,9 @@ import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/common/values/storage.dart';
+import 'package:vvibe/components/player/epg/epg_alert_dialog.dart';
 import 'package:vvibe/components/player/player_context_menu.dart';
+import 'package:vvibe/components/player/vplayer_controls.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
@@ -42,7 +44,7 @@ class _VplayerState extends State<Vplayer> {
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
   }
 
-  startPlay(PlayListItem? item) {
+  startPlay(PlayListItem? item, {bool playback = false}) {
     if (item == null || item.url == null) return;
 
     if (_controller?.value.isInitialized != null) {
@@ -148,13 +150,18 @@ class _VplayerState extends State<Vplayer> {
     startPlay(item);
   }
 
-  @override
-  void dispose() {
+  void stopPlayer() {
+    stopDanmakuSocket();
     _controller?.removeListener(() {
       videoPlayerListener(null);
     });
     _controller?.dispose();
     _controller = null;
+  }
+
+  @override
+  void dispose() {
+    stopPlayer();
   }
 
   Widget PlaceCover() {
@@ -213,6 +220,34 @@ class _VplayerState extends State<Vplayer> {
           child:
               DanmakuRender(data, fontSize: fontSize, isHackchat: isHackchat))
     ]);
+  }
+
+  //显示、隐藏节目单
+  void toggleEpgDialog() {
+    if (playingUrl == null) return;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EpgAlertDialog(
+            urlItem: playingUrl!,
+            doPlayback: doPlayback,
+          );
+        });
+  }
+
+//实现回看
+  void doPlayback(String playseek) {
+    if (playingUrl == null) return;
+    final _urlItem = playingUrl!.toJson();
+    var url = playingUrl?.url;
+    if (url == null) return;
+    Uri u = Uri.parse(url.trim());
+    final haveQueries = u.queryParameters.length > 0;
+    final _url = haveQueries
+        ? '${url}&playseek=${playseek}'
+        : '${url}${url.endsWith('?') ? '' : '?'}playseek=${playseek}';
+    _urlItem['url'] = _url;
+    startPlay(PlayListItem.fromJson(_urlItem), playback: true);
   }
 
   //显示、隐藏弹幕
@@ -282,13 +317,16 @@ class _VplayerState extends State<Vplayer> {
                           AspectRatio(
                               aspectRatio: _controller!.value.aspectRatio,
                               child: VideoPlayer(_controller!)),
-                          /*   VideoProgressIndicator(
+                          VplayerControls(
                             _controller!,
-                            colors: VideoProgressColors(
-                              playedColor: AppColors.primaryColor,
-                            ),
-                            allowScrubbing: true,
-                          ), */
+                            togglePlayList: togglePlayList,
+                            sendDanmaku: () {},
+                            toggleMediaInfo: toggleMediaInfo,
+                            toggleDanmaku: toggleDanmakuVisible,
+                            toggleEpgDialog: toggleEpgDialog,
+                            stopPlayer: stopPlayer,
+                            playingUrl: playingUrl,
+                          )
                         ]))
                     : PlaceCover()),
             Container(
