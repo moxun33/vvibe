@@ -223,6 +223,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
       playerConfig();
       player.media = url;
       player.state = PlaybackState.playing;
+
       player.updateTexture();
       if (!playback) {
         setState(() {
