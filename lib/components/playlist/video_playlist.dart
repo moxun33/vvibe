@@ -197,7 +197,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
             height: 30,
             width: PLAYLIST_BAR_WIDTH,
             padding: const EdgeInsets.fromLTRB(5, 1, 5, 0),
-            color: Colors.black87,
+            color: Colors.white12,
             child: DropdownButtonHideUnderline(
               child: DropdownButton2<String>(
                 dropdownStyleData: DropdownStyleData(

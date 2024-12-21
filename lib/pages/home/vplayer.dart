@@ -1,11 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:video_player/video_player.dart';
-import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/consts.dart';
+import 'package:vvibe/common/values/storage.dart';
+import 'package:vvibe/components/player/player_context_menu.dart';
+import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
+import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/danmaku/danmaku_service.dart';
+import 'package:vvibe/utils/LogFile.dart';
+import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/logger.dart';
+import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
+import 'package:vvibe/window/window.dart';
 
 class Vplayer extends StatefulWidget {
   const Vplayer({Key? key}) : super(key: key);
@@ -17,6 +27,15 @@ class Vplayer extends StatefulWidget {
 class _VplayerState extends State<Vplayer> {
   VideoPlayerController? _controller;
   bool playListShowed = true;
+
+  final barrageWallController = BarrageWallController();
+  PlayListItem? playingUrl;
+
+  bool danmakuManualShow = true;
+  String tip = ''; //左上角的单个文字提示，如成功、失败
+  List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
+  bool msgsShowed = false;
+  Map<String, String> extraMetaInfo = {}; //额外的元数据
   @override
   void initState() {
     super.initState();
@@ -25,15 +44,86 @@ class _VplayerState extends State<Vplayer> {
 
   startPlay(PlayListItem? item) {
     if (item == null || item.url == null) return;
-    if (_controller?.value?.isInitialized != null) _controller?.dispose();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(item.url!));
 
-    _controller?.addListener(() {
-      setState(() {});
+    if (_controller?.value.isInitialized != null) {
+      _controller?.dispose();
+      _controller = null;
+    }
+    ;
+
+    _controller = VideoPlayerController.networkUrl(Uri.parse(item.url!));
+    setState(() {
+      tip = '正在打开 ${item.name ?? ''}';
     });
-    _controller?.setLooping(true);
-    _controller?.initialize().then((_) => setState(() {}));
+    _controller?.addListener(() {
+      videoPlayerListener(item);
+    });
+    _controller?.initialize().then((_) => setState(() {
+          setState(() {
+            tip = '';
+            playingUrl = item;
+          });
+          startDanmakuSocket(item);
+          updateWindowTitle(item);
+          toggleMediaInfo(msgsShowed);
+        }));
     _controller?.play();
+  }
+
+  void updateWindowTitle(PlayListItem item) {
+    final size = _controller?.value.size;
+    final ratio = '${size!.width.toInt()}x${size.height.toInt()}';
+    final title = '${item.name} [${ratio}]';
+    VWindow().setWindowTitle(title, item.tvgLogo);
+  }
+
+// 显隐媒体元数据
+  void toggleMediaInfo([show = false]) {
+    setState(() {
+      msgsShowed = show;
+    });
+    /*  if (show) {
+      final info = player.mediaInfo;
+      final vc = info.video?[0].codec;
+      final ac = info.audio?[0].codec;
+      final _msgs = [
+        'Video: ${vc?.codec}/ ${info.format}',
+        '   Frame Rate: ${vc?.frameRate} fps',
+        '   Resolution: ${vc?.width} x ${vc?.height}',
+        '   Format: ${vc?.formatName}',
+        '   Bitrate: ${(vc?.bitRate ?? 0) / 1000} kbps',
+        '   ',
+        'Audio: ${ac?.codec}  ',
+        '   Channels: ${ac?.channels}',
+        '   Sample Rate: ${ac?.sampleRate} Hz',
+        '   Bitrate: ${(ac?.bitRate ?? 0) / 1000} kbps',
+      ];
+      setState(() {
+        msgs = _msgs;
+      });
+
+      MyLogger.info(info.toString());
+    } else {
+      setState(() {
+        msgs = [];
+      });
+    } */
+  }
+
+  videoPlayerListener(PlayListItem? item) {
+    if (item == null) return;
+    final _val = _controller?.value;
+    if (_val == null) return;
+    if (_val.hasError && !_val.isCompleted) {
+      setState(() {
+        tip = '${item.name} 播放失败 ${_val.errorDescription ?? ''}';
+        playingUrl = null;
+      });
+      return;
+    }
+
+    if (_val.position >= _val.duration) {}
+    print('mytest  ${_val.buffered}');
   }
 
   //播放url改变
@@ -42,61 +132,165 @@ class _VplayerState extends State<Vplayer> {
     startPlay(item);
   }
 
-  @override
-  void dispose() {
-    _controller?.dispose();
+  //播放列表菜单显示
+  void togglePlayList() {
+    setState(() {
+      playListShowed = !playListShowed;
+    });
+    LogFile.log('app log');
   }
 
-  Widget _buildCover() {
+//打开单个播放url
+  void onOpenOneUrl(String url) async {
+    MyLogger.info('打开链接 $url');
+    if (url.isEmpty) return;
+    final item = await PlaylistUtil().parseSingleUrlAsync(url);
+    startPlay(item);
+  }
+
+  @override
+  void dispose() {
+    _controller?.removeListener(() {
+      videoPlayerListener(null);
+    });
+    _controller?.dispose();
+    _controller = null;
+  }
+
+  Widget PlaceCover() {
+    return GestureDetector(
+        onTap: () {
+          togglePlayList();
+        },
+        child: Container(
+          color: Colors.black12,
+          child: Center(
+            child: Wrap(
+              direction: Axis.vertical,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 50,
+              children: [
+                SizedBox(
+                    width: 200,
+                    child: CachedNetworkImage(
+                      fit: BoxFit.contain,
+                      imageUrl: playingUrl?.tvgLogo ?? '',
+                      errorWidget: (context, url, error) =>
+                          Image.asset('assets/logo.png'),
+                    ))
+              ],
+            ),
+          ),
+        ));
+  }
+
+//开始连接斗鱼、忽悠、b站的弹幕
+  void startDanmakuSocket(PlayListItem item) async {
+    stopDanmakuSocket();
+    if (!danmakuManualShow) {
+      return;
+    }
+    barrageWallController.enable();
+    DanmakuService().start(item, renderDanmaku);
+  }
+
+//断开所有弹幕连接
+  void stopDanmakuSocket() {
+    barrageWallController.clear();
+    barrageWallController.disable();
+    DanmakuService().stop();
+  }
+
+//发送弹幕到屏幕
+  void renderDanmaku(LiveDanmakuItem? data, {isHackchat = false}) async {
+    if (!danmakuManualShow) return;
+
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final fontSize =
+        settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
+    barrageWallController.send([
+      Bullet(
+          child:
+              DanmakuRender(data, fontSize: fontSize, isHackchat: isHackchat))
+    ]);
+  }
+
+  //显示、隐藏弹幕
+  void toggleDanmakuVisible() {
+    if (barrageWallController.isEnabled) {
+      barrageWallController.disable();
+      setState(() {
+        danmakuManualShow = false;
+      });
+      stopDanmakuSocket();
+    } else {
+      barrageWallController.enable();
+      setState(() {
+        danmakuManualShow = true;
+      });
+      if (playingUrl != null) startDanmakuSocket(playingUrl!);
+    }
+  }
+
+//获取当前弹幕区域尺寸
+  Size getDanmakuSize() => Size(
+      playListShowed
+          ? getDeviceWidth(context) - PLAYLIST_BAR_WIDTH
+          : getDeviceWidth(context),
+      getDeviceHeight(context));
+  // 信息展示
+  Widget OsdMsg() {
+    final _msgs = [tip] + msgs;
     return Container(
-      color: Colors.black,
-      child: Center(
-        child: Wrap(
-          direction: Axis.vertical,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 50,
-          children: [
-            SizedBox(
-                width: 200,
-                child: CachedNetworkImage(
-                  fit: BoxFit.contain,
-                  imageUrl: '',
-                  errorWidget: (context, url, error) =>
-                      Image.asset('assets/logo.png'),
-                ))
-          ],
-        ),
-      ),
-    );
+        padding: const EdgeInsets.all(10),
+        width: getDanmakuSize().width,
+        height: getDanmakuSize().height - 100,
+        color: Colors.transparent,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _msgs.map((txt) {
+              return Text(
+                txt,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    overflow: TextOverflow.ellipsis),
+              );
+            }).toList()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: getDeviceWidth(context),
       color: Colors.black12,
       child: Stack(
-        alignment: Alignment.bottomCenter,
         children: <Widget>[
           Row(children: <Widget>[
             Expanded(
                 flex: 4,
                 child: _controller != null &&
                         _controller?.value.isInitialized == true
-                    ? Stack(alignment: Alignment.bottomCenter, children: [
-                        AspectRatio(
-                            aspectRatio: _controller!.value.aspectRatio,
-                            child: Container(
-                                color: Colors.black12,
-                                child: VideoPlayer(_controller!))),
-                        VideoProgressIndicator(
-                          _controller!,
-                          colors: VideoProgressColors(
-                              playedColor: AppColors.primaryColor),
-                          allowScrubbing: true,
-                        ),
-                      ])
-                    : _buildCover()),
+                    ? BarrageWall(
+                        debug: false, //!Global.isRelease,
+                        safeBottomHeight: getDeviceHeight(context) ~/ 4 * 3,
+                        speed: 10,
+                        massiveMode: false,
+                        speedCorrectionInMilliseconds: 10000,
+                        bullets: [],
+                        controller: barrageWallController,
+                        child: Stack(alignment: Alignment.center, children: [
+                          AspectRatio(
+                              aspectRatio: _controller!.value.aspectRatio,
+                              child: VideoPlayer(_controller!)),
+                          /*   VideoProgressIndicator(
+                            _controller!,
+                            colors: VideoProgressColors(
+                              playedColor: AppColors.primaryColor,
+                            ),
+                            allowScrubbing: true,
+                          ), */
+                        ]))
+                    : PlaceCover()),
             Container(
                 width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
                 child: VideoPlaylist(
@@ -104,6 +298,13 @@ class _VplayerState extends State<Vplayer> {
                   onUrlTap: onPlayUrlChange,
                 )),
           ]),
+          GestureDetector(
+              onDoubleTap: () => togglePlayList(),
+              child: PlayerContextMenu(
+                  onOpenUrl: onOpenOneUrl,
+                  showPlaylist: togglePlayList,
+                  playListShowed: playListShowed,
+                  child: OsdMsg())),
         ],
       ),
     );
