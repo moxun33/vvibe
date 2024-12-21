@@ -2,19 +2,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:desktop_multi_window/desktop_multi_window.dart';
+//import 'package:desktop_multi_window/desktop_multi_window.dart';
 
 class SubWindow extends StatefulWidget {
   const SubWindow(
       {Key? key,
-      required this.windowController,
+      //required this.windowController,
       required this.args,
       required this.title,
       required this.child,
       required this.theme})
       : super(key: key);
   final ThemeData theme;
-  final WindowController windowController;
+  //final WindowController windowController;
   final Map? args;
   final String title;
   final Widget child;

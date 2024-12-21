@@ -26,6 +26,7 @@ jobs:
     env:
       FFMPEG_DOWNLOAD_URL: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z
       FFMPEG_VERSION: latest
+      FVP_DEPS_LATEST: 1
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -54,7 +55,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.24.3
+          flutter-version: 3.24.4
           cache: true
 
       - name: Build

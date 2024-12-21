@@ -4,18 +4,15 @@
  * @LastEditors: moxun33
  * @LastEditTime: 2023-05-16 00:11:04
  * @FilePath: \vvibe\lib\components\player\player_context_menu.dart
- * @Description: 
+ * @Description:
  * @qmj
  */
-import 'dart:convert';
-
-import 'package:desktop_multi_window/desktop_multi_window.dart';
+//import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:vvibe/common/values/values.dart';
+import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/components/player/settings/open_url_dialog.dart';
 import 'package:vvibe/components/player/settings/setting_alert_dialog.dart';
-import 'package:native_context_menu/native_context_menu.dart';
 
 class PlayerContextMenu extends StatefulWidget {
   PlayerContextMenu(
@@ -35,14 +32,14 @@ class PlayerContextMenu extends StatefulWidget {
 
 class _PlayerContextMenuState extends State<PlayerContextMenu> {
   void _showNewWin(String key, {String? title}) async {
-    final window = await DesktopMultiWindow.createWindow(jsonEncode({
+    /*  final window = await DesktopMultiWindow.createWindow(jsonEncode({
       'key': key,
     }));
     window
       ..setTitle(title ?? 'VVibe')
       ..setFrame(const Offset(0, 0) & Size(1280, 720 + CUS_WIN_TITLEBAR_HEIGHT))
       ..center()
-      ..show();
+      ..show(); */
   }
 
   void _onItemSelect(BuildContext context, MenuItem item) {

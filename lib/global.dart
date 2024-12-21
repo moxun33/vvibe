@@ -39,13 +39,12 @@ class Global {
 // set logger before registerWith()
     // if (!IS_RELEASE) Logger.root.level = Level.ALL;
 
-    final df = DateFormat("HH:mm:ss.SSS");
-
     Logger.root.onRecord.listen((record) {
+      final df = DateFormat("HH:mm:ss.SSS");
       final content =
           '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}';
       print(content);
-      if (IS_RELEASE) LogFile.log(content + '\n');
+      //if (IS_RELEASE) LogFile.log(content + '\n');
     });
     fvp.registerWith();
     // Ruquest 模块初始化
