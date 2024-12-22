@@ -15,7 +15,6 @@ import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
-import 'package:vvibe/utils/common.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
@@ -189,8 +188,6 @@ class _VplayerState extends State<Vplayer> {
           setState(() {
             bufferSpeed = speed; // 计算缓冲速度
           });
-
-          updateWindowTitle(playingUrl!, '${formatFileSize(speed)}/S');
         }
       }
 
