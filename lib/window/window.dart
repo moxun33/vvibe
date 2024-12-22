@@ -42,4 +42,9 @@ class VWindow {
   ) {
     eventBus.emit('set-window-icon', icon ?? '');
   }
+
+  // 显示隐藏标题栏
+  void showTitleBar([bool show = false]) {
+    eventBus.emit('show-title-bar', show);
+  }
 }

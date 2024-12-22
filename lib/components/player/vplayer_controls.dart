@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/window/window.dart';
+import 'package:window_manager/window_manager.dart';
 
 class VplayerControls extends StatefulWidget {
   VplayerControls(this.controller,
@@ -46,12 +49,15 @@ class _VplayerControlsState extends State<VplayerControls>
   late FocusNode textFocusNode = new FocusNode();
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
+  bool _isFullScreen = false;
 
   @override
   void initState() {
     super.initState();
     init();
   }
+
+  VideoPlayerController? get player => widget.controller;
 
   void init() async {
     /* playPauseController = AnimationController(
@@ -74,16 +80,30 @@ class _VplayerControlsState extends State<VplayerControls>
     super.dispose();
   }
 
+  // 切换全屏状态
+  void _toggleFullScreen() {
+    _setFullScreen(!_isFullScreen);
+  }
+
+  void _setFullScreen([bool full = false]) {
+    windowManager.setFullScreen(!_isFullScreen);
+    VWindow().showTitleBar(_isFullScreen);
+
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
+  }
+
   void reload() {
-    widget.controller.play();
+    player?.play();
   }
 
   void playOrPuase() async {
-    bool toPause = widget.controller.value.isPlaying;
+    bool toPause = player?.value.isPlaying == true;
     if (toPause) {
-      widget.controller.pause();
+      player?.pause();
     } else {
-      widget.controller.play();
+      player?.play();
     }
 
     /* if (FvpPlayState.playing == state) {
@@ -153,7 +173,7 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   bool isLive() {
-    return widget.controller.value.duration.inDays == 106751991;
+    return player?.value.duration.inDays == 106751991;
   }
 
   String parseDuration(Duration duration) {
@@ -175,71 +195,95 @@ class _VplayerControlsState extends State<VplayerControls>
     }
   }
 
+  // 处理键盘事件
+  void _onKey(KeyEvent event) {
+    final key = event.logicalKey;
+    if (event is KeyUpEvent) {
+      if (key.keyLabel == 'space') {
+        playOrPuase();
+      }
+
+      if (key.keyLabel == 'Escape') {
+        _setFullScreen();
+      }
+
+      if (key.keyLabel == 'Enter') {
+        _toggleFullScreen();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<VideoPlayerValue>(
         valueListenable: widget.controller,
-        builder: (context, value, child) => GestureDetector(
-            onTap: () {
-              if (isPlaying == true) {
-                if (_displayTapped) {
-                  setState(() => _hideControls = true);
-                } else {
-                  _cancelAndRestartTimer();
-                }
-              } else {
-                setState(() => _hideControls = true);
-              }
-            },
-            child: MouseRegion(
-              onHover: (_) {
-                _cancelAndRestartTimer();
-              },
-              child: AbsorbPointer(
-                  absorbing: _hideControls,
-                  child: Stack(
-                    children: [
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 500),
-                        opacity: _hideControls ? 0.0 : 1.0,
-                        child: Stack(fit: StackFit.expand, children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xCC000000),
-                                  Color(0x00000000),
-                                  Color(0x00000000),
-                                  Color(0x00000000),
-                                  Color(0x00000000),
-                                  Color(0x00000000),
-                                  Color(0xCC000000),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                              left: 10,
-                              right: 0,
-                              bottom: 18,
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    color: Colors.white,
-                                    splashRadius: 12,
-                                    iconSize: 28,
-                                    tooltip: isPlaying == true ? '正在播放' : '已暂停',
-                                    icon: Icon(isPlaying == true
-                                        ? Icons.pause
-                                        : Icons.play_arrow),
-                                    onPressed: () {
-                                      playOrPuase();
-                                    },
+        builder: (context, value, child) => KeyboardListener(
+            autofocus: true,
+            focusNode:
+                FocusNode(), // 为了使 RawKeyboardListener 响应事件，需要有一个 FocusNode
+            onKeyEvent: _onKey, // 监听键盘事件
+            child: GestureDetector(
+                onTap: () {
+                  if (isPlaying == true) {
+                    if (_displayTapped) {
+                      setState(() => _hideControls = true);
+                    } else {
+                      _cancelAndRestartTimer();
+                    }
+                  } else {
+                    setState(() => _hideControls = true);
+                  }
+                },
+                child: MouseRegion(
+                  onHover: (_) {
+                    _cancelAndRestartTimer();
+                  },
+                  child: AbsorbPointer(
+                      absorbing: _hideControls,
+                      child: Stack(
+                        children: [
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 500),
+                            opacity: _hideControls ? 0.0 : 1.0,
+                            child: Stack(fit: StackFit.expand, children: [
+                              Container(
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xCC000000),
+                                      Color(0x00000000),
+                                      Color(0x00000000),
+                                      Color(0x00000000),
+                                      Color(0x00000000),
+                                      Color(0x00000000),
+                                      Color(0xCC000000),
+                                    ],
                                   ),
+                                ),
+                              ),
+                              Positioned(
+                                  left: 10,
+                                  right: 0,
+                                  bottom: 18,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        color: Colors.white,
+                                        splashRadius: 12,
+                                        iconSize: 28,
+                                        tooltip:
+                                            isPlaying == true ? '正在播放' : '已暂停',
+                                        icon: Icon(isPlaying == true
+                                            ? Icons.pause
+                                            : Icons.play_arrow),
+                                        onPressed: () {
+                                          playOrPuase();
+                                        },
+                                      ),
 
-                                  /* IconButton(
+                                      /* IconButton(
                                 tooltip: '重新加载',
                                 color: Colors.white,
                                 icon: Icon(Icons.rotate_right_outlined),
@@ -247,22 +291,22 @@ class _VplayerControlsState extends State<VplayerControls>
                                   reload();
                                 },
                               ), */
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  IconButton(
-                                    tooltip: '停止',
-                                    color: Colors.white,
-                                    icon: Icon(Icons.stop_sharp),
-                                    onPressed: () {
-                                      stop();
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      IconButton(
+                                        tooltip: '停止',
+                                        color: Colors.white,
+                                        icon: Icon(Icons.stop_sharp),
+                                        onPressed: () {
+                                          stop();
+                                        },
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
 
-                                  /*     Focus(
+                                      /*     Focus(
                                   focusNode: textFocusNode,
                                   onFocusChange: onTextFocusChange,
                                   child: Container(
@@ -297,107 +341,127 @@ class _VplayerControlsState extends State<VplayerControls>
                                       ],
                                     ),
                                   )), */
-                                  const Expanded(
-                                      flex: 9, child: SizedBox(width: 8)),
-                                ],
-                              )),
-                          Positioned(
-                              right: 220,
-                              bottom: 18,
-                              child: IconButton(
-                                tooltip: '点击${showDanmaku ? '关闭' : '显示'}弹幕',
-                                color: Colors.white,
-                                iconSize: 20,
-                                icon: Icon(showDanmaku
-                                    ? Icons.subtitles_outlined
-                                    : Icons.subtitles_off_sharp),
-                                onPressed: () {
-                                  _toggleDanmakuShow();
-                                },
-                              )),
-                          Positioned(
-                            right: 160,
-                            bottom: 18,
-                            child: VolumeControl(
-                              widget.controller,
-                              thumbColor: Colors.white70,
-                            ),
-                          ),
-                          Positioned(
-                              right: 110,
-                              bottom: 18,
-                              child: IconButton(
-                                tooltip: '元数据',
-                                color: Colors.white,
-                                iconSize: 20,
-                                icon: Icon(Icons.info_outline),
-                                onPressed: () {
-                                  _getMetaInfo();
-                                },
-                              )),
-                          Positioned(
-                            right: 60,
-                            bottom: 18,
-                            child: IconButton(
-                              tooltip: '节目单',
-                              color: Colors.white,
-                              icon: Icon(Icons.event_repeat_sharp),
-                              onPressed: () {
-                                _toggleEpgDialog();
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            right: 10,
-                            bottom: 18,
-                            child: IconButton(
-                              tooltip: '播放列表',
-                              color: Colors.white,
-                              icon: Icon(Icons.menu_sharp),
-                              onPressed: () {
-                                widget.togglePlayList();
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            left: 10,
-                            right: 10,
-                            bottom: 1,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                    width: 60,
-                                    child: Text(
-                                      parseDuration(value.position),
-                                      style: TextStyle(color: Colors.white),
+                                      const Expanded(
+                                          flex: 9, child: SizedBox(width: 8)),
+                                    ],
+                                  )),
+                              Positioned(
+                                  left: 110,
+                                  bottom: 20,
+                                  child: VolumeControl(
+                                    widget.controller,
+                                    thumbColor: Colors.white70,
+                                  )),
+                              Positioned(
+                                  right: 20,
+                                  bottom: 22,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        tooltip:
+                                            '点击${showDanmaku ? '关闭' : '显示'}弹幕',
+                                        color: Colors.white,
+                                        iconSize: 20,
+                                        icon: Icon(showDanmaku
+                                            ? Icons.subtitles_outlined
+                                            : Icons.subtitles_off_sharp),
+                                        onPressed: () {
+                                          _toggleDanmakuShow();
+                                        },
+                                      ),
+                                      IconButton(
+                                        tooltip: '元数据',
+                                        color: Colors.white,
+                                        iconSize: 20,
+                                        icon: Icon(Icons.info_outline),
+                                        onPressed: () {
+                                          _getMetaInfo();
+                                        },
+                                      ),
+                                      IconButton(
+                                        tooltip: '节目单',
+                                        color: Colors.white,
+                                        icon: Icon(Icons.event_repeat_sharp),
+                                        onPressed: () {
+                                          _toggleEpgDialog();
+                                        },
+                                      ),
+                                      IconButton(
+                                        tooltip: '全屏',
+                                        color: Colors.white,
+                                        icon: Icon(_isFullScreen
+                                            ? Icons.fullscreen_exit
+                                            : Icons.fullscreen),
+                                        onPressed: () {
+                                          _toggleFullScreen();
+                                        },
+                                      ),
+                                      IconButton(
+                                        tooltip: '播放列表',
+                                        color: Colors.white,
+                                        icon: Icon(Icons.menu_sharp),
+                                        onPressed: () {
+                                          widget.togglePlayList();
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                              Positioned(
+                                left: 10,
+                                right: 0,
+                                bottom: 5,
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                        width: 60,
+                                        child: Text(
+                                          parseDuration(value.position),
+                                          style: TextStyle(color: Colors.white),
+                                        )),
+                                    Expanded(
+                                        child: VideoProgressIndicator(
+                                      widget.controller,
+                                      colors: VideoProgressColors(
+                                        playedColor: AppColors.primaryColor,
+                                      ),
+                                      allowScrubbing: true,
                                     )),
-                                Expanded(
-                                    child: VideoProgressIndicator(
-                                  widget.controller,
-                                  colors: VideoProgressColors(
-                                    playedColor: AppColors.primaryColor,
-                                  ),
-                                  allowScrubbing: true,
-                                )),
-                                SizedBox(
-                                  width: 10,
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    SizedBox(
+                                        width: 60,
+                                        child: Text(
+                                          parseDuration(isLive()
+                                              ? value.position
+                                              : value.duration),
+                                          style: TextStyle(color: Colors.white),
+                                        ))
+                                  ],
                                 ),
-                                SizedBox(
-                                    width: 60,
-                                    child: Text(
-                                      parseDuration(isLive()
-                                          ? value.position
-                                          : value.duration),
-                                      style: TextStyle(color: Colors.white),
-                                    ))
-                              ],
-                            ),
-                          )
-                        ]),
-                      ),
-                    ],
-                  )),
-            )));
+                              )
+                            ]),
+                          ),
+                          /*     _isFullScreen
+                              ? Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  top: 18,
+                                  child: IconButton(
+                                    tooltip: '退出全屏',
+                                    onPressed: () {
+                                      _toggleFullScreen();
+                                    },
+                                    icon: Icon(
+                                      Icons.fullscreen_exit,
+                                      size: 30,
+                                    ),
+                                    color: Colors.white,
+                                  ))
+                              : SizedBox() */
+                        ],
+                      )),
+                ))));
   }
 }
 
@@ -417,17 +481,20 @@ class VolumeControl extends StatefulWidget {
 
 class _VolumeControlState extends State<VolumeControl> {
   double volume = 1.0;
-  bool _showVolume = false;
   double unmutedVolume = 1.0;
+  bool _showVolume = false;
 
   VideoPlayerController? get player => widget.controller;
   void _onScroll(PointerScrollEvent event) {
-    // 根据滚轮的方向调整音量
-    final _volume = volume + event.scrollDelta.dy > 0 ? 0.05 : -0.05;
+    final _volume = volume + (event.scrollDelta.dy < 0 ? 0.05 : -0.05);
+    print('mytest ${_volume}');
+    _setVolume(_volume);
+  }
 
-    // 确保音量在 0.0 到 1.0 之间
+  _setVolume(double v) {
+    player?.setVolume(v.clamp(0.0, 1.0));
     setState(() {
-      volume = _volume.clamp(0.0, 1.0);
+      volume = v.clamp(0.0, 1.0);
     });
   }
 
@@ -467,13 +534,7 @@ class _VolumeControlState extends State<VolumeControl> {
                         max: 1.0,
                         divisions: 100,
                         value: volume.roundToDouble(),
-                        onChanged: (v) {
-                          print('volume $v');
-                          player?.setVolume(v);
-                          setState(() {
-                            volume = v;
-                          });
-                        },
+                        onChanged: _setVolume,
                       ),
                     ),
                   ),
@@ -482,21 +543,60 @@ class _VolumeControlState extends State<VolumeControl> {
             ),
           ),
         ),
-        MouseRegion(
-          onEnter: (_) {
-            setState(() => _showVolume = true);
+        Listener(
+          onPointerSignal: (event) {
+            if (event is PointerScrollEvent) {
+              _onScroll(event);
+            }
           },
-          onExit: (_) {
-            setState(() => _showVolume = false);
-          },
-          child: IconButton(
-            color: Colors.white,
-            onPressed: () => muteUnmute(),
-            icon: Icon(getIcon()),
+          child: MouseRegion(
+            onEnter: (_) {
+              setState(() => _showVolume = true);
+            },
+            onExit: (_) {
+              setState(() => _showVolume = false);
+            },
+            child: IconButton(
+              color: Colors.white,
+              onPressed: () => muteUnmute(),
+              icon: Tooltip(
+                message: (volume * 1 * 100).roundToDouble().toString(),
+                child: Icon(getIcon()),
+              ),
+            ),
           ),
         )
       ],
     );
+    /* return Row(
+      children: [
+        IconButton(
+          color: Colors.white,
+          onPressed: () => muteUnmute(),
+          icon: Icon(getIcon()),
+        ),
+        SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: AppColors.primaryColor.withOpacity(.7),
+            thumbColor: widget.thumbColor,
+          ),
+          child: Slider.adaptive(
+            label: (volume * 1 * 100).roundToDouble().toString(),
+            min: 0.0,
+            max: 1.0,
+            divisions: 100,
+            value: volume.roundToDouble(),
+            onChanged: (v) {
+              print('mytest volume $v');
+              player?.setVolume(v);
+              setState(() {
+                volume = v;
+              });
+            },
+          ),
+        ),
+      ],
+    ); */
   }
 
   IconData getIcon() {

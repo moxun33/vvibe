@@ -59,29 +59,19 @@ class _WindowButtonsState extends State<WindowButtons> {
 }
 
 class WindowTitle extends StatefulWidget {
-  WindowTitle({Key? key, this.title}) : super(key: key);
+  WindowTitle({Key? key, this.title, this.icon, this.visible})
+      : super(key: key);
   final String? title;
+  final String? icon;
+  final bool? visible;
   @override
   _WindowTitleState createState() => _WindowTitleState();
 }
 
 class _WindowTitleState extends State<WindowTitle> {
-  String title = 'VVibe';
-  String icon = '';
   @override
   void initState() {
     super.initState();
-    title = widget.title ?? 'VVibe';
-    eventBus.on("set-window-title", (arg) {
-      setState(() {
-        title = arg;
-      });
-    });
-    eventBus.on("set-window-icon", (arg) {
-      setState(() {
-        icon = arg;
-      });
-    });
   }
 
   Widget BarIcon() {
@@ -89,10 +79,10 @@ class _WindowTitleState extends State<WindowTitle> {
       'assets/logo.png',
       height: 25,
     );
-    if (icon.isEmpty) return defIcon;
+    if (widget.icon != null || widget.icon?.isEmpty == true) return defIcon;
     return CachedNetworkImage(
       fit: BoxFit.contain,
-      imageUrl: icon,
+      imageUrl: widget.icon!,
       height: 30,
       errorWidget: (context, url, error) => defIcon,
     );
@@ -100,37 +90,46 @@ class _WindowTitleState extends State<WindowTitle> {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(children: [
-      Padding(
-          padding: const EdgeInsets.only(left: 5, top: 2), child: BarIcon()),
-      Container(
-        padding: const EdgeInsets.only(left: 10, top: 5),
-        child: Text(title, style: TextStyle(color: Colors.white)),
-      )
-    ]);
+    return widget.visible == true
+        ? Wrap(children: [
+            Padding(
+                padding: const EdgeInsets.only(left: 5, top: 2),
+                child: BarIcon()),
+            Container(
+              padding: const EdgeInsets.only(left: 10, top: 5),
+              child: Text(widget.title ?? 'VVibe',
+                  style: TextStyle(color: Colors.white)),
+            )
+          ])
+        : SizedBox();
   }
 }
 
 //顶部操作栏
-Widget WindowTitleBar({String title = 'VVibe'}) {
-  return WindowTitleBarBox(
-    child: MoveWindow(
-        child: Container(
-      decoration: BoxDecoration(
-          color: ColorUtil.fromHex('#3D3D3D'),
-          border: Border(top: BorderSide(color: Colors.black38, width: 1))),
-      height: CUS_WIN_TITLEBAR_HEIGHT,
-      child: Flex(
-        direction: Axis.horizontal,
-        children: [
-          Expanded(
-            child: WindowTitle(title: title),
-          ),
-          WindowButtons()
-        ],
-      ),
-    )),
-  );
+Widget WindowTitleBar(
+    {String title = 'VVibe', String icon = '', bool visible = true}) {
+  return visible
+      ? WindowTitleBarBox(
+          child: MoveWindow(
+              child: Container(
+            height: visible ? CUS_WIN_TITLEBAR_HEIGHT : 0,
+            decoration: BoxDecoration(
+                color: ColorUtil.fromHex('#3D3D3D'),
+                border:
+                    Border(top: BorderSide(color: Colors.black38, width: 1))),
+            child: Flex(
+              direction: Axis.horizontal,
+              children: [
+                Expanded(
+                  child:
+                      WindowTitle(visible: visible, title: title, icon: icon),
+                ),
+                WindowButtons()
+              ],
+            ),
+          )),
+        )
+      : SizedBox();
 }
 
 //统一窗口包裹器
@@ -148,10 +147,29 @@ class WindowScaffold extends StatefulWidget {
 }
 
 class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
+  bool showTitlebar = true;
+  String title = 'VVibe';
+  String icon = '';
+
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
+    eventBus.on("show-title-bar", (arg) {
+      setState(() {
+        showTitlebar = arg;
+      });
+    });
+    eventBus.on("set-window-title", (arg) {
+      setState(() {
+        title = arg;
+      });
+    });
+    eventBus.on("set-window-icon", (arg) {
+      setState(() {
+        icon = arg;
+      });
+    });
   }
 
   @override
@@ -179,7 +197,9 @@ class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
           child: Column(
             children: [
               WindowTitleBar(
-                title: widget.title ?? 'VVibe',
+                visible: showTitlebar,
+                title: title,
+                icon: icon,
               ),
               Expanded(child: widget.child)
             ],
