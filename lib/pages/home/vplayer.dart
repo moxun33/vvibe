@@ -15,9 +15,7 @@ import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
-import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/local_storage.dart';
-import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
 import 'package:vvibe/window/window.dart';
@@ -41,6 +39,9 @@ class _VplayerState extends State<Vplayer> {
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
+  int bufferSpeed = 0; // 缓冲速度 (字节/秒)
+  Duration lastBufferUpdateTime = Duration.zero;
+  Duration lastBufferedPosition = Duration.zero;
   @override
   void initState() {
     super.initState();
@@ -111,10 +112,10 @@ class _VplayerState extends State<Vplayer> {
     _controller?.play();
   }
 
-  void updateWindowTitle(PlayListItem item) {
+  void updateWindowTitle(PlayListItem item, [String extra = '']) {
     final size = _controller?.value.size;
     final ratio = '${size!.width.toInt()}x${size.height.toInt()}';
-    final title = '${item.name} [${ratio}]';
+    final title = '${item.name} [${ratio}] ' + ' ${extra}';
     VWindow().setWindowTitle(title, item.tvgLogo);
   }
 
@@ -152,7 +153,7 @@ class _VplayerState extends State<Vplayer> {
   }
 
   videoPlayerListener(PlayListItem? item) {
-    if (item == null) return;
+    if (item == null || _controller?.value.isInitialized != true) return;
     final _val = _controller?.value;
     if (_val == null) return;
     if (_val.hasError && !_val.isCompleted) {
@@ -162,9 +163,39 @@ class _VplayerState extends State<Vplayer> {
       });
       return;
     }
+    if (_val.isBuffering && !_val.isPlaying) {
+      setState(() {
+        tip = '${item.name} 缓冲中......';
+      });
+    } else {
+      setState(() {
+        tip = '';
+      });
+    }
+    final buffered = _controller?.value.buffered;
 
-    if (_val.position >= _val.duration) {}
-    print('mytest  ${_val.buffered}');
+    // 获取最新的缓冲区
+    if (buffered != null && buffered.isNotEmpty) {
+      final newBufferEnd = buffered.last.end;
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      if (lastBufferUpdateTime != Duration.zero) {
+        final elapsedTime = now - lastBufferUpdateTime.inMilliseconds;
+        final newBufferedBytes =
+            newBufferEnd.inMilliseconds - lastBufferedPosition.inMilliseconds;
+        final speed = (newBufferedBytes / (elapsedTime / 1000)).toInt();
+        if (speed > 0 && playingUrl != null) {
+          setState(() {
+            bufferSpeed = speed; // 计算缓冲速度
+          });
+
+          updateWindowTitle(playingUrl!, '$speed KB/S');
+        }
+      }
+
+      lastBufferedPosition = newBufferEnd;
+      lastBufferUpdateTime = Duration(milliseconds: now);
+    }
   }
 
   //播放url改变
@@ -178,12 +209,12 @@ class _VplayerState extends State<Vplayer> {
     setState(() {
       playListShowed = !playListShowed;
     });
-    LogFile.log('app log');
+    // LogFile.log('app log');
   }
 
 //打开单个播放url
   void onOpenOneUrl(String url) async {
-    MyLogger.info('打开链接 $url');
+    // MyLogger.info('打开链接 $url');
     if (url.isEmpty) return;
     final item = await PlaylistUtil().parseSingleUrlAsync(url);
     startPlay(item);
@@ -201,38 +232,6 @@ class _VplayerState extends State<Vplayer> {
       playingUrl = null;
       _controller = null;
     });
-  }
-
-  @override
-  void dispose() {
-    stopPlayer();
-  }
-
-  Widget PlaceCover() {
-    return GestureDetector(
-        onTap: () {
-          togglePlayList();
-        },
-        child: Container(
-          color: Colors.black12,
-          child: Center(
-            child: Wrap(
-              direction: Axis.vertical,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 50,
-              children: [
-                SizedBox(
-                    width: 200,
-                    child: CachedNetworkImage(
-                      fit: BoxFit.contain,
-                      imageUrl: playingUrl?.tvgLogo ?? '',
-                      errorWidget: (context, url, error) =>
-                          Image.asset('assets/logo.png'),
-                    ))
-              ],
-            ),
-          ),
-        ));
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
@@ -317,6 +316,39 @@ class _VplayerState extends State<Vplayer> {
           ? getDeviceWidth(context) - PLAYLIST_BAR_WIDTH
           : getDeviceWidth(context),
       getDeviceHeight(context));
+
+  @override
+  void dispose() {
+    stopPlayer();
+  }
+
+  Widget PlaceCover() {
+    return GestureDetector(
+        onTap: () {
+          togglePlayList();
+        },
+        child: Container(
+          color: Colors.black12,
+          child: Center(
+            child: Wrap(
+              direction: Axis.vertical,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 50,
+              children: [
+                SizedBox(
+                    width: 200,
+                    child: CachedNetworkImage(
+                      fit: BoxFit.contain,
+                      imageUrl: playingUrl?.tvgLogo ?? '',
+                      errorWidget: (context, url, error) =>
+                          Image.asset('assets/logo.png'),
+                    ))
+              ],
+            ),
+          ),
+        ));
+  }
+
   // 信息展示
   Widget OsdMsg() {
     final _msgs = [tip] + msgs;
