@@ -40,7 +40,7 @@
 
 ![img](docs/player.png)
 ![img](docs/settings.png)
-![img](docs/urls-sniffing.png)
+ 
 
 ## 注意事项
 
