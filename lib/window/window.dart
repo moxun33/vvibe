@@ -29,7 +29,7 @@ class VWindow {
   }
 
 //设置window title
-  void setWindowTitle(String? title, [String? icon]) {
+  void setWindowTitle([String? title, String? icon]) {
     final _title = title ?? 'VVibe';
     appWindow.title = _title;
     eventBus.emit('set-window-title', _title);

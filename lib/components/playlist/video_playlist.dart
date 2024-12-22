@@ -263,9 +263,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                     )),
           height: MediaQuery.of(context).size.height,
           decoration: new BoxDecoration(
-              color: Colors.black87,
+              color: Colors.white10,
               border:
-                  Border(left: BorderSide(color: Colors.white54, width: 1))),
+                  Border(left: BorderSide(color: Colors.white12, width: 1))),
         ))
       ],
     );

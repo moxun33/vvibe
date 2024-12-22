@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/utils/screen_device.dart';
 
 class VplayerControls extends StatefulWidget {
   VplayerControls(this.controller,
@@ -144,7 +143,7 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   void _startHideTimer() {
-    _hideTimer = Timer(const Duration(seconds: 2), () {
+    _hideTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _hideControls = true;
@@ -204,8 +203,23 @@ class _VplayerControlsState extends State<VplayerControls>
                         duration: const Duration(milliseconds: 500),
                         opacity: _hideControls ? 0.0 : 1.0,
                         child: Stack(fit: StackFit.expand, children: [
-                          //widget.videoWidget,
-
+                          Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xCC000000),
+                                  Color(0x00000000),
+                                  Color(0x00000000),
+                                  Color(0x00000000),
+                                  Color(0x00000000),
+                                  Color(0x00000000),
+                                  Color(0xCC000000),
+                                ],
+                              ),
+                            ),
+                          ),
                           Positioned(
                               left: 10,
                               right: 0,
@@ -321,7 +335,6 @@ class _VplayerControlsState extends State<VplayerControls>
                                   _getMetaInfo();
                                 },
                               )),
-
                           Positioned(
                             right: 60,
                             bottom: 18,
@@ -381,10 +394,6 @@ class _VplayerControlsState extends State<VplayerControls>
                             ),
                           )
                         ]),
-                      ),
-                      Container(
-                        width: getDeviceWidth(context),
-                        height: getDeviceHeight(context),
                       ),
                     ],
                   )),

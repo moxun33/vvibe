@@ -44,17 +44,42 @@ class _VplayerState extends State<Vplayer> {
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
   }
 
-  startPlay(PlayListItem? item, {bool playback = false}) {
+  playerConfig() async {
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final fullFfmpeg = settings['fullFfmpeg'] == 'true';
+    /*  player.setProperty('http_persistent', '0');
+    player.setDecoders(MediaType.video, [
+      "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
+      "hap",
+      "D3D11",
+      "DXVA",
+      "CUDA",
+      "FFmpeg",
+      "dav1d"
+    ]);
+    if (fullFfmpeg) {
+      player.setProperty('video.avfilter', 'yadif');
+    }
+    player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
+    player.setProperty('video.reconnect', '1');
+    player.setProperty('video.reconnect_delay_max', '3');
+    player.setProperty('demux.buffer.range', '7');
+    player.setProperty('buffer', '2000+600000'); */
+  }
+
+  startPlay(PlayListItem? item, {bool playback = false}) async {
     if (item == null || item.url == null) return;
 
-    if (_controller?.value.isInitialized != null) {
-      _controller?.dispose();
-      _controller = null;
+    if (_controller?.value.isInitialized == true) {
+      stopPlayer();
     }
-    ;
-
-    _controller = VideoPlayerController.networkUrl(Uri.parse(item.url!));
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    _controller =
+        VideoPlayerController.networkUrl(Uri.parse(item.url!), httpHeaders: {
+      'User-Agent': settings['ua'] ?? DEF_REQ_UA,
+    });
     setState(() {
+      playingUrl = item;
       tip = '正在打开 ${item.name ?? ''}';
     });
     _controller?.addListener(() {
@@ -156,7 +181,12 @@ class _VplayerState extends State<Vplayer> {
       videoPlayerListener(null);
     });
     _controller?.dispose();
-    _controller = null;
+
+    VWindow().setWindowTitle();
+    setState(() {
+      playingUrl = null;
+      _controller = null;
+    });
   }
 
   @override
@@ -329,12 +359,10 @@ class _VplayerState extends State<Vplayer> {
                           )
                         ]))
                     : PlaceCover()),
-            Container(
-                width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
-                child: VideoPlaylist(
-                  visible: playListShowed,
-                  onUrlTap: onPlayUrlChange,
-                )),
+            VideoPlaylist(
+              visible: playListShowed,
+              onUrlTap: onPlayUrlChange,
+            ),
           ]),
           GestureDetector(
               onDoubleTap: () => togglePlayList(),
