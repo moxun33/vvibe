@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
+import 'package:fvp/fvp.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/common/values/storage.dart';
@@ -9,9 +10,11 @@ import 'package:vvibe/components/player/player_context_menu.dart';
 import 'package:vvibe/components/player/vplayer_controls.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
+import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
+import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/LogFile.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/logger.dart';
@@ -41,35 +44,43 @@ class _VplayerState extends State<Vplayer> {
   @override
   void initState() {
     super.initState();
+    playerConfig();
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
+    eventBus.on('play-last-video', (e) {
+      final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+      if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
+        if (Global.isRelease) {
+          startPlay(PlayListItem.fromJson(lastPlayUrl));
+        }
+      }
+    });
   }
 
-  playerConfig() async {
-    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+  playerConfig() {
+    final settings = LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fullFfmpeg = settings['fullFfmpeg'] == 'true';
-    /*  player.setProperty('http_persistent', '0');
-    player.setDecoders(MediaType.video, [
-      "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
-      "hap",
-      "D3D11",
-      "DXVA",
-      "CUDA",
-      "FFmpeg",
-      "dav1d"
-    ]);
+
+    final Map<String, String> playerProps = {};
     if (fullFfmpeg) {
-      player.setProperty('video.avfilter', 'yadif');
+      playerProps['video.avfilter'] = 'yadif';
     }
-    player.setProperty('avio.user_agent', settings?['ua'] ?? DEF_REQ_UA);
-    player.setProperty('video.reconnect', '1');
-    player.setProperty('video.reconnect_delay_max', '3');
-    player.setProperty('demux.buffer.range', '7');
-    player.setProperty('buffer', '2000+600000'); */
+    registerWith(options: {
+      'video.decoders': [
+        "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
+        "D3D11",
+        "DXVA",
+        "hap",
+        "CUDA",
+        "FFmpeg",
+        "dav1d"
+      ],
+      'player': playerProps
+    });
   }
 
   startPlay(PlayListItem? item, {bool playback = false}) async {
     if (item == null || item.url == null) return;
-
+    playerConfig();
     if (_controller?.value.isInitialized == true) {
       stopPlayer();
     }
@@ -86,10 +97,13 @@ class _VplayerState extends State<Vplayer> {
       videoPlayerListener(item);
     });
     _controller?.initialize().then((_) => setState(() {
-          setState(() {
-            tip = '';
-            playingUrl = item;
-          });
+          if (!playback) {
+            setState(() {
+              tip = '';
+              playingUrl = item;
+            });
+            LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
+          }
           startDanmakuSocket(item);
           updateWindowTitle(item);
           toggleMediaInfo(msgsShowed);
@@ -359,10 +373,12 @@ class _VplayerState extends State<Vplayer> {
                           )
                         ]))
                     : PlaceCover()),
-            VideoPlaylist(
-              visible: playListShowed,
-              onUrlTap: onPlayUrlChange,
-            ),
+            Container(
+                width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
+                child: VideoPlaylist(
+                  visible: playListShowed,
+                  onUrlTap: onPlayUrlChange,
+                )),
           ]),
           GestureDetector(
               onDoubleTap: () => togglePlayList(),

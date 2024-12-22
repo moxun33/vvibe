@@ -20,7 +20,7 @@ class VVFFmpeg {
       : Directory(Platform.resolvedExecutable).parent.path;
   String downloadUrl() {
     if (Platform.isWindows) {
-      return 'https://gitdl.cn/https://github.com/moxun33/vvibe/releases/download/v0.7.9/ffmpeg-master-windows-desktop-vs2022-default.zip';
+      return 'https://ghproxy.net/https://github.com/moxun33/vvibe/releases/download/v0.7.9/ffmpeg-master-windows-desktop-vs2022-default.zip';
     }
     return '';
   }
@@ -67,7 +67,8 @@ class VVFFmpeg {
       }
       Dio dio = Dio();
       final savePath = await getZipPath();
-      if (File(savePath).existsSync()) {
+      final zipFile = File(savePath);
+      if (zipFile.existsSync() && zipFile.lengthSync() > 50389000) {
         unzipFfmpeg(savePath);
         return;
       }
@@ -197,7 +198,7 @@ class VVFFmpeg {
     try {
       // if (!IS_RELEASE) return false;
       if (Platform.isWindows) {
-        await replaceFfmpegDll(rollback:rollback);
+        await replaceFfmpegDll(rollback: rollback);
       }
       return true;
     } catch (e) {
