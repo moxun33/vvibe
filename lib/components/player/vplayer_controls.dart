@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fvp/fvp.dart';
+import 'package:fvp/mdk.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -173,7 +175,7 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   bool isLive() {
-    return player?.value.duration.inDays == 106751991;
+    return widget.controller.isLive();
   }
 
   String parseDuration(Duration duration) {
@@ -211,6 +213,16 @@ class _VplayerControlsState extends State<VplayerControls>
         _toggleFullScreen();
       }
     }
+  }
+
+  bool hasAudioTracks() {
+    final list = player?.getActiveAudioTracks();
+    return list != null && list.length > 0;
+  }
+
+  bool hasSubsTracks() {
+    final list = player?.getActiveSubtitleTracks();
+    return list != null && list.length > 0;
   }
 
   @override
@@ -291,9 +303,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                   reload();
                                 },
                               ), */
-                                      SizedBox(
-                                        width: 10,
-                                      ),
+
                                       IconButton(
                                         tooltip: '停止',
                                         color: Colors.white,
@@ -302,9 +312,8 @@ class _VplayerControlsState extends State<VplayerControls>
                                           stop();
                                         },
                                       ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
+                                      AudioTackControl(controller: player),
+                                      SubtitleTackControl(controller: player),
 
                                       /*     Focus(
                                   focusNode: textFocusNode,
@@ -346,8 +355,8 @@ class _VplayerControlsState extends State<VplayerControls>
                                     ],
                                   )),
                               Positioned(
-                                  left: 110,
-                                  bottom: 20,
+                                  right: 220,
+                                  bottom: 22,
                                   child: VolumeControl(
                                     widget.controller,
                                     thumbColor: Colors.white70,
@@ -381,6 +390,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                       IconButton(
                                         tooltip: '节目单',
                                         color: Colors.white,
+                                        iconSize: 18,
                                         icon: Icon(Icons.event_repeat_sharp),
                                         onPressed: () {
                                           _toggleEpgDialog();
@@ -408,14 +418,14 @@ class _VplayerControlsState extends State<VplayerControls>
                                   )),
                               Positioned(
                                 left: 10,
-                                right: 0,
+                                right: 30,
                                 bottom: 5,
                                 child: Row(
                                   children: [
                                     SizedBox(
-                                        width: 60,
+                                        width: 120,
                                         child: Text(
-                                          parseDuration(value.position),
+                                          '${parseDuration(value.position)} / ${parseDuration(isLive() ? value.buffered.last.end : value.duration)}',
                                           style: TextStyle(color: Colors.white),
                                         )),
                                     Expanded(
@@ -424,19 +434,8 @@ class _VplayerControlsState extends State<VplayerControls>
                                       colors: VideoProgressColors(
                                         playedColor: AppColors.primaryColor,
                                       ),
-                                      allowScrubbing: true,
+                                      allowScrubbing: !isLive(),
                                     )),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    SizedBox(
-                                        width: 60,
-                                        child: Text(
-                                          parseDuration(isLive()
-                                              ? value.position
-                                              : value.duration),
-                                          style: TextStyle(color: Colors.white),
-                                        ))
                                   ],
                                 ),
                               )
@@ -568,35 +567,6 @@ class _VolumeControlState extends State<VolumeControl> {
         )
       ],
     );
-    /* return Row(
-      children: [
-        IconButton(
-          color: Colors.white,
-          onPressed: () => muteUnmute(),
-          icon: Icon(getIcon()),
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: AppColors.primaryColor.withOpacity(.7),
-            thumbColor: widget.thumbColor,
-          ),
-          child: Slider.adaptive(
-            label: (volume * 1 * 100).roundToDouble().toString(),
-            min: 0.0,
-            max: 1.0,
-            divisions: 100,
-            value: volume.roundToDouble(),
-            onChanged: (v) {
-              print('mytest volume $v');
-              player?.setVolume(v);
-              setState(() {
-                volume = v;
-              });
-            },
-          ),
-        ),
-      ],
-    ); */
   }
 
   IconData getIcon() {
@@ -624,5 +594,134 @@ class _VolumeControlState extends State<VolumeControl> {
         volume = unmutedVolume;
       });
     }
+  }
+}
+
+class AudioTackControl extends StatefulWidget {
+  const AudioTackControl({Key? key, required this.controller})
+      : super(key: key);
+  final VideoPlayerController? controller;
+
+  @override
+  _AudioTackControlState createState() => _AudioTackControlState();
+}
+
+class _AudioTackControlState extends State<AudioTackControl> {
+  VideoPlayerController? get player => widget.controller;
+  AudioStreamInfo? currentAudio;
+  int currentAudioIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    setCurrentAudio();
+  }
+
+  List<AudioStreamInfo> getAudios() {
+    final list = player?.getMediaInfo()?.audio;
+    return list != null ? list : [];
+  }
+
+  setCurrentAudio([int index = 0]) {
+    if (getAudios().length < 1) return;
+    final tracks = player?.getActiveAudioTracks();
+    if (tracks == null) return;
+    final list = player?.getMediaInfo()?.audio;
+    final _index =
+        (index >= 0 ? index : tracks.first).clamp(0, tracks.length - 1);
+
+    final audio = list![_index];
+    setState(() {
+      currentAudio = audio;
+      currentAudioIndex = _index.clamp(0, tracks.length - 1);
+    });
+  }
+
+  setNextSub() {
+    final nextIndex = currentAudioIndex + 1;
+    player?.setAudioTracks([nextIndex]);
+    setCurrentAudio(nextIndex);
+  }
+
+  get currentAudioName {
+    return currentAudio?.metadata['language'] ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return getAudios().length > 0
+        ? Container(
+            child: IconButton(
+              tooltip:
+                  '声道: [${currentAudioIndex + 1} / ${getAudios().length}] $currentAudioName',
+              color: Colors.white,
+              icon: Icon(Icons.audiotrack_sharp),
+              onPressed: () {},
+            ),
+          )
+        : SizedBox();
+  }
+}
+
+class SubtitleTackControl extends StatefulWidget {
+  const SubtitleTackControl({Key? key, required this.controller})
+      : super(key: key);
+  final VideoPlayerController? controller;
+
+  @override
+  _SubtitleTackControlState createState() => _SubtitleTackControlState();
+}
+
+class _SubtitleTackControlState extends State<SubtitleTackControl> {
+  VideoPlayerController? get player => widget.controller;
+
+  SubtitleStreamInfo? currentSub;
+  int currentSubIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    setCurrentSub();
+  }
+
+  List<SubtitleStreamInfo> getSubs() {
+    final list = player?.getMediaInfo()?.subtitle;
+    return list != null ? list : [];
+  }
+
+  setCurrentSub([int index = 0]) {
+    if (getSubs().length < 1) return;
+    final tracks = player?.getActiveSubtitleTracks();
+    if (tracks == null) return;
+    final list = player?.getMediaInfo()?.subtitle;
+    final _index =
+        (index >= 0 ? index : tracks.first).clamp(0, tracks.length - 1);
+    final sub = list![_index];
+    setState(() {
+      currentSubIndex = _index;
+      currentSub = sub;
+    });
+  }
+
+  setNextSub() {
+    final nextIndex = currentSubIndex + 1;
+    player?.setSubtitleTracks([nextIndex]);
+    setCurrentSub(nextIndex);
+  }
+
+  get currentSubName {
+    return currentSub?.metadata['language'] ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return getSubs().length > 0
+        ? Container(
+            child: IconButton(
+                tooltip:
+                    '字幕: [${currentSubIndex + 1} / ${getSubs().length}] ${currentSubName}',
+                color: Colors.white,
+                icon: Icon(Icons.subtitles_sharp),
+                onPressed: setNextSub),
+          )
+        : SizedBox();
   }
 }

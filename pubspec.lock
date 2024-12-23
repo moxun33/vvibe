@@ -360,11 +360,12 @@ packages:
   fvp:
     dependency: "direct main"
     description:
-      name: fvp
-      sha256: "3dd245cac5dfba36311cbf5834d8f275ba1f3e49a5cdcb4a98e01cb41e9a21d8"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.28.0"
+      path: "."
+      ref: master
+      resolved-ref: f857be9c10de2221520b2edb0df65dce90c7cba2
+      url: "https://github.com/wang-bin/fvp"
+    source: git
+    version: "0.29.0"
   glob:
     dependency: transitive
     description:

@@ -16,6 +16,7 @@ import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/local_storage.dart';
+import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
 import 'package:vvibe/window/window.dart';
@@ -39,9 +40,7 @@ class _VplayerState extends State<Vplayer> {
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
-  int bufferSpeed = 0; // 缓冲速度 (字节/秒)
-  Duration lastBufferUpdateTime = Duration.zero;
-  Duration lastBufferedPosition = Duration.zero;
+
   @override
   void initState() {
     super.initState();
@@ -124,8 +123,9 @@ class _VplayerState extends State<Vplayer> {
     setState(() {
       msgsShowed = show;
     });
-    /*  if (show) {
-      final info = player.mediaInfo;
+    if (show) {
+      final info = _controller?.getMediaInfo();
+      if (info == null) return;
       final vc = info.video?[0].codec;
       final ac = info.audio?[0].codec;
       final _msgs = [
@@ -149,7 +149,7 @@ class _VplayerState extends State<Vplayer> {
       setState(() {
         msgs = [];
       });
-    } */
+    }
   }
 
   videoPlayerListener(PlayListItem? item) {
@@ -171,28 +171,6 @@ class _VplayerState extends State<Vplayer> {
       setState(() {
         tip = '';
       });
-    }
-    final buffered = _controller?.value.buffered;
-
-    // 获取最新的缓冲区
-    if (buffered != null && buffered.isNotEmpty) {
-      final newBufferEnd = buffered.last.end;
-      final now = DateTime.now().millisecondsSinceEpoch;
-
-      if (lastBufferUpdateTime != Duration.zero) {
-        final elapsedTime = now - lastBufferUpdateTime.inMilliseconds;
-        final newBufferedBytes =
-            newBufferEnd.inMilliseconds - lastBufferedPosition.inMilliseconds;
-        final speed = (newBufferedBytes / (elapsedTime / 1000)).toInt();
-        if (speed > 0 && playingUrl != null) {
-          setState(() {
-            bufferSpeed = speed; // 计算缓冲速度
-          });
-        }
-      }
-
-      lastBufferedPosition = newBufferEnd;
-      lastBufferUpdateTime = Duration(milliseconds: now);
     }
   }
 
@@ -227,6 +205,8 @@ class _VplayerState extends State<Vplayer> {
 
     VWindow().setWindowTitle();
     setState(() {
+      msgs = [];
+      msgsShowed = false;
       playingUrl = null;
       _controller = null;
     });

@@ -37,11 +37,11 @@ dependencies:
   #flutter_cache_manager: ^3.1.0
   web_socket_channel: ^2.4.5
   html: ^0.15.4
-  fvp: 0.28.0
-  #fvp:
-  #  git:
-  #    url: https://github.com/wang-bin/fvp
-  #    ref: master
+  #fvp: 0.28.0
+  fvp:
+    git:
+      url: https://github.com/wang-bin/fvp
+      ref: master
 
   #https://github.com/MixinNetwork/flutter-plugins/issues/151#issuecomment-1297805330
   #desktop_multi_window:
