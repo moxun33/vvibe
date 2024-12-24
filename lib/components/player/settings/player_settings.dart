@@ -131,8 +131,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
             children: [
               SizedBox(
                   width: 60,
-                  child:
-                      Text('FFmpeg', style: TextStyle(color: Colors.purple))),
+                  child: Text('反交错', style: TextStyle(color: Colors.purple))),
               SizedBox(
                 width: 150,
                 child: Switch(
@@ -145,8 +144,8 @@ class _PlayerSettingsState extends State<PlayerSettings> {
                   },
                 ),
               ),
-              Expanded(
-                  child: Text('默认是裁剪版ffmpeg。开启后自动下载完整版ffmpeg，支持开启反交错等滤镜。重启生效。'))
+              /* Expanded(
+                  child: Text('默认是裁剪版ffmpeg。开启后自动下载完整版ffmpeg，支持开启反交错等滤镜。重启生效。')) */
             ],
           ),
           SizedBox(

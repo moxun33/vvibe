@@ -78,7 +78,7 @@ class Global {
       );
     if (shouldSetSize) {
       EpgUtil().downloadEpgDataAync();
-      VVFFmpeg().checkFfmpegDllAync();
+      // VVFFmpeg().checkFfmpegDllAync();
     }
     return genTheme();
   }
