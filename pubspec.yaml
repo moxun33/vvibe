@@ -62,8 +62,8 @@ dependencies:
   # dio cache
   dio_cache_interceptor: ^3.5.0
   shortid: ^0.1.2
-  bitsdojo_window: ^0.1.6
-  window_manager: 0.4.2
+  #bitsdojo_window: ^0.1.6
+  window_manager: 0.4.3
   synchronized: 3.1.0
   xml2json: ^6.2.3
   ip2region_plus: ^1.0.2

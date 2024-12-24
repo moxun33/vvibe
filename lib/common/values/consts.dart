@@ -18,3 +18,6 @@ final ASSETS_DIR = IS_RELEASE ? 'data/flutter_assets/assets' : 'assets';
 
 //自定义窗口标题栏高度
 final CUS_WIN_TITLEBAR_HEIGHT = 30.0;
+
+// app name
+final APP_NAME = 'VVibe';

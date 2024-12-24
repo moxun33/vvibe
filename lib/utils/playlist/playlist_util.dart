@@ -188,7 +188,7 @@ class PlaylistUtil {
         ext = _info['ext'] ?? Map<String, dynamic>.from({});
     final PlayListItem item = PlayListItem.fromJson({
       'url': url,
-      'name': 'vvibe',
+      'name': APP_NAME,
       'group': _info['group'],
       'tvgId': _info['tvgId'],
       'ext': ext
@@ -206,7 +206,7 @@ class PlaylistUtil {
     ext['playUrl'] = url;
     final PlayListItem item = PlayListItem.fromJson({
       'url': url,
-      'name': name ?? 'vvibe',
+      'name': name ?? APP_NAME,
       'group': _info['group'],
       'tvgId': _info['tvgId'],
       'ext': ext ?? {}

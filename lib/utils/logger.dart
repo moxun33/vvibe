@@ -1,11 +1,12 @@
 import 'package:logging/logging.dart';
+import 'package:vvibe/common/values/consts.dart';
 
 class MyLogger {
   static MyLogger _instance = new MyLogger._();
   factory MyLogger() => _instance;
 
   MyLogger._();
-  static final log = Logger('VVibe');
+  static final log = Logger(APP_NAME);
 
   static info(String message) {
     log.info(message);

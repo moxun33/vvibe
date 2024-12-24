@@ -10,16 +10,23 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/pages/home/vplayer.dart';
-import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/window_widgets.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main(List<String> args) async {
-  Global.init().then((theme) {
-    runApp(MyApp(theme: theme ?? ThemeData()));
-    VWindow().initWindow();
+  final theme = await Global.init();
+
+  windowManager.waitUntilReadyToShow().then((_) {
+    windowManager.setAsFrameless();
+    windowManager.setBackgroundColor(Colors.black12);
+    windowManager.setBrightness(Brightness.dark);
+    windowManager.center();
+    windowManager.show();
   });
+  runApp(MyApp(theme: theme ?? ThemeData()));
   /* if (args.firstOrNull == 'multi_window') {
     final windowId = int.parse(args[1]);
     final argument = args[2].isEmpty
@@ -50,7 +57,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       color: Colors.black12,
-      title: 'VVibe',
+      title: APP_NAME,
       theme: theme.useSystemChineseFont(Brightness.dark),
       home: WindowScaffold(
         child: Vplayer(),

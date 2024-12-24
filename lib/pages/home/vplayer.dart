@@ -57,7 +57,7 @@ class _VplayerState extends State<Vplayer> {
   }
 
   playerConfig() {
-    final settings = LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final settings = LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
     final fullFfmpeg = settings['fullFfmpeg'] == 'true';
 
     final Map<String, String> playerProps = {};

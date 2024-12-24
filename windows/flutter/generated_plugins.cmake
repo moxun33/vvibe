@@ -3,10 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  bitsdojo_window_windows
   fvp
   native_context_menu
-  screen_retriever
+  screen_retriever_windows
   url_launcher_windows
   window_manager
 )
