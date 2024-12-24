@@ -247,8 +247,14 @@ class _VplayerControlsState extends State<VplayerControls>
                   }
                 },
                 child: MouseRegion(
+                  onEnter: (_) {
+                    _cancelAndRestartTimer();
+                  },
                   onHover: (_) {
                     _cancelAndRestartTimer();
+                  },
+                  onExit: (_) {
+                    _startHideTimer();
                   },
                   child: AbsorbPointer(
                       absorbing: _hideControls,
