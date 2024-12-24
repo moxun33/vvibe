@@ -40,7 +40,9 @@ class _VplayerState extends State<Vplayer> {
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
-
+  int bufferSpeed = 0; // 缓冲速度 (字节/秒)
+  Duration lastBufferUpdateTime = Duration.zero;
+  Duration lastBufferedPosition = Duration.zero;
   @override
   void initState() {
     super.initState();
@@ -171,6 +173,31 @@ class _VplayerState extends State<Vplayer> {
       setState(() {
         tip = '';
       });
+    }
+    final buffered = _controller?.value.buffered;
+
+    // 获取最新的缓冲区
+    if (buffered != null && buffered.isNotEmpty) {
+      final newBufferEnd = buffered.last.end;
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      if (lastBufferUpdateTime != Duration.zero) {
+        final elapsedTime = (now - lastBufferUpdateTime.inMilliseconds);
+        final newBufferedBytes =
+            newBufferEnd.inMilliseconds - lastBufferedPosition.inMilliseconds;
+        final speed = (newBufferedBytes / (elapsedTime / 1000));
+        final _speed = speed.isFinite ? speed.toInt() : 0;
+        if (speed > 0 && playingUrl != null) {
+          print('cache $_speed KB/s');
+          setState(() {
+            bufferSpeed = _speed;
+          });
+          updateWindowTitle(playingUrl!, '$_speed KB/s');
+        }
+      }
+
+      lastBufferedPosition = newBufferEnd;
+      lastBufferUpdateTime = Duration(milliseconds: now);
     }
   }
 

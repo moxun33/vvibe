@@ -396,7 +396,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                           _toggleEpgDialog();
                                         },
                                       ),
-                                      IconButton(
+                                      /*  IconButton(
                                         tooltip: '全屏',
                                         color: Colors.white,
                                         icon: Icon(_isFullScreen
@@ -405,7 +405,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                         onPressed: () {
                                           _toggleFullScreen();
                                         },
-                                      ),
+                                      ), */
                                       IconButton(
                                         tooltip: '播放列表',
                                         color: Colors.white,
@@ -648,7 +648,7 @@ class _AudioTackControlState extends State<AudioTackControl> {
 
   @override
   Widget build(BuildContext context) {
-    return getAudios().length > 0
+    return getAudios().length > 1
         ? Container(
             child: IconButton(
               tooltip:
@@ -713,7 +713,7 @@ class _SubtitleTackControlState extends State<SubtitleTackControl> {
 
   @override
   Widget build(BuildContext context) {
-    return getSubs().length > 0
+    return getSubs().length > 1
         ? Container(
             child: IconButton(
                 tooltip:
