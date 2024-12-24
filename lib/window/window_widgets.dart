@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
-import 'package:vvibe/utils/color_util.dart';
 import 'package:window_manager/window_manager.dart';
 
 class WindowButtons extends StatefulWidget {
@@ -62,9 +60,9 @@ class _WindowButtonsState extends State<WindowButtons> with WindowListener {
           onPressed: minimize,
         ),
         WinButton(
-          icon:maximized?Icons.filter_none: Icons.rectangle_outlined,
+          icon: maximized ? Icons.filter_none : Icons.rectangle_outlined,
           onPressed: maximize,
-          iconSize: maximized?16:18,
+          iconSize: maximized ? 16 : 18,
         ),
         WinButton(
           hoverColor: Colors.red,
@@ -151,13 +149,15 @@ class _WindowTitleState extends State<WindowTitle> {
       'assets/logo.png',
       height: 25,
     );
-    if (widget.icon != null || widget.icon?.isEmpty == true) return defIcon;
-    return CachedNetworkImage(
-      fit: BoxFit.contain,
-      imageUrl: widget.icon!,
-      height: 25,
-      errorWidget: (context, url, error) => defIcon,
-    );
+    if (widget.icon != null && widget.icon?.isNotEmpty == true) {
+      return CachedNetworkImage(
+        fit: BoxFit.contain,
+        imageUrl: widget.icon!,
+        height: 25,
+        errorWidget: (context, url, error) => defIcon,
+      );
+    }
+    return defIcon;
   }
 
   @override
@@ -225,10 +225,7 @@ class _WindowTitleBarState extends State<WindowTitleBar> {
 //统一窗口包裹器
 class WindowScaffold extends StatefulWidget {
   WindowScaffold(
-      {super.key,
-      required Widget this.child,
-      this.title,
-      String icon = ''});
+      {super.key, required Widget this.child, this.title, String icon = ''});
   final Widget child;
   final String? title;
   final String? icon = '';
