@@ -1,4 +1,7 @@
 import 'dart:math';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 
 // Define a reusable function
 String genRandomStr({int length = 20}) {
@@ -27,4 +30,45 @@ String formatFileSize(int bytes) {
   }
 
   return '${size.toStringAsFixed(2)} ${units[unitIndex]}';
+}
+
+class Debouncer {
+  final int milliseconds;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
+  }
+}
+
+class Throttler {
+  final int milliseconds;
+  Timer? _timer;
+  bool isExecuted = false;
+
+  Throttler({required this.milliseconds});
+
+  void run(VoidCallback action) {
+    if (isExecuted) {
+      return;
+    }
+
+    _timer = Timer(Duration(milliseconds: milliseconds), () {
+      _timer?.cancel();
+      isExecuted = false;
+    });
+    isExecuted = true;
+    action();
+  }
+
+  void dispose() {
+    _timer?.cancel();
+  }
 }

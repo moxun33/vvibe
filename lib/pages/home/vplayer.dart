@@ -20,6 +20,7 @@ import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
 import 'package:vvibe/window/window.dart';
+import 'package:window_manager/window_manager.dart';
 
 class Vplayer extends StatefulWidget {
   const Vplayer({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class Vplayer extends StatefulWidget {
   _VplayerState createState() => _VplayerState();
 }
 
-class _VplayerState extends State<Vplayer> {
+class _VplayerState extends State<Vplayer> with WindowListener {
   VideoPlayerController? _controller;
   bool playListShowed = true;
 
@@ -46,26 +47,36 @@ class _VplayerState extends State<Vplayer> {
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     playerConfig();
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
     eventBus.on('play-last-video', (e) {
-      final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
-      if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
-        if (Global.isRelease) {
-          startPlay(PlayListItem.fromJson(lastPlayUrl));
-        }
-      }
+      initLastVideo();
     });
+    initLastVideo();
+  }
+
+  initLastVideo() {
+    final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+    if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
+      if (Global.isRelease) {
+        startPlay(PlayListItem.fromJson(lastPlayUrl));
+      }
+    }
   }
 
   playerConfig() {
     final settings = LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
     final fullFfmpeg = settings['fullFfmpeg'] == 'true';
 
-    final Map<String, String> playerProps = {};
+    final Map<String, String> playerProps = {
+      'demux.buffer.ranges': '8',
+      'buffer': '2000+1500000'
+    };
     if (fullFfmpeg) {
       playerProps['video.avfilter'] = 'yadif';
     }
+
     registerWith(options: {
       'video.decoders': [
         "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
@@ -98,18 +109,26 @@ class _VplayerState extends State<Vplayer> {
     _controller?.addListener(() {
       videoPlayerListener(item);
     });
-    _controller?.initialize().then((_) => setState(() {
-          if (!playback) {
-            setState(() {
-              tip = '';
-              playingUrl = item;
+    _controller
+        ?.initialize()
+        .then((_) => setState(() {
+              if (!playback) {
+                setState(() {
+                  tip = '';
+                  playingUrl = item;
+                });
+                LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
+              }
+              startDanmakuSocket(item);
+              updateWindowTitle(item);
+              toggleMediaInfo(msgsShowed);
+            }))
+        .catchError((_) => {
+              setState(() {
+                tip = '${item.name} 播放失败';
+                playingUrl = null;
+              })
             });
-            LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
-          }
-          startDanmakuSocket(item);
-          updateWindowTitle(item);
-          toggleMediaInfo(msgsShowed);
-        }));
     _controller?.play();
   }
 
@@ -158,7 +177,7 @@ class _VplayerState extends State<Vplayer> {
     if (item == null || _controller?.value.isInitialized != true) return;
     final _val = _controller?.value;
     if (_val == null) return;
-    if (_val.hasError && !_val.isCompleted) {
+    if (_val.hasError && !_val.isBuffering) {
       setState(() {
         tip = '${item.name} 播放失败 ${_val.errorDescription ?? ''}';
         playingUrl = null;
@@ -223,6 +242,12 @@ class _VplayerState extends State<Vplayer> {
     startPlay(item);
   }
 
+  void _setTipMsg(String msg) {
+    setState(() {
+      tip = msg;
+    });
+  }
+
   void stopPlayer() {
     stopDanmakuSocket();
     _controller?.removeListener(() {
@@ -237,6 +262,7 @@ class _VplayerState extends State<Vplayer> {
       playingUrl = null;
       _controller = null;
     });
+    windowManager.removeListener(this);
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
@@ -245,14 +271,16 @@ class _VplayerState extends State<Vplayer> {
     if (!danmakuManualShow) {
       return;
     }
-    barrageWallController.enable();
+
     DanmakuService().start(item, renderDanmaku);
   }
 
 //断开所有弹幕连接
   void stopDanmakuSocket() {
-    barrageWallController.clear();
-    barrageWallController.disable();
+    if (barrageWallController.isEnabled) {
+      barrageWallController.clear();
+      barrageWallController.disable();
+    }
     DanmakuService().stop();
   }
 
@@ -263,6 +291,7 @@ class _VplayerState extends State<Vplayer> {
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fontSize =
         settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
+    barrageWallController.enable();
     barrageWallController.send([
       Bullet(
           child:
@@ -376,6 +405,14 @@ class _VplayerState extends State<Vplayer> {
   }
 
   @override
+  void onWindowEnterFullScreen() {
+    super.onWindowEnterFullScreen();
+    setState(() {
+      playListShowed = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.black12,
@@ -406,6 +443,7 @@ class _VplayerState extends State<Vplayer> {
                             toggleDanmaku: toggleDanmakuVisible,
                             toggleEpgDialog: toggleEpgDialog,
                             stopPlayer: stopPlayer,
+                            setTipMsg: _setTipMsg,
                             playingUrl: playingUrl,
                           )
                         ]))

@@ -19,6 +19,7 @@ class VplayerControls extends StatefulWidget {
       required this.toggleEpgDialog,
       required this.toggleMediaInfo,
       required this.stopPlayer,
+      required this.setTipMsg,
       this.sendDanmaku,
       this.playingUrl})
       : super(key: key);
@@ -28,6 +29,7 @@ class VplayerControls extends StatefulWidget {
   final Function toggleDanmaku;
   final Function toggleEpgDialog;
   final Function stopPlayer;
+  final Function setTipMsg;
   final Function? sendDanmaku;
   PlayListItem? playingUrl;
   @override
@@ -52,7 +54,7 @@ class _VplayerControlsState extends State<VplayerControls>
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
   bool _isFullScreen = false;
-
+  String message = 'ddss';
   @override
   void initState() {
     super.initState();
@@ -83,16 +85,13 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   // 切换全屏状态
-  void _toggleFullScreen() {
-    _setFullScreen(!_isFullScreen);
-  }
-
-  void _setFullScreen([bool full = false]) {
-    windowManager.setFullScreen(!_isFullScreen);
-    VWindow().showTitleBar(_isFullScreen);
+  void _toggleFullScreen() async {
+    final nowFull = await windowManager.isFullScreen();
+    windowManager.setFullScreen(!nowFull);
+    VWindow().showTitleBar(nowFull);
 
     setState(() {
-      _isFullScreen = !_isFullScreen;
+      _isFullScreen = !nowFull;
     });
   }
 
@@ -178,11 +177,21 @@ class _VplayerControlsState extends State<VplayerControls>
     return widget.controller.isLive();
   }
 
+  String _parsePosition() {
+    final v = parseDuration(player!.value.position);
+    if (v.isEmpty) {
+      return parseDuration(player!.value.duration);
+    }
+    return v;
+  }
+
   String parseDuration(Duration duration) {
     int hours = duration.inHours;
     int minutes = duration.inMinutes % 60;
     int seconds = duration.inSeconds % 60;
-
+    if (duration.inDays >= 106751991) {
+      return '';
+    }
     // 如果有小时，显示为小时:分钟:秒
     if (hours > 0) {
       return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
@@ -198,21 +207,43 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   // 处理键盘事件
-  void _onKey(KeyEvent event) {
+  void _onKey(RawKeyEvent event) {
     final key = event.logicalKey;
-    if (event is KeyUpEvent) {
-      if (key.keyLabel == 'space') {
+    if (event.runtimeType.toString() == 'RawKeyUpEvent') {
+      if (key == LogicalKeyboardKey.space) {
         playOrPuase();
       }
 
-      if (key.keyLabel == 'Escape') {
-        _setFullScreen();
+      if (key == LogicalKeyboardKey.escape) {
+        _toggleFullScreen();
       }
 
-      if (key.keyLabel == 'Enter') {
+      if (key == LogicalKeyboardKey.enter) {
         _toggleFullScreen();
       }
     }
+    if (event.runtimeType.toString() == 'RawKeyDownEvent') {
+      if (key == LogicalKeyboardKey.arrowUp) {
+        _setVolumn(true);
+      }
+      if (key == LogicalKeyboardKey.arrowDown) {
+        _setVolumn();
+      }
+    }
+  }
+
+  _setVolumn([bool up = false]) async {
+    final v = ((await player?.value.volume ?? 0) + (up ? 0.05 : -0.05))
+        .clamp(0.0, 1.0);
+    widget.setTipMsg('音量:${(v * 100).toInt()}%');
+    player?.setVolume(v);
+    _clearMessageDelay();
+  }
+
+  _clearMessageDelay() {
+    Future.delayed(Duration(seconds: 3), () {
+      widget.setTipMsg('');
+    });
   }
 
   bool hasAudioTracks() {
@@ -229,11 +260,11 @@ class _VplayerControlsState extends State<VplayerControls>
   Widget build(BuildContext context) {
     return ValueListenableBuilder<VideoPlayerValue>(
         valueListenable: widget.controller,
-        builder: (context, value, child) => KeyboardListener(
+        builder: (context, value, child) => RawKeyboardListener(
             autofocus: true,
             focusNode:
                 FocusNode(), // 为了使 RawKeyboardListener 响应事件，需要有一个 FocusNode
-            onKeyEvent: _onKey, // 监听键盘事件
+            onKey: _onKey, // 监听键盘事件
             child: GestureDetector(
                 onTap: () {
                   if (isPlaying == true) {
@@ -402,7 +433,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                           _toggleEpgDialog();
                                         },
                                       ),
-                                      /*  IconButton(
+                                      IconButton(
                                         tooltip: '全屏',
                                         color: Colors.white,
                                         icon: Icon(_isFullScreen
@@ -411,7 +442,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                         onPressed: () {
                                           _toggleFullScreen();
                                         },
-                                      ), */
+                                      ),
                                       IconButton(
                                         tooltip: '播放列表',
                                         color: Colors.white,
@@ -429,9 +460,9 @@ class _VplayerControlsState extends State<VplayerControls>
                                 child: Row(
                                   children: [
                                     SizedBox(
-                                        width: 120,
+                                        width: 130,
                                         child: Text(
-                                          '${parseDuration(value.position)} / ${parseDuration(isLive() ? value.buffered.last.end : value.duration)}',
+                                          '${_parsePosition()} / ${parseDuration(isLive() ? value.buffered.last.end : value.duration)}',
                                           style: TextStyle(color: Colors.white),
                                         )),
                                     Expanded(
@@ -444,7 +475,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                     )),
                                   ],
                                 ),
-                              )
+                              ),
                             ]),
                           ),
                           /*     _isFullScreen
@@ -631,21 +662,19 @@ class _AudioTackControlState extends State<AudioTackControl> {
     if (getAudios().length < 1) return;
     final tracks = player?.getActiveAudioTracks();
     if (tracks == null) return;
-    final list = player?.getMediaInfo()?.audio;
-    final _index =
-        (index >= 0 ? index : tracks.first).clamp(0, tracks.length - 1);
-
-    final audio = list![_index];
+    final list = player?.getMediaInfo()?.audio ?? [];
+    final _index = (index >= 0 && index < list.length ? index : 0)
+        .clamp(0, list.length - 1);
+    final audio = list[_index];
     setState(() {
       currentAudio = audio;
-      currentAudioIndex = _index.clamp(0, tracks.length - 1);
+      currentAudioIndex = _index;
     });
+    player?.setAudioTracks([_index]);
   }
 
-  setNextSub() {
-    final nextIndex = currentAudioIndex + 1;
-    player?.setAudioTracks([nextIndex]);
-    setCurrentAudio(nextIndex);
+  setNextAudio([int n = 0]) {
+    setCurrentAudio(n);
   }
 
   get currentAudioName {
@@ -661,7 +690,9 @@ class _AudioTackControlState extends State<AudioTackControl> {
                   '声道: [${currentAudioIndex + 1} / ${getAudios().length}] $currentAudioName',
               color: Colors.white,
               icon: Icon(Icons.audiotrack_sharp),
-              onPressed: () {},
+              onPressed: () {
+                setNextAudio(currentAudioIndex + 1);
+              },
             ),
           )
         : SizedBox();
@@ -697,20 +728,19 @@ class _SubtitleTackControlState extends State<SubtitleTackControl> {
     if (getSubs().length < 1) return;
     final tracks = player?.getActiveSubtitleTracks();
     if (tracks == null) return;
-    final list = player?.getMediaInfo()?.subtitle;
-    final _index =
-        (index >= 0 ? index : tracks.first).clamp(0, tracks.length - 1);
-    final sub = list![_index];
+    final list = player?.getMediaInfo()?.subtitle ?? [];
+    final _index = (index >= 0 && index < list.length ? index : 0)
+        .clamp(0, list.length - 1);
+    final sub = list[_index];
     setState(() {
       currentSubIndex = _index;
       currentSub = sub;
     });
+    player?.setSubtitleTracks([_index]);
   }
 
-  setNextSub() {
-    final nextIndex = currentSubIndex + 1;
-    player?.setSubtitleTracks([nextIndex]);
-    setCurrentSub(nextIndex);
+  setNextSub([int n = 0]) {
+    setCurrentSub(n);
   }
 
   get currentSubName {
@@ -726,7 +756,9 @@ class _SubtitleTackControlState extends State<SubtitleTackControl> {
                     '字幕: [${currentSubIndex + 1} / ${getSubs().length}] ${currentSubName}',
                 color: Colors.white,
                 icon: Icon(Icons.subtitles_sharp),
-                onPressed: setNextSub),
+                onPressed: () {
+                  setNextSub(currentSubIndex + 1);
+                }),
           )
         : SizedBox();
   }
