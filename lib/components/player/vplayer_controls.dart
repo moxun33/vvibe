@@ -8,6 +8,7 @@ import 'package:fvp/mdk.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -70,6 +71,9 @@ class _VplayerControlsState extends State<VplayerControls>
         .listen((event) => setPlaybackMode(event.isPlaying));
     int state = await _fvp.getState();
     if (FvpPlayState.playing == state) playPauseController.forward(); */
+    eventBus.on('show-vplayer-controls', (e) {
+      _cancelAndRestartTimer();
+    });
   }
 
   void stop() async {
@@ -224,15 +228,15 @@ class _VplayerControlsState extends State<VplayerControls>
     }
     if (event.runtimeType.toString() == 'RawKeyDownEvent') {
       if (key == LogicalKeyboardKey.arrowUp) {
-        _setVolumn(true);
+        _setVolume(true);
       }
       if (key == LogicalKeyboardKey.arrowDown) {
-        _setVolumn();
+        _setVolume();
       }
     }
   }
 
-  _setVolumn([bool up = false]) async {
+  _setVolume([bool up = false]) async {
     final v = ((await player?.value.volume ?? 0) + (up ? 0.05 : -0.05))
         .clamp(0.0, 1.0);
     widget.setTipMsg('音量:${(v * 100).toInt()}%');
@@ -254,6 +258,10 @@ class _VplayerControlsState extends State<VplayerControls>
   bool hasSubsTracks() {
     final list = player?.getActiveSubtitleTracks();
     return list != null && list.length > 0;
+  }
+
+  void _onScroll(PointerScrollEvent event) {
+    _setVolume(event.scrollDelta.dy < 0);
   }
 
   @override
@@ -278,17 +286,11 @@ class _VplayerControlsState extends State<VplayerControls>
                   }
                 },
                 child: MouseRegion(
-                  onEnter: (_) {
-                    _cancelAndRestartTimer();
-                  },
                   onHover: (_) {
                     _cancelAndRestartTimer();
                   },
-                  onExit: (_) {
-                    _startHideTimer();
-                  },
                   child: AbsorbPointer(
-                      absorbing: _hideControls,
+                      absorbing: false,
                       child: Stack(
                         children: [
                           AnimatedOpacity(
@@ -536,9 +538,11 @@ class _VolumeControlState extends State<VolumeControl> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AnimatedOpacity(
+    return ValueListenableBuilder<VideoPlayerValue>(
+        valueListenable: widget.controller!,
+        builder: (context, value, child) => Column(
+              children: [
+                /* AnimatedOpacity(
           duration: const Duration(milliseconds: 250),
           opacity: _showVolume ? 1 : 0,
           child: AbsorbPointer(
@@ -548,7 +552,9 @@ class _VolumeControlState extends State<VolumeControl> {
                 setState(() => _showVolume = true);
               },
               onExit: (_) {
-                setState(() => _showVolume = false);
+                Future.delayed(Duration(milliseconds: 5000), () {
+                  setState(() => _showVolume = false);
+                });
               },
               child: SizedBox(
                 width: 50,
@@ -570,6 +576,7 @@ class _VolumeControlState extends State<VolumeControl> {
                         max: 1.0,
                         divisions: 100,
                         value: volume.roundToDouble(),
+                        autofocus: true,
                         onChanged: _setVolume,
                       ),
                     ),
@@ -578,32 +585,28 @@ class _VolumeControlState extends State<VolumeControl> {
               ),
             ),
           ),
-        ),
-        Listener(
-          onPointerSignal: (event) {
-            if (event is PointerScrollEvent) {
-              _onScroll(event);
-            }
-          },
-          child: MouseRegion(
-            onEnter: (_) {
-              setState(() => _showVolume = true);
-            },
-            onExit: (_) {
-              setState(() => _showVolume = false);
-            },
-            child: IconButton(
-              color: Colors.white,
-              onPressed: () => muteUnmute(),
-              icon: Tooltip(
-                message: (volume * 1 * 100).roundToDouble().toString(),
-                child: Icon(getIcon()),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
+        ), */
+                Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent) {
+                        _onScroll(event);
+                      }
+                    },
+                    child: MouseRegion(
+                      onEnter: (_) {
+                        setState(() => _showVolume = true);
+                      },
+                      child: IconButton(
+                        color: Colors.white,
+                        onPressed: () => muteUnmute(),
+                        icon: Tooltip(
+                          message: (value.volume * 1 * 100).toInt().toString(),
+                          child: Icon(getIcon()),
+                        ),
+                      ),
+                    )),
+              ],
+            ));
   }
 
   IconData getIcon() {
