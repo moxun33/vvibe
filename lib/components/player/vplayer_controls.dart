@@ -436,7 +436,8 @@ class _VplayerControlsState extends State<VplayerControls>
                                         },
                                       ),
                                       IconButton(
-                                        tooltip: '全屏',
+                                        tooltip:
+                                            '${_isFullScreen ? '退出' : ''}全屏',
                                         color: Colors.white,
                                         icon: Icon(_isFullScreen
                                             ? Icons.fullscreen_exit
