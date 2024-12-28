@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/services/event_bus.dart';
+import 'package:window_manager/window_manager.dart';
 
 /* 自定义窗口外观 */
 class VWindow {
@@ -7,6 +9,17 @@ class VWindow {
   factory VWindow() => _instance;
 
   VWindow._();
+  initWindow() async {
+    windowManager.waitUntilReadyToShow().then((_) async {
+      await windowManager.setAsFrameless();
+      await windowManager.setMinimumSize(const Size(1280, 750));
+      await windowManager.setBackgroundColor(Colors.black12);
+      await windowManager.setBrightness(Brightness.dark);
+      // await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
+      await windowManager.center();
+      await windowManager.show();
+    });
+  }
 
 //设置window title
   void setWindowTitle([String? title, String? icon]) {

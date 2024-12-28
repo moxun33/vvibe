@@ -13,19 +13,13 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/pages/home/vplayer.dart';
+import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/window_widgets.dart';
-import 'package:window_manager/window_manager.dart';
 
 void main(List<String> args) async {
   final theme = await Global.init();
 
-  windowManager.waitUntilReadyToShow().then((_) {
-    windowManager.setAsFrameless();
-    windowManager.setBackgroundColor(Colors.black12);
-    windowManager.setBrightness(Brightness.dark);
-    windowManager.center();
-    windowManager.show();
-  });
+  await VWindow().initWindow();
   runApp(MyApp(theme: theme ?? ThemeData()));
   /* if (args.firstOrNull == 'multi_window') {
     final windowId = int.parse(args[1]);
