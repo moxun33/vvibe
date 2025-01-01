@@ -15,6 +15,7 @@ import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/models/playlist_text_group.dart';
 import 'package:vvibe/services/danmaku/danmaku_type.dart';
@@ -81,31 +82,74 @@ class PlaylistUtil {
   }
 
   //解析【本地】文件的播放列表内容
-  Future<List<PlayListItem>> parsePlaylistFile(String filename) async {
+  Future<PlayListInfo?> parsePlaylistFile(
+    String filename,
+  ) async {
     try {
       final filePath =
           "${(await PlaylistUtil().getPlayListDir()).path}/${filename}";
-      if (filePath.endsWith('.m3u')) {
-        final lines = await compute(readFileLines, filePath);
-        return compute(parseM3uContents, lines);
+      final lines = await compute(readFileLines, filePath);
+      PlayListInfo? data = await compute(parseM3uContents, lines);
+      if (data != null && data.channels.isNotEmpty) {
+        return data;
       }
-
-      if (filePath.endsWith('.txt')) {
-        final lines = await compute(readFileLines, filePath);
-
-        return compute(parseTxtContents, lines);
-      }
-
-      return [];
+      return compute(parseTxtContents, lines);
     } catch (e) {
-      return [];
+      print(e);
     }
+    return null;
+  }
+
+// 获取订阅配置列表
+  Future<Map<String, List<dynamic>>> getSubConfigs() async {
+    final files = await PlaylistUtil().getPlayListFiles(basename: true);
+    final urls = await PlaylistUtil().getSubUrls();
+    return {
+      'files': files,
+      'urls': urls,
+    };
   }
 
 //获取订阅地址列表
   Future<List<Map<String, dynamic>>> getSubUrls() async {
     final list = await LoacalStorage().getJSON(PLAYLIST_SUB_URLS);
     return list != null ? List<Map<String, dynamic>>.from(list) : [];
+  }
+
+  // 是否为url
+  bool isUrl(String? url) {
+    if (url == null || url.isEmpty) return false;
+    final uri = Uri.tryParse(url);
+    return uri != null && uri.scheme.contains('http');
+  }
+
+// 解析本地或远程订阅,自动下钻单个直播源
+  Future<PlayListInfo?> parsePlayListsDrill(String src,
+      {int drilled = 0}) async {
+    final info = await PlaylistUtil().parsePlayLists(src);
+    if (info != null &&
+        info.channels.length == 1 &&
+        info.channels.first.url.isNotEmpty &&
+        drilled < 3) {
+      return await PlaylistUtil().parsePlayListsDrill(
+        info.channels.first.url,
+        drilled: drilled + 1,
+      );
+    }
+    return info;
+  }
+
+// 解析本地或远程订阅
+  Future<PlayListInfo?> parsePlayLists(String src) async {
+    PlayListInfo? data = await PlaylistUtil().parsePlaylistSubUrl(
+      src,
+    );
+    if (data != null && data.channels.isNotEmpty) {
+      return data;
+    }
+    return PlaylistUtil().parsePlaylistFile(
+      src,
+    );
   }
 
   final dioCacheOptions = CacheOptions(
@@ -165,6 +209,11 @@ class PlaylistUtil {
         matchDy = matches['douyu'] == true,
         matchHy = matches['huya'] == true,
         matchBl = matches['bilibili'] == true;
+    try {
+      matches['memo'] = url.split('\$').last;
+    } catch (e) {
+      matches['memo'] = '';
+    }
     if (matchDy) map['group'] = DanmakuType.douyuCN;
     if (matchHy) map['group'] = DanmakuType.huyaCN;
     if (matchBl) map['group'] = DanmakuType.bilibiliCN;
@@ -215,8 +264,9 @@ class PlaylistUtil {
   }
 
 //根据url解析远程txt或m3u内容
-  Future<List<PlayListItem>> parsePlaylistSubUrl(String url,
+  Future<PlayListInfo?> parsePlaylistSubUrl(String url,
       {bool? forceRefresh = false}) async {
+    if (!PlaylistUtil().isUrl(url)) return null;
     final client = Dio(BaseOptions(receiveTimeout: const Duration(seconds: 30)))
       ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
     final resp = await client.get(url);
@@ -231,8 +281,7 @@ class PlaylistUtil {
     } else {
       await EasyLoading.showError('加载订阅失败 ${resp.statusCode} ');
     }
-
-    return [];
+    return null;
   }
 
 //读取文件文本行内容
@@ -267,7 +316,8 @@ class PlaylistUtil {
   }
 
   //根据文本行 解析txt的播放列表文件内容
-  List<PlayListItem> parseTxtContents(List<String> lines) {
+  PlayListInfo? parseTxtContents(List<String> lines,
+      {bool includeMeta = false}) {
     try {
       final groups = parseTxtGroups(lines);
       final list = lines
@@ -298,11 +348,11 @@ class PlaylistUtil {
           .where((PlayListItem element) =>
               element.url != null && element.name != null)
           .toList();
-      return list;
+      return PlayListInfo.fromJson({'channels': list});
     } catch (e) {
       print('读取解析TXT文本行内容出错: $e');
-      return [];
     }
+    return null;
   }
 
   //reg group-title, tvg-id, tvg-logo等属性表达式
@@ -316,11 +366,19 @@ class PlaylistUtil {
   }
 
   //根据文本行 解析m3u的播放列表文件内容
-  Future<List<PlayListItem>> parseM3uContents(List<String> lines) async {
+  Future<PlayListInfo?> parseM3uContents(List<String> lines,
+      [bool includeMeta = false]) async {
     try {
-      if (!(lines.length > 0 && lines[0].startsWith("#EXTM3U"))) {
-        return [];
+      // 移除空行
+      lines.removeWhere((element) => element.isEmpty);
+      if (!(lines.length > 0 && lines[0].trim().startsWith("#EXTM3U"))) {
+        return null;
       }
+      // 解析第一行的 x-tvg-url等信息
+      final Map<String, dynamic> meta = {
+        "x-tvg-url":
+            getTextByReg(lines[0], new RegExp(r'x-tvg-url="(.*?)"'), defVal: "")
+      };
 
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
@@ -355,12 +413,18 @@ class PlaylistUtil {
           //print(item.toJson());
           list.add(item);
         }
+        if (lines[i].trim().startsWith('#EXTM3U')) {
+          // xtvg-url或tvg-url
+          meta["x-tvg-url"] = getTextByReg(
+              lines[i], new RegExp(r'(?:x-)?tvg-url="(.*?)"'),
+              defVal: "");
+        }
       }
-      return list;
+      return PlayListInfo.fromJson({'channels': list});
     } catch (e) {
       print('读取M3U文本行内容出错: $e');
-      return [];
     }
+    return null;
   }
 
   //对播放列表分组

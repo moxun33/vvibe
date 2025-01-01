@@ -12,6 +12,7 @@ import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
+import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -26,7 +27,8 @@ class VideoPlaylist extends StatefulWidget {
 }
 
 class _VideoPlaylistState extends State<VideoPlaylist> {
-  List<PlayListItem> playlist = [];
+  // List<PlayListItem> playlist = [];
+  PlayListInfo? playlistInfo;
   List<Map<String, dynamic>> playFiles = []; //本地、订阅列表
   String? selectedFilename = null;
   bool loading = true;
@@ -39,9 +41,11 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   }
 
   void _initData() async {
-    final _files = await PlaylistUtil().getPlayListFiles(basename: true);
-    //订阅url列表
-    final _urls = await PlaylistUtil().getSubUrls(), urls = _urls;
+    final Map<String, List<dynamic>> configs =
+        await PlaylistUtil().getSubConfigs();
+    final urls = (configs['urls'] ?? []) as List<Map<String, dynamic>>;
+    final List<String> _files = (configs['files'] ?? []) as List<String>;
+
     urls.addAll(_files.map((e) => {'name': e}));
     setState(() => playFiles = urls);
     final lastSelect = LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
@@ -64,6 +68,10 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     });
   }
 
+  List<PlayListItem> get playlist {
+    return playlistInfo?.channels ?? [];
+  }
+
   bool _containSelectedFile(List<Map<String, dynamic>> files) {
     if (selectedFilename == null) return true;
     final map = jsonDecode(selectedFilename!);
@@ -72,8 +80,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
 
   void updatePlaylistFiles() async {
     try {
-      final files = await PlaylistUtil().getPlayListFiles(basename: true);
-      final urls = await PlaylistUtil().getSubUrls();
+      final Map<String, dynamic> configs = await PlaylistUtil().getSubConfigs();
+      final urls = configs['urls'] ?? [];
+      final files = configs['files'] ?? [];
       urls.addAll(files.map((e) => {'name': e}));
 
       setState(() {
@@ -82,13 +91,15 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
           selectedFilename = null;
         }
       });
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
 //切换播放文件或订阅
   void onPlayFileChange(String? value, {bool? forceRefresh = false}) async {
     setState(() {
-      playlist = [];
+      playlistInfo = null;
       selectedFilename = value;
     });
 
@@ -99,16 +110,12 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     final map = jsonDecode(value);
 
     LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
-    List<PlayListItem> data = [];
-    if (map['url'] != null) {
-      data = await PlaylistUtil().parsePlaylistSubUrl(map['url']);
-    } else {
-      //本地文件
-      data = await PlaylistUtil().parsePlaylistFile(map['name']);
-    }
+    PlayListInfo? data =
+        await PlaylistUtil().parsePlayListsDrill(map['url'] ?? map['name']);
+
     setState(() {
       if (!mounted) return;
-      if (value == selectedFilename) playlist = data;
+      if (value == selectedFilename) playlistInfo = data;
       loading = false;
     });
     if (value == selectedFilename)

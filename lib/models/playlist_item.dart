@@ -30,9 +30,9 @@ String playListItemToJson(PlayListItem data) => json.encode(data.toJson());
 
 class PlayListItem {
   PlayListItem({
-    this.name,
+    required this.name,
     this.group,
-    this.url,
+    required this.url,
     this.tvgId,
     this.tvgName,
     this.tvgLogo,
@@ -41,9 +41,9 @@ class PlayListItem {
     this.ext,
   });
 
-  String? name;
+  String name;
   String? group;
-  String? url;
+  String url;
   String? tvgId;
   String? tvgName;
   String? tvgLogo;
@@ -53,9 +53,9 @@ class PlayListItem {
       ext; //平台代理配置{'bakUrls':['备用链接列表'] 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
-      name: json["name"],
+      name: json["name"] ?? '未命名',
       group: json["group"],
-      url: json["url"],
+      url: json["url"] ?? '',
       tvgId: json["tvgId"],
       tvgName: json["tvgName"],
       tvgLogo: json["tvgLogo"],
