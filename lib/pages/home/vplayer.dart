@@ -92,19 +92,20 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   }
 
   startPlay(PlayListItem? item, {bool playback = false}) async {
-    if (item == null || item.url == null) return;
+    if (item == null) return;
     playerConfig();
     if (_controller?.value.isInitialized == true) {
       stopPlayer();
     }
+    _controller?.dispose();
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     _controller =
-        VideoPlayerController.networkUrl(Uri.parse(item.url!), httpHeaders: {
+        VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
       'User-Agent': settings['ua'] ?? DEF_REQ_UA,
     });
     setState(() {
       playingUrl = item;
-      tip = '正在打开 ${item.name ?? ''}';
+      tip = '正在打开 ${item.name}';
     });
     _controller?.addListener(() {
       videoPlayerListener(item);
@@ -222,7 +223,6 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   //播放url改变
   void onPlayUrlChange(PlayListItem item) async {
-    if (item.url == null) return;
     startPlay(item);
   }
 
