@@ -5,6 +5,7 @@
  * @Last Modified time: 2022-09-10 00:55:23
  */
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -43,11 +44,12 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   void _initData() async {
     final Map<String, List<dynamic>> configs =
         await PlaylistUtil().getSubConfigs();
-    final urls = (configs['urls'] ?? []) as List<Map<String, dynamic>>;
+    final urls = (configs['urls'] ?? []);
     final List<String> _files = (configs['files'] ?? []) as List<String>;
 
-    urls.addAll(_files.map((e) => {'name': e}));
-    setState(() => playFiles = urls);
+    urls.addAll(
+        _files.map((e) => {'name': e}).toList() as List<Map<String, dynamic>>);
+    setState(() => playFiles = urls as List<Map<String, dynamic>>);
     final lastSelect = LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
     if (lastSelect == null) {
       setState(() {
@@ -66,6 +68,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     setState(() {
       loading = false;
     });
+    watchPlaylistDir();
   }
 
   List<PlayListItem> get playlist {
@@ -81,9 +84,10 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   void updatePlaylistFiles() async {
     try {
       final Map<String, dynamic> configs = await PlaylistUtil().getSubConfigs();
-      final urls = configs['urls'] ?? [];
-      final files = configs['files'] ?? [];
-      urls.addAll(files.map((e) => {'name': e}));
+      final urls = (configs['urls'] ?? []);
+      final List<String> files = (configs['files'] ?? []);
+      urls.addAll(
+          files.map((e) => {'name': e}).toList() as List<Map<String, dynamic>>);
 
       setState(() {
         playFiles = urls;
@@ -150,6 +154,14 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     if (widget.visible && playFiles.length < 1) {
       _initData();
     }
+  }
+
+  void watchPlaylistDir() async {
+    final dir = await PlaylistUtil().getPlayListDir();
+    dir.watch(events: FileSystemEvent.all).listen((FileSystemEvent event) {
+      print('playlist dir change event: ${event.type}');
+      updatePlaylistFiles();
+    });
   }
 
   //组件被从父节点移除时回调的方法，如果没插入到其他节点会随后调用dispose完全释放
@@ -230,7 +242,6 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   onPlayFileChange(value);
                 },
                 menuItemStyleData: MenuItemStyleData(height: 20),
-                //on: updatePlaylistFiles,
                 style: const TextStyle(color: Colors.white, fontSize: 12),
                 items: playFiles.map<DropdownMenuItem<String>>((v) {
                   return DropdownMenuItem<String>(
