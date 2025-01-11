@@ -6,11 +6,11 @@ import 'package:vvibe/utils/playlist/epg_util.dart';
 
 class EpgDateTabsView extends StatefulWidget {
   const EpgDateTabsView(
-      {Key? key, required this.urlItem, required this.doPlayback})
+      {Key? key, required this.urlItem, this.epgUrl, required this.doPlayback})
       : super(key: key);
 
   final PlayListItem urlItem;
-
+  final String? epgUrl;
   final Function doPlayback;
   @override
   _EpgDateTabsViewState createState() => _EpgDateTabsViewState();
@@ -59,6 +59,7 @@ class _EpgDateTabsViewState extends State<EpgDateTabsView>
             controller: _tabController,
             children: tabs
                 .map((e) => EpgChannelDate(
+                      epgUrl: widget.epgUrl,
                       doPlayback: widget.doPlayback,
                       urlItem: widget.urlItem,
                       date: e['value']!,

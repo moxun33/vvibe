@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
@@ -61,7 +62,10 @@ class EpgUtil {
   }
 
 // epg 主机
-  Future<String> getEpgUrl() async {
+  Future<String> getEpgUrl([String? epgUrl]) async {
+    if (epgUrl != null && epgUrl.isNotEmpty) {
+      return epgUrl;
+    }
     String url = DEF_EPG_URL;
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     if (settings != null) {
@@ -83,9 +87,9 @@ class EpgUtil {
   }
 
   // epg xml地址
-  Future<String?> getEpgXmlUrl() async {
+  Future<String?> getEpgXmlUrl([String? epgUrl]) async {
     try {
-      String url = await getEpgUrl();
+      String url = await getEpgUrl(epgUrl);
       if (url.endsWith('.xml.gz') || url.endsWith('.xml')) {
         return url;
       }
@@ -222,10 +226,12 @@ class EpgUtil {
     }
   }
 
-  downloadEpgDataAync() {
+  downloadEpgDataAync({String? epgUrl}) {
     try {
-      downloadEpgData();
-    } catch (e) {}
+      downloadEpgData(epgUrl: epgUrl);
+    } catch (e) {
+      MyLogger.error('downloadEpgDataAync errors $e $epgUrl');
+    }
   }
 
   Future<String> getZipPath() async {
@@ -338,8 +344,8 @@ class EpgUtil {
   }
 
 // downloadepg数据
-  Future downloadEpgData({text = false}) async {
-    final url = await getEpgXmlUrl();
+  Future downloadEpgData({text = false, String? epgUrl}) async {
+    final url = await getEpgXmlUrl(epgUrl);
     if (url == null || !url.contains('xml')) return;
     final savePath = text ? await getXmlFilePath() : await getZipPath();
     final dlRes = await downloadFile(

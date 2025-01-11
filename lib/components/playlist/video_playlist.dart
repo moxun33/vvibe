@@ -21,8 +21,8 @@ import 'package:vvibe/utils/utils.dart';
 class VideoPlaylist extends StatefulWidget {
   const VideoPlaylist({Key? key, required this.onUrlTap, this.visible = false})
       : super(key: key);
-  final void Function(PlayListItem item, {Map<String, dynamic> subConfig})
-      onUrlTap;
+  final void Function(PlayListItem item,
+      {Map<String, dynamic>? subConfig, PlayListInfo? playlistInfo}) onUrlTap;
   final bool visible;
   @override
   _VideoPlaylistState createState() => _VideoPlaylistState();
@@ -293,7 +293,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   data: playlist,
                   currentSubConfig: selectedFile ?? {},
                   onUrlTap: (e) {
-                    widget.onUrlTap(e, subConfig: selectedFile ?? {});
+                    widget.onUrlTap(e,
+                        playlistInfo: playlistInfo,
+                        subConfig: selectedFile ?? {});
                   },
                   forceRefreshPlaylist: () {
                     onPlayFileChange(selectedFileId, forceRefresh: true);

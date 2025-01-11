@@ -12,6 +12,7 @@ import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
+import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
@@ -40,7 +41,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   String tip = ''; //左上角的单个文字提示，如成功、失败
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
-  Map<String, String> extraMetaInfo = {}; //额外的元数据
+  PlayListInfo? playListInfo; // 当前订阅的信息
   Map<String, dynamic> subConf = {}; //当前远程订阅的独立配置
   int bufferSpeed = 0; // 缓冲速度 (字节/秒)
   Duration lastBufferUpdateTime = Duration.zero;
@@ -49,7 +50,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
-    playerConfig();
+
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
     eventBus.on('play-last-video', (e) {
       initLastVideo();
@@ -105,8 +106,12 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
-      'User-Agent': settings['ua'] ?? DEF_REQ_UA,
+      'User-Agent': PlaylistUtil().isStrValid(subConf['ua'])
+          ? subConf['ua']
+          : settings['ua'] ?? DEF_REQ_UA,
     });
+    item.catchup = playListInfo?.catchup;
+    item.catchupSource = playListInfo?.catchupSource;
     setState(() {
       playingUrl = item;
       tip = '正在打开 ${item.name}';
@@ -230,9 +235,10 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   //播放url改变
   void onPlayUrlChange(PlayListItem item,
-      {Map<String, dynamic>? subConfig}) async {
+      {Map<String, dynamic>? subConfig, PlayListInfo? playlistInfo}) async {
     setState(() {
       subConf = (subConfig ?? {});
+      playListInfo = playlistInfo;
     });
 
     startPlay(item);
@@ -314,10 +320,14 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   //显示、隐藏节目单
   void toggleEpgDialog() {
     if (playingUrl == null) return;
+    final epgUrl = PlaylistUtil().isStrValid(subConf['epg'])
+        ? subConf['epg']
+        : playListInfo?.xTvgUrl;
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return EpgAlertDialog(
+            epgUrl: epgUrl,
             urlItem: playingUrl!,
             doPlayback: doPlayback,
           );

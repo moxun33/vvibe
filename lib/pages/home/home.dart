@@ -306,7 +306,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   //播放url改变
-  void onPlayUrlChange(PlayListItem item) async {
+  void onPlayUrlChange(PlayListItem item,
+      {Map<String, dynamic>? subConfig}) async {
     if (item.url == null) return;
     stopPlayer();
 

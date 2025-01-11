@@ -142,7 +142,7 @@ class PlaylistUtil {
     return v.toString().isNotEmpty;
   }
 
-// 解析本地或远程订阅,自动下钻单个直播源集合
+// 解析本地或远程订阅,自动下钻单个直播源集合； 触发：一个直播源且名称为index
   Future<PlayListInfo?> parsePlayListsDrill(String src,
       {int drilled = 0,
       PlayListInfo? defInfo,
@@ -150,6 +150,7 @@ class PlaylistUtil {
     final info = await PlaylistUtil().parsePlayLists(src, config: config);
     if (info != null &&
         info.channels.length == 1 &&
+        info.channels.first.name == 'index' &&
         info.channels.first.url.isNotEmpty &&
         drilled < 2) {
       return await PlaylistUtil().parsePlayListsDrill(

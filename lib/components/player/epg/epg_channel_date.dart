@@ -11,10 +11,12 @@ class EpgChannelDate extends StatefulWidget {
       {Key? key,
       required this.urlItem,
       required String this.date,
+      this.epgUrl,
       required this.doPlayback})
       : super(key: key);
   final PlayListItem urlItem;
   final String date;
+  final String? epgUrl;
   final Function doPlayback;
   @override
   _EpgChannelDateState createState() => _EpgChannelDateState();
@@ -30,6 +32,7 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   void getEpgData() async {
     try {
+      await EpgUtil().downloadEpgDataAync(epgUrl: widget.epgUrl);
       final name = widget.urlItem.tvgName!.isNotEmpty
           ? widget.urlItem.tvgName
           : widget.urlItem.name;
@@ -64,8 +67,10 @@ class _EpgChannelDateState extends State<EpgChannelDate> {
 
   bool canUrlPlayback() {
     final url = widget.urlItem.url;
-    if (url == null) return false;
-    return url.indexOf('PLTV') > -1 || url.indexOf('TVOD') > -1;
+    return (widget.urlItem.catchup != null &&
+            widget.urlItem.catchupSource != null) ||
+        url.indexOf('PLTV') > -1 ||
+        url.indexOf('TVOD') > -1;
   }
 
   String getPlayseek(EpgDatum epg) {

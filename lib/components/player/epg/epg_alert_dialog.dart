@@ -6,10 +6,11 @@ import 'package:vvibe/utils/utils.dart';
 
 class EpgAlertDialog extends StatefulWidget {
   const EpgAlertDialog(
-      {Key? key, required this.urlItem, required this.doPlayback})
+      {Key? key, required this.urlItem, this.epgUrl, required this.doPlayback})
       : super(key: key);
 
   final PlayListItem urlItem;
+  final String? epgUrl;
   final Function doPlayback;
   @override
   _EpgAlertDialogState createState() => _EpgAlertDialogState();
@@ -27,6 +28,7 @@ class _EpgAlertDialogState extends State<EpgAlertDialog> {
         width: 1000,
         height: getDeviceHeight(context),
         child: EpgDateTabsView(
+          epgUrl: widget.epgUrl,
           doPlayback: widget.doPlayback,
           urlItem: widget.urlItem,
         ),
