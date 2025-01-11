@@ -1,7 +1,7 @@
 //设置modal的标签页
 import 'package:flutter/material.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/components/player/settings/player_settings.dart';
-
 import 'package:vvibe/components/player/settings/playlist_subscription.dart';
 
 class SettingsTabsView extends StatefulWidget {
@@ -31,15 +31,16 @@ class _SettingsTabsViewState extends State<SettingsTabsView>
 
   Widget _buildTabBar() => TabBar(
         onTap: (tab) => print(tab),
-        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        unselectedLabelStyle: TextStyle(fontSize: 16),
+        labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(fontSize: 14),
         isScrollable: true,
-        labelColor: Colors.purple,
-        indicatorWeight: 3,
+        labelColor: AppColors.primaryColor,
+        indicatorWeight: 2,
+        tabAlignment: TabAlignment.center,
+        indicatorSize: TabBarIndicatorSize.label,
         controller: _tabController,
-        indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
         unselectedLabelColor: Colors.black87,
-        indicatorColor: Colors.purple[300],
+        indicatorColor: AppColors.primaryColor,
         tabs: tabs.map((e) => Tab(text: e['label'])).toList(),
       );
 

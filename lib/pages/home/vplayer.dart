@@ -41,6 +41,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
   Map<String, String> extraMetaInfo = {}; //额外的元数据
+  Map<String, dynamic> subConf = {}; //当前远程订阅的独立配置
   int bufferSpeed = 0; // 缓冲速度 (字节/秒)
   Duration lastBufferUpdateTime = Duration.zero;
   Duration lastBufferedPosition = Duration.zero;
@@ -59,6 +60,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   initLastVideo() {
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
+      setState(() {
+        subConf = lastPlayUrl['subConf'] ?? {};
+      });
       if (Global.isRelease) {
         startPlay(PlayListItem.fromJson(lastPlayUrl));
       }
@@ -118,7 +122,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
                   tip = '';
                   playingUrl = item;
                 });
-                LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, item.toJson());
+                final itemJson = item.toJson();
+                itemJson['subConf'] = subConf;
+                LoacalStorage().setJSON(LAST_PLAY_VIDEO_URL, itemJson);
               }
               startDanmakuSocket(item);
               updateWindowTitle(item);
@@ -137,7 +143,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final size = _controller?.value.size;
     final ratio = '${size!.width.toInt()}x${size.height.toInt()}';
     final title = '${item.name} [${ratio}] ' + ' ${extra}';
-    VWindow().setWindowTitle(title, item.tvgLogo);
+    final showIcon = PlaylistUtil().isBoolValid(subConf['showIcon']);
+    VWindow().setWindowTitle(title, showIcon ? item.tvgLogo : null);
   }
 
 // 显隐媒体元数据
@@ -222,7 +229,12 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   }
 
   //播放url改变
-  void onPlayUrlChange(PlayListItem item) async {
+  void onPlayUrlChange(PlayListItem item,
+      {Map<String, dynamic>? subConfig}) async {
+    setState(() {
+      subConf = (subConfig ?? {});
+    });
+
     startPlay(item);
   }
 
@@ -356,6 +368,10 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     stopPlayer();
   }
 
+  Widget DefIconLogo() {
+    return Image.asset('assets/logo.png');
+  }
+
   Widget PlaceCover() {
     return GestureDetector(
         onTap: () {
@@ -371,12 +387,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               children: [
                 SizedBox(
                     width: 200,
-                    child: CachedNetworkImage(
-                      fit: BoxFit.contain,
-                      imageUrl: playingUrl?.tvgLogo ?? '',
-                      errorWidget: (context, url, error) =>
-                          Image.asset('assets/logo.png'),
-                    ))
+                    child: !PlaylistUtil().isBoolValid(subConf['showIcon'])
+                        ? DefIconLogo()
+                        : CachedNetworkImage(
+                            fit: BoxFit.contain,
+                            imageUrl: playingUrl?.tvgLogo ?? '',
+                            errorWidget: (context, url, error) => DefIconLogo(),
+                          ))
               ],
             ),
           ),
@@ -440,7 +457,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
                                   child: VideoPlayer(_controller!)),
                               MouseRegion(
                                   onHover: (_) {
-                                    print('cachee hover');
+                                    // print('cachee hover');
                                   },
                                   child: VplayerControls(
                                     _controller!,

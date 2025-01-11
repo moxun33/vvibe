@@ -21,7 +21,8 @@ import 'package:vvibe/utils/utils.dart';
 class VideoPlaylist extends StatefulWidget {
   const VideoPlaylist({Key? key, required this.onUrlTap, this.visible = false})
       : super(key: key);
-  final void Function(PlayListItem item) onUrlTap;
+  final void Function(PlayListItem item, {Map<String, dynamic> subConfig})
+      onUrlTap;
   final bool visible;
   @override
   _VideoPlaylistState createState() => _VideoPlaylistState();
@@ -31,7 +32,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   // List<PlayListItem> playlist = [];
   PlayListInfo? playlistInfo;
   List<Map<String, dynamic>> playFiles = []; //本地、订阅列表
-  String? selectedFilename = null;
+  String? selectedFileId = null;
+  Map<String, dynamic>? selectedFile = null;
   bool loading = true;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
@@ -45,10 +47,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     final Map<String, List<dynamic>> configs =
         await PlaylistUtil().getSubConfigs();
     final urls = (configs['urls'] ?? []);
-    final List<String> _files = (configs['files'] ?? []) as List<String>;
+    final _files = (configs['files'] ?? []);
 
-    urls.addAll(
-        _files.map((e) => {'name': e}).toList() as List<Map<String, dynamic>>);
+    urls.addAll(_files);
     setState(() => playFiles = urls as List<Map<String, dynamic>>);
     final lastSelect = LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
     if (lastSelect == null) {
@@ -58,10 +59,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       return;
     }
 
-    final lastFile = lastSelect['name'];
-
-    if (lastFile != '' && _files.contains(lastFile)) {
-      onPlayFileChange(jsonEncode(lastSelect));
+    if (plFileExists(lastSelect)) {
+      onPlayFileChange(lastSelect['id'] ?? '');
     }
     //初始化订阅url的列表
 
@@ -71,59 +70,84 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     watchPlaylistDir();
   }
 
-  List<PlayListItem> get playlist {
-    return playlistInfo?.channels ?? [];
+  bool plFileExists(Map<String, dynamic>? pl) {
+    return pl != null && playFiles.where((e) => e['id'] == pl['id']).length > 0;
   }
 
-  bool _containSelectedFile(List<Map<String, dynamic>> files) {
-    if (selectedFilename == null) return true;
-    final map = jsonDecode(selectedFilename!);
-    return files.map((e) => e['name']).contains(map['name']);
+  List<PlayListItem> get playlist {
+    final channels = playlistInfo?.channels ?? [];
+    final last = channels.where((e) => !blackGroups.contains(e.group)).toList();
+    return last;
+  }
+
+  List<String> get blackGroups {
+    try {
+      final map = selectedFile ?? {};
+      final String bg = map['blackGroups'] ?? '';
+      final bgs = bg.split(',').map((e) => e.trim()).toList();
+      return bgs;
+    } catch (e) {
+      print('$e  bgs errors');
+      return [];
+    }
   }
 
   void updatePlaylistFiles() async {
     try {
       final Map<String, dynamic> configs = await PlaylistUtil().getSubConfigs();
       final urls = (configs['urls'] ?? []);
-      final List<String> files = (configs['files'] ?? []);
-      urls.addAll(
-          files.map((e) => {'name': e}).toList() as List<Map<String, dynamic>>);
+      final List<Map<String, dynamic>> files = (configs['files'] ?? []);
+      urls.addAll(files);
 
       setState(() {
         playFiles = urls;
-        if (!_containSelectedFile(urls)) {
+        /* if (!plFileExists(selectedFilename != null
+            ? jsonDecode(selectedFilename ?? '{}')
+            : null)) {
           selectedFilename = null;
-        }
+        } */
       });
     } catch (e) {
-      print(e);
+      print('$e  updatePlaylistFiles errors');
+    }
+  }
+
+  Map<String, dynamic> pickPlFile(String? id) {
+    try {
+      if (id == null) return {};
+      final file = playFiles.where((e) => e['id'] == id).toList().first;
+      return file;
+    } catch (e) {
+      print('$e  pickPlFile errors');
+      return {};
     }
   }
 
 //切换播放文件或订阅
-  void onPlayFileChange(String? value, {bool? forceRefresh = false}) async {
+  void onPlayFileChange(String? id, {bool? forceRefresh = false}) async {
+    final Map<String, dynamic> file = pickPlFile(id);
     setState(() {
       playlistInfo = null;
-      selectedFilename = value;
+      selectedFile = file;
+      selectedFileId = id;
     });
 
-    if (value == null) return;
+    if (id == null) return;
     setState(() {
       loading = true;
     });
-    final map = jsonDecode(value);
+    final map = file;
 
     LoacalStorage().setJSON(LAST_PLAYLIST_FILE_OR_SUB, map);
-    PlayListInfo? data =
-        await PlaylistUtil().parsePlayListsDrill(map['url'] ?? map['name']);
-
+    PlayListInfo? data = await PlaylistUtil()
+        .parsePlayListsDrill(map['url'] ?? map['name'], config: map);
+    if (!mounted) return;
     setState(() {
-      if (!mounted) return;
-      if (value == selectedFilename) playlistInfo = data;
+      playlistInfo = data;
       loading = false;
     });
-    if (value == selectedFilename)
-      LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
+
+    LoacalStorage().setJSON(LAST_PLAYLIST_DATA, data);
   }
 
   //菜单点击
@@ -234,8 +258,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 onMenuStateChange: (isOpen) {
                   updatePlaylistFiles();
                 },
+                value: selectedFileId,
                 hint: Text('选择播放列表', style: TextStyle(color: Colors.white)),
-                value: selectedFilename,
                 iconStyleData:
                     IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),
                 onChanged: (String? value) {
@@ -243,20 +267,20 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 },
                 menuItemStyleData: MenuItemStyleData(height: 20),
                 style: const TextStyle(color: Colors.white, fontSize: 12),
-                items: playFiles.map<DropdownMenuItem<String>>((v) {
+                items: playFiles.map<DropdownMenuItem<String>>((obj) {
                   return DropdownMenuItem<String>(
-                      value: jsonEncode(v),
-                      key: ObjectKey(v),
+                      value: obj['id'] ?? jsonEncode(obj),
+                      key: ObjectKey(obj),
                       child: ContextMenuRegion(
                         onItemSelected: (item) {
-                          _onMenuItemTap(context, item, v);
+                          _onMenuItemTap(context, item, obj);
                         },
-                        menuItems: v['url'] == null
+                        menuItems: obj['url'] == null
                             ? [
                                 MenuItem(title: '编辑文件内容'),
                               ]
                             : [],
-                        child: MenuItemRow(v),
+                        child: MenuItemRow(obj),
                       ));
                 }).toList(),
               ),
@@ -267,11 +291,12 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
           child: playlist.length > 0
               ? PlGroupPanel(
                   data: playlist,
+                  currentSubConfig: selectedFile ?? {},
                   onUrlTap: (e) {
-                    widget.onUrlTap(e);
+                    widget.onUrlTap(e, subConfig: selectedFile ?? {});
                   },
                   forceRefreshPlaylist: () {
-                    onPlayFileChange(selectedFilename, forceRefresh: true);
+                    onPlayFileChange(selectedFileId, forceRefresh: true);
                   },
                 )
               : (widget.visible && loading

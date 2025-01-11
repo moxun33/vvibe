@@ -6,7 +6,7 @@
 
 //import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:vvibe/utils/color_util.dart';
+import 'package:vvibe/common/colors/colors.dart';
 
 /* import 'package:json_theme/json_theme.dart';
 import 'package:flutter/services.dart';
@@ -23,9 +23,10 @@ Future<ThemeData> genTheme(
  */
 ThemeData genTheme() {
   return ThemeData(
-      scaffoldBackgroundColor: Colors.black12,
-      canvasColor: Colors.black12,
-      primaryColor: ColorUtil.fromHex(' #A92EFD'),
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent);
+    scaffoldBackgroundColor: Colors.black12,
+    canvasColor: Colors.black12,
+    primaryColor: AppColors.primaryColor,
+    splashColor: Colors.transparent,
+    highlightColor: Colors.transparent,
+  );
 }

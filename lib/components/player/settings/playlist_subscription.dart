@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:uuid/uuid.dart';
+import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/utils/utils.dart';
 
@@ -15,10 +16,17 @@ class PlaylistSubscription extends StatefulWidget {
 class _PlaylistSubscritionState extends State<PlaylistSubscription> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _uaController = TextEditingController();
+  final TextEditingController _epgController = TextEditingController();
+  final TextEditingController _bgController = TextEditingController();
   final _uuid = Uuid();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> urls = []; //所有的订阅
   Map<String, dynamic>? editUrl; //正在编辑的订阅
+  late String name, url, ua, epg, blackGroups;
+  bool _checkAlive = false;
+  bool _showIcon = false;
 
   @override
   void initState() {
@@ -36,35 +44,50 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     }
   }
 
+  void _submit() {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      _submitForm();
+    }
+  }
+
   void _submitForm() {
-    //验证通过提交数据
-    final name = _nameController.text, url = _urlController.text;
-    if (name.isEmpty || url.isEmpty) {
-      EasyLoading.showError('名称和地址都不能为空');
-      return;
-    }
-    if (!PlaylistUtil().validateUrl(url)) {
-      EasyLoading.showError('订阅地址无效');
-      return;
-    }
     final _urls = urls;
     final index =
         _urls.indexWhere((element) => element['id'] == editUrl?['id']);
     if (editUrl != null && index > -1) {
-      editUrl!['name'] = name;
+      editUrl!['name'] = name.isEmpty ? '未命名' : name;
       editUrl!['url'] = url;
+      editUrl!['ua'] = ua;
+      editUrl!['epg'] = epg;
+      editUrl!['blackGroups'] = blackGroups;
+      editUrl!['checkAlive'] = _checkAlive.toString();
+      editUrl!['showIcon'] = _showIcon.toString();
+
       _urls.fillRange(index, index, editUrl);
       setState(() {
         editUrl = null;
       });
     } else {
-      final _map = {'name': name, 'url': url, 'id': _uuid.v4()};
+      final _map = {
+        'name': name,
+        'url': url,
+        'id': _uuid.v4(),
+        'ua': ua,
+        'epg': epg,
+        'blackGroups': blackGroups,
+        'checkAlive': _checkAlive.toString(),
+        'showIcon': _showIcon.toString()
+      };
       //_urls.add(SubscriptionUrl(id: _uuid.v4(), name: name, url: url));
       _urls.add(_map);
     }
     _updateUrlsData(_urls);
     _nameController.clear();
     _urlController.clear();
+    _uaController.clear();
+    _epgController.clear();
+    _bgController.clear();
   }
 
   void _updateUrlsData(List<Map<String, dynamic>> list) {
@@ -80,8 +103,18 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     setState(() {
       editUrl = item;
     });
-    _nameController.text = item['name'];
-    _urlController.text = item['url'];
+    _nameController.text = item['name'] ?? '';
+    _urlController.text = item['url'] ?? '';
+    _uaController.text = item['ua'] ?? '';
+    _epgController.text = item['epg'] ?? '';
+    _bgController.text = item['blackGroups'] ?? '';
+    setState(() {
+      _checkAlive = PlaylistUtil().isBoolValid(item['checkAlive']);
+      _showIcon = PlaylistUtil().isBoolValid(item['showIcon']);
+    });
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+    }
   }
 
   void _onDelete(int index) {
@@ -90,139 +123,249 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     _updateUrlsData(_urls);
   }
 
-  Widget _buildForm() {
-    return Row(
-      children: <Widget>[
-        SizedBox(
-          width: 300,
-          child: TextField(
-            autofocus: true,
-            controller: _nameController,
-            decoration: InputDecoration(
-                hintText: "名称",
-                icon: Icon(Icons.insert_chart_outlined),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.close),
+  String? _validateUrl(value) {
+    if (value.isEmpty) {
+      return '不能为空';
+    }
+    // 判断url
+    if (!PlaylistUtil().isUrl(value)) {
+      return 'URL无效';
+    }
+    return null;
+  }
+
+  String? _validateEpgUrl(value) {
+    if (!value.isEmpty) {
+      return _validateUrl(value);
+    }
+    return null;
+  }
+
+  Widget _buildSubsList() {
+    return ListView.builder(
+        itemCount: urls.length,
+        itemExtent: 70.0,
+        itemBuilder: (BuildContext context, int index) {
+          final item = urls[index];
+          return ListTile(
+            title: Row(children: [
+              Row(
+                children: [
+                  Padding(
+                      padding: EdgeInsets.only(right: 5, top: 5),
+                      child: Icon(
+                          PlaylistUtil().isStrValid(item['epg'])
+                              ? Icons.event_repeat_sharp
+                              : Icons.link,
+                          color: PlaylistUtil().isStrValid(item['epg'])
+                              ? Colors.green
+                              : AppColors.primaryColor,
+                          size: 12)),
+                  SelectableText(
+                    item['name'],
+                    style: TextStyle(fontSize: 16),
+                  )
+                ],
+              ),
+              SizedBox(
+                width: 50,
+              ),
+              Tooltip(
+                child: IconButton(
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 16,
+                  ),
                   onPressed: () {
-                    setState(() {
-                      _nameController.clear();
-                    });
-                  },
-                )),
-          ),
-        ),
-        SizedBox(
-          width: 20,
-        ),
-        SizedBox(
-          width: 500,
-          child: TextField(
-            controller: _urlController,
-            decoration: InputDecoration(
-                hintText: "URL地址, 如: http://localhost/live.m3u",
-                icon: Icon(Icons.add_link_sharp),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    setState(() {
-                      _urlController.clear();
-                    });
-                  },
-                )),
-          ),
-        ),
-        SizedBox(
-          width: 20,
-        ),
-        SizedBox(
-          width: 130,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: ElevatedButton(
-                  child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        children: [
-                          Text("保存"),
-                          SizedBox(
-                            width: 20,
-                            child: Tooltip(
-                              child: Icon(Icons.question_mark_outlined),
-                              message:
-                                  '注意：订阅接口URL必须以.m3u或.txt结尾\n订阅接口响应必须为.m3u或.txt格式的文本内容;\n暂时支持斗鱼、虎牙和B站实时弹幕，请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id',
-                            ),
-                          ),
-                        ],
-                      )),
-                  onPressed: () {
-                    // 通过_formKey.currentState 获取FormState后，
-                    // 调用validate()方法校验用户名密码是否合法，校验
-                    // 通过后再提交数据。
-                    _submitForm();
+                    _onEdit(item);
                   },
                 ),
+                message: '编辑',
               ),
-            ],
+              Tooltip(
+                child: IconButton(
+                  icon: Icon(
+                    Icons.delete_forever_outlined,
+                    size: 16,
+                    color: Colors.redAccent,
+                  ),
+                  onPressed: () {
+                    _onDelete(index);
+                  },
+                ),
+                message: '删除',
+              )
+            ]),
+            subtitle: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(color: Colors.black12, width: 0.5)),
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                      padding: EdgeInsets.only(right: 5, top: 5),
+                      child: Icon(
+                        PlaylistUtil().isStrValid(item['showIcon'])
+                            ? Icons.tv_outlined
+                            : Icons.tv_off_outlined,
+                        color: Colors.orange,
+                        size: 12,
+                      )),
+                  SelectableText(
+                    item['url'],
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            contentPadding: EdgeInsets.all(0),
+          );
+        });
+  }
+
+  Widget _buildForm2() {
+    return Form(
+      key: _formKey,
+      child: Column(children: <Widget>[
+        TextFormField(
+          autofocus: true,
+          controller: _urlController,
+          decoration: InputDecoration(
+            labelText: '订阅地址, 如: http://a.cn/a.m3u',
+            labelStyle: TextStyle(color: Colors.grey),
           ),
-        )
-      ],
+          onSaved: (value) {
+            this.url = value!;
+          },
+          validator: _validateUrl,
+        ),
+        TextFormField(
+          controller: _nameController,
+          decoration: InputDecoration(
+              labelText: '名称', labelStyle: TextStyle(color: Colors.grey)),
+          onSaved: (value) {
+            this.name = value!;
+          },
+        ),
+        TextFormField(
+          controller: _uaController,
+          decoration: InputDecoration(
+            labelText: 'User-Agent',
+            labelStyle: TextStyle(color: Colors.grey),
+          ),
+          onSaved: (value) {
+            this.ua = value!;
+          },
+        ),
+        TextFormField(
+          controller: _epgController,
+          decoration: InputDecoration(
+            labelText: 'EPG地址',
+            labelStyle: TextStyle(color: Colors.grey),
+          ),
+          onSaved: (value) {
+            this.epg = value!;
+          },
+          validator: _validateEpgUrl,
+        ),
+        TextFormField(
+          controller: _bgController,
+          decoration: InputDecoration(
+              labelText: '屏蔽分组, 英文逗号分隔',
+              labelStyle: TextStyle(color: Colors.grey)),
+          onSaved: (value) {
+            this.blackGroups = value!;
+          },
+        ),
+        Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: Row(
+              children: [
+                SizedBox(
+                    width: 60,
+                    child:
+                        Text('实时检测', style: TextStyle(color: Colors.purple))),
+                SizedBox(
+                  width: 80,
+                  child: Switch(
+                    value: _checkAlive, //当前状态
+                    onChanged: (value) {
+                      setState(() {
+                        _checkAlive = value;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                SizedBox(
+                    width: 60,
+                    child:
+                        Text('频道图标', style: TextStyle(color: Colors.purple))),
+                SizedBox(
+                  width: 80,
+                  child: Switch(
+                    value: _showIcon, //当前状态
+                    onChanged: (value) {
+                      setState(() {
+                        _showIcon = value;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            )),
+        Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Center(
+                child: SizedBox(
+              width: 150,
+              child: ElevatedButton(
+                child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: [
+                        Text("立即保存"),
+                        SizedBox(
+                          width: 20,
+                          child: Tooltip(
+                            child: Icon(Icons.question_mark_outlined),
+                            message:
+                                '注意：订阅接口响应须为.m3u或.txt格式的标准文本内容;\n暂时支持斗鱼、虎牙和B站实时弹幕，请确保m3u文件的group-title分别为斗鱼或douyu、虎牙或huya、 B站或bilibili, tvg-id为真实房间id',
+                          ),
+                        ),
+                      ],
+                    )),
+                onPressed: () {
+                  _submit();
+                },
+              ),
+            )))
+      ]),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        _buildForm(),
+        Container(
+          padding: EdgeInsets.only(right: 10),
+          width: 400,
+          child: _buildForm2(),
+        ),
         Expanded(
-            child: ListView.builder(
-                itemCount: urls.length,
-                itemExtent: 70.0,
-                itemBuilder: (BuildContext context, int index) {
-                  final item = urls[index];
-                  return ListTile(
-                    title: Row(children: [
-                      SelectableText(
-                        item['name'],
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(
-                        width: 50,
-                      ),
-                      Tooltip(
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.edit_outlined,
-                            size: 18,
-                          ),
-                          onPressed: () {
-                            _onEdit(item);
-                          },
-                        ),
-                        message: '编辑',
-                      ),
-                      Tooltip(
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.delete_forever_outlined,
-                            size: 18,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            _onDelete(index);
-                          },
-                        ),
-                        message: '删除',
-                      )
-                    ]),
-                    subtitle: SelectableText(
-                      item['url'],
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    contentPadding: EdgeInsets.all(0),
-                  );
-                })),
+            child: Container(
+          padding: EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(
+              border:
+                  Border(left: BorderSide(color: Colors.black12, width: 0.5))),
+          child: _buildSubsList(),
+        )),
       ],
     );
   }

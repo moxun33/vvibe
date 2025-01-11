@@ -18,6 +18,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
   final TextEditingController _danmuFSizeTextCtl = TextEditingController();
   bool _checkAlive = true;
   bool _fullFfmpeg = false;
+  bool _showIcon = false;
   @override
   void initState() {
     super.initState();
@@ -32,8 +33,9 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       _epgUrlTextCtl.text = v['epg'] ?? '';
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
       setState(() {
-        _checkAlive = v['checkAlive'].toString() == 'false' ? false : true;
-        _fullFfmpeg = v['fullFfmpeg'].toString() == 'true' ? true : false;
+        _checkAlive = PlaylistUtil().isBoolValid(v);
+        _fullFfmpeg = PlaylistUtil().isBoolValid(v['fullFfmpeg']);
+        _showIcon = PlaylistUtil().isBoolValid(v['showIcon']);
       });
     }
   }
@@ -46,7 +48,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
             width: 100,
             child: Text(label ?? '', style: TextStyle(color: Colors.purple))),
         SizedBox(
-          width: 350,
+          width: 450,
           child: TextField(controller: controller, decoration: decoration),
         )
       ],
@@ -66,7 +68,8 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'epg': epg.isNotEmpty ? epg : DEF_EPG_URL,
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
       'checkAlive': _checkAlive.toString(),
-      'fullFfmpeg': _fullFfmpeg.toString()
+      'fullFfmpeg': _fullFfmpeg.toString(),
+      'showIcon': _showIcon.toString(),
     };
     await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
@@ -94,58 +97,71 @@ class _PlayerSettingsState extends State<PlayerSettings> {
                       InputDecoration(hintText: 'EPG地址，默认 ${DEF_EPG_URL}')),
             ],
           ),
+          Row(children: [
+            _buldInputRow(_danmuFSizeTextCtl,
+                label: '弹幕大小',
+                decoration: InputDecoration(hintText: '弹幕字体大小，默认20')),
+          ]),
+          SizedBox(
+            height: 20,
+          ),
           Row(
             children: [
               Row(
                 children: [
                   SizedBox(
-                      width: 60,
+                      width: 70,
                       child:
                           Text('实时检测', style: TextStyle(color: Colors.purple))),
                   SizedBox(
-                    width: 150,
+                    width: 50,
                     child: Switch(
                       value: _checkAlive, //当前状态
                       onChanged: (value) {
-                        //重新构建页面
                         setState(() {
                           _checkAlive = value;
                         });
                       },
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    width: 60,
+                  ),
+                  SizedBox(
+                      width: 70,
+                      child:
+                          Text('频道图标', style: TextStyle(color: Colors.purple))),
+                  SizedBox(
+                    width: 50,
+                    child: Switch(
+                      value: _showIcon, //当前状态
+                      onChanged: (value) {
+                        setState(() {
+                          _showIcon = value;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 60,
+                  ),
+                  SizedBox(
+                      width: 60,
+                      child:
+                          Text('反交错', style: TextStyle(color: Colors.purple))),
+                  SizedBox(
+                    width: 50,
+                    child: Switch(
+                      value: _fullFfmpeg, //当前状态
+                      onChanged: (value) {
+                        setState(() {
+                          _fullFfmpeg = value;
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(
-                width: 290,
-              ),
-              _buldInputRow(_danmuFSizeTextCtl,
-                  label: '弹幕大小',
-                  decoration: InputDecoration(hintText: '弹幕字体大小，默认20')),
-              SizedBox(
-                width: 50,
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              SizedBox(
-                  width: 60,
-                  child: Text('反交错', style: TextStyle(color: Colors.purple))),
-              SizedBox(
-                width: 150,
-                child: Switch(
-                  value: _fullFfmpeg, //当前状态
-                  onChanged: (value) {
-                    //重新构建页面
-                    setState(() {
-                      _fullFfmpeg = value;
-                    });
-                  },
-                ),
-              ),
-              /* Expanded(
-                  child: Text('默认是裁剪版ffmpeg。开启后自动下载完整版ffmpeg，支持开启反交错等滤镜。重启生效。')) */
             ],
           ),
           SizedBox(
@@ -153,8 +169,8 @@ class _PlayerSettingsState extends State<PlayerSettings> {
           ),
           Center(
             child: ElevatedButton(
-              child:
-                  Padding(padding: const EdgeInsets.all(10), child: Text("保存")),
+              child: Padding(
+                  padding: const EdgeInsets.all(10), child: Text("立即保存")),
               onPressed: () {
                 // 通过_formKey.currentState 获取FormState后，
                 // 调用validate()方法校验用户名密码是否合法，校验

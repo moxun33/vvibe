@@ -64,7 +64,8 @@ class PlaylistUtil {
   }
 
   //获取本地播放列表文件列表
-  Future<List<String>> getPlayListFiles({bool basename = false}) async {
+  Future<List<Map<String, dynamic>>> getPlayListFiles(
+      {bool basename = false}) async {
     try {
       final Directory dir = await getPlayListDir();
       final dirList = await dir.list().toList();
@@ -75,7 +76,11 @@ class PlaylistUtil {
           list.add(basename ? path.split('/').last : path);
         }
       }
-      return list;
+      return list
+          .map(
+            (e) => {'id': e, 'name': e, 'type': 'file'},
+          )
+          .toList();
     } catch (e) {
       return [];
     }
@@ -118,32 +123,48 @@ class PlaylistUtil {
 
   // 是否为url
   bool isUrl(String? url) {
-    if (url == null || url.isEmpty) return false;
-    final uri = Uri.tryParse(url);
-    return uri != null && uri.scheme.contains('http');
+    try {
+      if (url == null || url.isEmpty) return false;
+      final uri = Uri.tryParse(url);
+      return uri != null && uri.scheme.isNotEmpty && uri.host.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 
-// 解析本地或远程订阅,自动下钻单个直播源
+  bool isBoolValid(dynamic v) {
+    if (v == null) return false;
+    return v.toString() == 'true';
+  }
+
+  bool isStrValid(dynamic v) {
+    if (v == null) return false;
+    return v.toString().isNotEmpty;
+  }
+
+// 解析本地或远程订阅,自动下钻单个直播源集合
   Future<PlayListInfo?> parsePlayListsDrill(String src,
-      {int drilled = 0}) async {
-    final info = await PlaylistUtil().parsePlayLists(src);
+      {int drilled = 0,
+      PlayListInfo? defInfo,
+      Map<String, dynamic>? config}) async {
+    final info = await PlaylistUtil().parsePlayLists(src, config: config);
     if (info != null &&
         info.channels.length == 1 &&
         info.channels.first.url.isNotEmpty &&
-        drilled < 3) {
+        drilled < 2) {
       return await PlaylistUtil().parsePlayListsDrill(
         info.channels.first.url,
         drilled: drilled + 1,
       );
     }
-    return info;
+    return info ?? defInfo;
   }
 
 // 解析本地或远程订阅
-  Future<PlayListInfo?> parsePlayLists(String src) async {
-    PlayListInfo? data = await PlaylistUtil().parsePlaylistSubUrl(
-      src,
-    );
+  Future<PlayListInfo?> parsePlayLists(String src,
+      {Map<String, dynamic>? config}) async {
+    PlayListInfo? data =
+        await PlaylistUtil().parsePlaylistSubUrl(src, config: config);
     if (data != null && data.channels.isNotEmpty) {
       return data;
     }
@@ -265,10 +286,23 @@ class PlaylistUtil {
 
 //根据url解析远程txt或m3u内容
   Future<PlayListInfo?> parsePlaylistSubUrl(String url,
-      {bool? forceRefresh = false}) async {
+      {Map<String, dynamic>? config, bool? forceRefresh = false}) async {
     if (!PlaylistUtil().isUrl(url)) return null;
-    final client = Dio(BaseOptions(receiveTimeout: const Duration(seconds: 30)))
-      ..interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
+    final headers = {
+      'User-Agent':
+          config != null && isStrValid(config['ua']) ? config['ua'] : DEF_REQ_UA
+    };
+
+    final client = Dio(BaseOptions(
+        headers: headers, receiveTimeout: const Duration(seconds: 30)));
+    if (forceRefresh != true) {
+      final dioCacheOptions = CacheOptions(
+        policy: CachePolicy.forceCache,
+        store: MemCacheStore(),
+        maxStale: const Duration(minutes: 1),
+      );
+      client.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
+    }
     final resp = await client.get(url);
     if (resp.statusCode == 200 || resp.statusCode! < 400) {
       final String _data = resp.data;
@@ -452,7 +486,9 @@ class PlaylistUtil {
 
   //检查是否为真实有效的url
   bool validateUrl(String url) {
-    return Uri.tryParse(url)?.origin.isNotEmpty ?? isRtUrl(url);
+    final v = isUrl(url);
+    if (!v) return isRtUrl(url);
+    return v;
   }
 
   Future<Map> checkUrlAccessible(String url, CancelToken cancelToken) async {

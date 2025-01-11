@@ -28,9 +28,11 @@ class PlGroupPanel extends StatefulWidget {
       required this.data,
       //this.expansionCallback,
       required this.forceRefreshPlaylist,
+      required this.currentSubConfig,
       required this.onUrlTap})
       : super(key: key);
   final List<PlayListItem> data;
+  final Map<String, dynamic> currentSubConfig;
   // final ExpansionPanelCallback? expansionCallback;
   final void Function(PlayListItem item) onUrlTap;
   final void Function() forceRefreshPlaylist;
@@ -59,9 +61,8 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   List<PlayListItem> filterPlaylist(String keyword, List<PlayListItem> list) {
     if (keyword.isEmpty) return widget.data;
     return list.where((PlayListItem element) {
-      return element.name != null &&
-          expandKey == element.group &&
-          element.name!.toLowerCase().contains(keyword.toLowerCase());
+      return expandKey == element.group &&
+          element.name.toLowerCase().contains(keyword.toLowerCase());
     }).toList();
   }
 
@@ -106,7 +107,9 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final groups = PlaylistUtil().getPlaylistgroups(playlist),
+    final groups = PlaylistUtil().getPlaylistgroups(
+          playlist,
+        ),
         keyList = groups.keys.toList();
     return SingleChildScrollView(
         child: ExpansionPanelList(
@@ -159,6 +162,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                   body: expandKey == key
                       ? PlUrlListView(
                           playerSetting: playerSettings,
+                          currentSubConfig: widget.currentSubConfig,
                           data: urlList,
                           onUrlTap: widget.onUrlTap,
                           forceRefreshPlaylist: widget.forceRefreshPlaylist)
@@ -175,11 +179,13 @@ class PlUrlListView extends StatefulWidget {
       {Key? key,
       required this.data,
       required this.playerSetting,
+      required this.currentSubConfig,
       required this.onUrlTap,
       required this.forceRefreshPlaylist})
       : super(key: key);
   final List<PlayListItem> data;
   final Map<String, dynamic> playerSetting;
+  final Map<String, dynamic> currentSubConfig;
   final void Function(PlayListItem item) onUrlTap;
   final void Function() forceRefreshPlaylist;
   @override
@@ -203,7 +209,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   }
 
   void onSelectUrl(PlayListItem e) {
-    if (!(e.url != null && e.url!.isNotEmpty)) {
+    if ((e.url.isEmpty)) {
       EasyLoading.showError('缺少播放地址或地址错误');
       return;
     }
@@ -217,6 +223,22 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     return getDeviceHeight(context) - 50;
   }
 
+  bool get _showIcon {
+    final singleSet =
+        PlaylistUtil().isBoolValid(widget.currentSubConfig['showIcon']);
+    if (!singleSet)
+      return PlaylistUtil().isBoolValid(widget.playerSetting['showIcon']);
+    return true;
+  }
+
+  bool get _checkAlive {
+    final singleSet =
+        PlaylistUtil().isBoolValid(widget.currentSubConfig['checkAlive']);
+    if (!singleSet)
+      return PlaylistUtil().isBoolValid(widget.playerSetting['checkAlive']);
+    return true;
+  }
+
   Widget _buildList() {
     if (widget.data.length != 0) {
       final h = widget.data.length * 20.0;
@@ -228,8 +250,8 @@ class _PlUrlListViewState extends State<PlUrlListView> {
           itemBuilder: (context, index) {
             final e = widget.data[index];
             return PlUrlTile(
-                checkAllive:
-                    widget.playerSetting['checkAlive'].toString() == 'true',
+                showIcon: _showIcon,
+                checkAlive: _checkAlive,
                 index: index,
                 onSelectUrl: onSelectUrl,
                 selectedItem: selectedItem,
@@ -257,7 +279,8 @@ class PlUrlTile extends StatefulWidget {
   const PlUrlTile(
       {Key? key,
       required this.url,
-      required this.checkAllive,
+      required this.checkAlive,
+      required this.showIcon,
       required this.index,
       required this.onSelectUrl,
       required this.forceRefreshPlaylist,
@@ -265,7 +288,8 @@ class PlUrlTile extends StatefulWidget {
       : super(key: key);
   final PlayListItem url;
   final int index;
-  final bool checkAllive;
+  final bool checkAlive;
+  final bool showIcon;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
   final void Function() forceRefreshPlaylist;
@@ -291,7 +315,7 @@ class _PlUrlTileState extends State<PlUrlTile>
       urlItem = widget.url;
     }); */
 
-    if (widget.checkAllive) _checkUrlAccessible();
+    if (widget.checkAlive) _checkUrlAccessible();
   }
 
   void _selectUrl(PlayListItem url) {
@@ -307,7 +331,7 @@ class _PlUrlTileState extends State<PlUrlTile>
 
     switch (value) {
       case '复制链接':
-        Clipboard.setData(ClipboardData(text: widget.url.url ?? ''));
+        Clipboard.setData(ClipboardData(text: widget.url.url));
         EasyLoading.showSuccess('复制成功');
         break;
       case '强制刷新列表':
@@ -325,18 +349,11 @@ class _PlUrlTileState extends State<PlUrlTile>
   void _checkUrlAccessible() async {
     final url = widget.url;
     if (urlStatus != null) return;
-    if (url.url == null) {
-      setState(() {
-        urlStatus = 204;
-        loading = false;
-      });
-      return;
-    }
 
-    final res = await PlaylistUtil().checkUrlAccessible(url.url!, _cancelToken);
+    final res = await PlaylistUtil().checkUrlAccessible(url.url, _cancelToken);
 
     MyLogger.info(
-        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url!} 响应 $res');
+        '$urlStatus 检测url ${widget.index} ${url.name} ${url.url} 响应 $res');
     if (mounted) {
       setState(() {
         loading = false;
@@ -480,9 +497,9 @@ class _PlUrlTileState extends State<PlUrlTile>
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 1.0,
               children: [
-                widget.checkAllive
+                widget.checkAlive
                     ? _getIcon(urlStatus)
-                    : widget.url.tvgLogo != null
+                    : widget.url.tvgLogo != null && widget.showIcon
                         ? SizedBox(
                             width: 16,
                             child: CachedNetworkImage(
@@ -495,14 +512,16 @@ class _PlUrlTileState extends State<PlUrlTile>
                               ),
                             ),
                           )
-                        : SizedBox(
-                            width: 0,
+                        : Icon(
+                            Icons.movie_creation_outlined,
+                            size: 14,
+                            color: Colors.grey[500],
                           ),
                 SizedBox(
                     width: PLAYLIST_BAR_WIDTH - 42,
                     child: Tooltip(
                       child: Text(
-                        e.name?.trim() ?? '未知名称',
+                        e.name.trim().isNotEmpty ? e.name.trim() : '未知名称',
                         maxLines: 1,
                         softWrap: false,
                         overflow: TextOverflow.clip,

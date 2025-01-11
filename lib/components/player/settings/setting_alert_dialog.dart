@@ -14,12 +14,16 @@ class _SettingAlertDialogState extends State<SettingAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('设置'),
+      title: const Text(
+        '设置',
+      ),
+      titleTextStyle: TextStyle(
+          fontWeight: FontWeight.bold, color: Colors.black87, fontSize: 22),
       actions: [
         TextButton(child: const Text(''), onPressed: () {}),
       ],
       content: SizedBox(
-        width: 1000,
+        width: getDeviceWidth(context) - 100,
         height: getDeviceHeight(context),
         child: SettingsTabsView(),
       ),
