@@ -506,8 +506,7 @@ class _PlUrlTileState extends State<PlUrlTile>
                 widget.checkAlive
                     ? _getIcon(urlStatus)
                     : e.tvgLogo != null && widget.showLogo
-                        ? Container(
-                            padding: EdgeInsets.only(right: 4),
+                        ? SizedBox(
                             width: 16,
                             child: CachedNetworkImage(
                               fit: BoxFit.contain,
