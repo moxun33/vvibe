@@ -223,20 +223,26 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     return getDeviceHeight(context) - 50;
   }
 
-  bool get _showIcon {
-    final singleSet =
-        PlaylistUtil().isBoolValid(widget.currentSubConfig['showIcon']);
-    if (!singleSet)
-      return PlaylistUtil().isBoolValid(widget.playerSetting['showIcon']);
-    return true;
+  bool get _showLogo {
+    final singleSet = PlaylistUtil().isBoolValid(
+        widget.currentSubConfig['type'] == 'file'
+            ? widget.currentSubConfig['show-logo']
+            : widget.currentSubConfig['showLogo']);
+    if (!singleSet && widget.currentSubConfig['type'] != 'file')
+      return PlaylistUtil().isBoolValid(widget.playerSetting['showLogo']);
+    return singleSet;
   }
 
   bool get _checkAlive {
-    final singleSet =
-        PlaylistUtil().isBoolValid(widget.currentSubConfig['checkAlive']);
+    final singleSet = PlaylistUtil().isBoolValid(
+        widget.currentSubConfig['type'] == 'file'
+            ? widget.currentSubConfig['check-alive']
+            : widget.currentSubConfig['checkAlive'],
+        false);
     if (!singleSet)
-      return PlaylistUtil().isBoolValid(widget.playerSetting['checkAlive']);
-    return true;
+      return PlaylistUtil()
+          .isBoolValid(widget.playerSetting['checkAlive'], false);
+    return singleSet;
   }
 
   Widget _buildList() {
@@ -250,7 +256,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
           itemBuilder: (context, index) {
             final e = widget.data[index];
             return PlUrlTile(
-                showIcon: _showIcon,
+                showLogo: _showLogo,
                 checkAlive: _checkAlive,
                 index: index,
                 onSelectUrl: onSelectUrl,
@@ -280,7 +286,7 @@ class PlUrlTile extends StatefulWidget {
       {Key? key,
       required this.url,
       required this.checkAlive,
-      required this.showIcon,
+      required this.showLogo,
       required this.index,
       required this.onSelectUrl,
       required this.forceRefreshPlaylist,
@@ -289,7 +295,7 @@ class PlUrlTile extends StatefulWidget {
   final PlayListItem url;
   final int index;
   final bool checkAlive;
-  final bool showIcon;
+  final bool showLogo;
   final void Function(PlayListItem url) onSelectUrl;
   final PlayListItem? selectedItem;
   final void Function() forceRefreshPlaylist;
@@ -499,8 +505,9 @@ class _PlUrlTileState extends State<PlUrlTile>
               children: [
                 widget.checkAlive
                     ? _getIcon(urlStatus)
-                    : widget.url.tvgLogo != null && widget.showIcon
-                        ? SizedBox(
+                    : e.tvgLogo != null && widget.showLogo
+                        ? Container(
+                            padding: EdgeInsets.only(right: 4),
                             width: 16,
                             child: CachedNetworkImage(
                               fit: BoxFit.contain,

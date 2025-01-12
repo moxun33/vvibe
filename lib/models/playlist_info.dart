@@ -15,12 +15,16 @@ class PlayListInfo {
   String? xTvgUrl;
   String? catchup;
   String? catchupSource;
+  bool? showLogo;
+  bool? checkAlive;
   List<PlayListItem> channels;
 
   PlayListInfo({
     this.xTvgUrl,
     this.catchup,
     this.catchupSource,
+    this.showLogo,
+    this.checkAlive,
     required this.channels,
   });
 
@@ -29,15 +33,20 @@ class PlayListInfo {
         catchup: json["catchup"], // "append",
         catchupSource: json[
             "catchup-source"], //"?playseek=\${(b)yyyyMMddHHmmss}-\${(e)yyyyMMddHHmmss}",
+        showLogo: json["x-show-logo"] ?? json["show-logo"],
+        checkAlive: json["x-check-alive"] ?? json["check-alive"],
+
         channels: json["channels"] == null
             ? []
             : List<PlayListItem>.from(json["channels"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {
-        "x-tvg-url": xTvgUrl,
+        "tvg-url": xTvgUrl,
         "catchup": catchup,
         "catchup-source": catchupSource,
+        "show-logo": showLogo,
+        "check-alive": checkAlive,
         "channels": List<PlayListItem>.from(channels.map((x) => x)),
       };
 }

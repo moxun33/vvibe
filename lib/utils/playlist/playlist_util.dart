@@ -132,9 +132,12 @@ class PlaylistUtil {
     }
   }
 
-  bool isBoolValid(dynamic v) {
+  bool isBoolValid(dynamic v, [bool revert = true]) {
+    if (revert) {
+      return v.toString() != 'false' && v.toString() != 'no';
+    }
     if (v == null) return false;
-    return v.toString() == 'true';
+    return v.toString() == 'true' || v.toString() == 'yes';
   }
 
   bool isStrValid(dynamic v) {
@@ -144,21 +147,30 @@ class PlaylistUtil {
 
 // 解析本地或远程订阅,自动下钻单个直播源集合； 触发：一个直播源且名称为index
   Future<PlayListInfo?> parsePlayListsDrill(String src,
-      {int drilled = 0,
-      PlayListInfo? defInfo,
-      Map<String, dynamic>? config}) async {
-    final info = await PlaylistUtil().parsePlayLists(src, config: config);
-    if (info != null &&
+      {int drillMax = 1, Map<String, dynamic>? config}) async {
+    int drilled = 0;
+    PlayListInfo? info =
+        await PlaylistUtil().parsePlayLists(src, config: config);
+    Map<String, dynamic>? topMeta = {};
+    bool showLogo = true, checkAlive = false;
+
+    showLogo = info?.showLogo == true;
+    checkAlive = info?.checkAlive == true;
+
+    while (info != null &&
         info.channels.length == 1 &&
-        info.channels.first.name == 'index' &&
         info.channels.first.url.isNotEmpty &&
-        drilled < 2) {
-      return await PlaylistUtil().parsePlayListsDrill(
-        info.channels.first.url,
-        drilled: drilled + 1,
-      );
+        drilled < drillMax) {
+      info = await PlaylistUtil()
+          .parsePlayLists(info.channels.first.url, config: config);
+      drilled++;
     }
-    return info ?? defInfo;
+    if (info != null && drilled > 0) {
+      info.showLogo = showLogo;
+      info.checkAlive = checkAlive;
+    }
+
+    return info;
   }
 
 // 解析本地或远程订阅
@@ -362,27 +374,24 @@ class PlaylistUtil {
               !element.contains('#genre#') &&
               element.split(',').length >= 2)
           .map((String e) {
-            final List<String> arr = e.split(',');
+        final List<String> arr = e.split(',');
 
-            final item = PlayListItem(
-                group: matchTxtUrlGroup(groups, lines.indexOf(e)),
-                name: arr[0].trim(),
-                tvgId: '',
-                url: arr[1].trim());
+        final item = PlayListItem(
+            group: matchTxtUrlGroup(groups, lines.indexOf(e)),
+            name: arr[0].trim(),
+            tvgId: '',
+            url: arr[1].trim());
 
-            final platProxy = isDyHyDlProxyUrl(arr[1]);
+        final platProxy = isDyHyDlProxyUrl(arr[1]);
 
-            if (platProxy['platformHit'] == true) {
-              PlayListItem _temp = parseSingleUrl(arr[1]);
+        if (platProxy['platformHit'] == true) {
+          PlayListItem _temp = parseSingleUrl(arr[1]);
 
-              item.tvgId = _temp.tvgId;
-              item.group = _temp.group;
-            }
-            return item;
-          })
-          .where((PlayListItem element) =>
-              element.url != null && element.name != null)
-          .toList();
+          item.tvgId = _temp.tvgId;
+          item.group = _temp.group;
+        }
+        return item;
+      }).toList();
       return PlayListInfo.fromJson({'channels': list});
     } catch (e) {
       print('读取解析TXT文本行内容出错: $e');
@@ -399,6 +408,20 @@ class PlaylistUtil {
     }
     return defVal;
   }
+  // 解析第一行的 x-tvg-url等信息
+
+  Map<String, dynamic> extractM3uMeta(String line) {
+    return {
+      "tvg-url": getTextByReg(line, new RegExp(r'(?:x-)?tvg-url="(.*?)"')),
+      'show-logo': isBoolValid(
+          getTextByReg(line, new RegExp(r'(?:x-)?show-logo="(.*?)"'))),
+      'check-alive': isBoolValid(
+          getTextByReg(line, new RegExp(r'(?:x-)?check-alive="(.*?)"')), false),
+      'catchup': getTextByReg(line, new RegExp(r'catchup="(.*?)"')),
+      'catchup-source':
+          getTextByReg(line, new RegExp(r'catchup-source="(.*?)"')),
+    };
+  }
 
   //根据文本行 解析m3u的播放列表文件内容
   Future<PlayListInfo?> parseM3uContents(List<String> lines,
@@ -410,10 +433,7 @@ class PlaylistUtil {
         return null;
       }
       // 解析第一行的 x-tvg-url等信息
-      final Map<String, dynamic> meta = {
-        "x-tvg-url":
-            getTextByReg(lines[0], new RegExp(r'x-tvg-url="(.*?)"'), defVal: "")
-      };
+      final Map<String, dynamic> meta = extractM3uMeta(lines[0]);
 
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
@@ -447,15 +467,20 @@ class PlaylistUtil {
               url: url);
           //print(item.toJson());
           list.add(item);
-        }
-        if (lines[i].trim().startsWith('#EXTM3U')) {
-          // xtvg-url或tvg-url
-          meta["x-tvg-url"] = getTextByReg(
-              lines[i], new RegExp(r'(?:x-)?tvg-url="(.*?)"'),
-              defVal: "");
+          if (lines[i].trim().startsWith('#EXTM3U')) {
+            final _meta = extractM3uMeta(lines[i]);
+            meta.forEach((key, value) {
+              if (_meta[key] != null && _meta[key].toString().isNotEmpty) {
+                meta[key] = _meta[key];
+              }
+            });
+          }
         }
       }
-      return PlayListInfo.fromJson({'channels': list});
+      return PlayListInfo.fromJson({
+        ...meta,
+        'channels': list,
+      });
     } catch (e) {
       print('读取M3U文本行内容出错: $e');
     }

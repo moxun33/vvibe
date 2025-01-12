@@ -1,4 +1,4 @@
-/*
+/* /*
  * @Author: Moxx
  * @Date: 2022-09-13 14:05:05
  * @LastEditors: moxun33
@@ -20,6 +20,7 @@ import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/playlist/video_playlist.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
+import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
@@ -307,7 +308,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   //播放url改变
   void onPlayUrlChange(PlayListItem item,
-      {Map<String, dynamic>? subConfig}) async {
+      {Map<String, dynamic>? subConfig, PlayListInfo? playlistInfo}) async {
     if (item.url == null) return;
     stopPlayer();
 
@@ -517,3 +518,4 @@ class _HomePageState extends State<HomePage> with WindowListener {
     // do something
   }
 }
+ */

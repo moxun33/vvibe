@@ -80,6 +80,22 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     return last;
   }
 
+  Map<String, dynamic> get currentSubFileConf {
+    try {
+      if (selectedFile?['type'] != 'file') {
+        return selectedFile ?? {};
+      }
+      final map = selectedFile ?? {};
+      final String bg = map['blackGroups'] ?? '';
+      final bgs = bg.split(',').map((e) => e.trim()).toList();
+      final plInfoJson = playlistInfo?.toJson() ?? {};
+      return {...map, ...plInfoJson};
+    } catch (e) {
+      print('$e  currentSubFileConf errors');
+      return {};
+    }
+  }
+
   List<String> get blackGroups {
     try {
       final map = selectedFile ?? {};
@@ -291,7 +307,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
           child: playlist.length > 0
               ? PlGroupPanel(
                   data: playlist,
-                  currentSubConfig: selectedFile ?? {},
+                  currentSubConfig: currentSubFileConf,
                   onUrlTap: (e) {
                     widget.onUrlTap(e,
                         playlistInfo: playlistInfo,

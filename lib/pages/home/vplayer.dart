@@ -148,8 +148,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final size = _controller?.value.size;
     final ratio = '${size!.width.toInt()}x${size.height.toInt()}';
     final title = '${item.name} [${ratio}] ' + ' ${extra}';
-    final showIcon = PlaylistUtil().isBoolValid(subConf['showIcon']);
-    VWindow().setWindowTitle(title, showIcon ? item.tvgLogo : null);
+    VWindow().setWindowTitle(title, showLogo ? item.tvgLogo : null);
   }
 
 // 显隐媒体元数据
@@ -378,6 +377,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     stopPlayer();
   }
 
+  bool get showLogo {
+    if (subConf['type'] == 'file') {
+      return playListInfo?.showLogo != false;
+    }
+    return PlaylistUtil().isBoolValid(subConf['showLogo']);
+  }
+
   Widget DefIconLogo() {
     return Image.asset('assets/logo.png');
   }
@@ -397,7 +403,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               children: [
                 SizedBox(
                     width: 200,
-                    child: !PlaylistUtil().isBoolValid(subConf['showIcon'])
+                    child: !showLogo
                         ? DefIconLogo()
                         : CachedNetworkImage(
                             fit: BoxFit.contain,
@@ -437,6 +443,11 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     setState(() {
       playListShowed = false;
     });
+  }
+
+  @override
+  void onWindowClose() {
+    stopPlayer();
   }
 
   @override

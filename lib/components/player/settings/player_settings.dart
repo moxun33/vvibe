@@ -18,7 +18,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
   final TextEditingController _danmuFSizeTextCtl = TextEditingController();
   bool _checkAlive = true;
   bool _fullFfmpeg = false;
-  bool _showIcon = false;
+  bool _showLogo = false;
   @override
   void initState() {
     super.initState();
@@ -33,9 +33,9 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       _epgUrlTextCtl.text = v['epg'] ?? '';
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
       setState(() {
-        _checkAlive = PlaylistUtil().isBoolValid(v);
+        _checkAlive = PlaylistUtil().isBoolValid(v, false);
         _fullFfmpeg = PlaylistUtil().isBoolValid(v['fullFfmpeg']);
-        _showIcon = PlaylistUtil().isBoolValid(v['showIcon']);
+        _showLogo = PlaylistUtil().isBoolValid(v['showLogo']);
       });
     }
   }
@@ -69,7 +69,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
       'checkAlive': _checkAlive.toString(),
       'fullFfmpeg': _fullFfmpeg.toString(),
-      'showIcon': _showIcon.toString(),
+      'showLogo': _showLogo.toString(),
     };
     await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
     EasyLoading.showSuccess('保存成功');
@@ -134,10 +134,10 @@ class _PlayerSettingsState extends State<PlayerSettings> {
                   SizedBox(
                     width: 50,
                     child: Switch(
-                      value: _showIcon, //当前状态
+                      value: _showLogo, //当前状态
                       onChanged: (value) {
                         setState(() {
-                          _showIcon = value;
+                          _showLogo = value;
                         });
                       },
                     ),

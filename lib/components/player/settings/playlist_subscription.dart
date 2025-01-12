@@ -26,7 +26,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
   Map<String, dynamic>? editUrl; //正在编辑的订阅
   late String name, url, ua, epg, blackGroups;
   bool _checkAlive = false;
-  bool _showIcon = false;
+  bool _showLogo = false;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
       editUrl!['epg'] = epg;
       editUrl!['blackGroups'] = blackGroups;
       editUrl!['checkAlive'] = _checkAlive.toString();
-      editUrl!['showIcon'] = _showIcon.toString();
+      editUrl!['showLogo'] = _showLogo.toString();
 
       _urls.fillRange(index, index, editUrl);
       setState(() {
@@ -77,7 +77,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         'epg': epg,
         'blackGroups': blackGroups,
         'checkAlive': _checkAlive.toString(),
-        'showIcon': _showIcon.toString()
+        'showLogo': _showLogo.toString()
       };
       //_urls.add(SubscriptionUrl(id: _uuid.v4(), name: name, url: url));
       _urls.add(_map);
@@ -109,8 +109,8 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     _epgController.text = item['epg'] ?? '';
     _bgController.text = item['blackGroups'] ?? '';
     setState(() {
-      _checkAlive = PlaylistUtil().isBoolValid(item['checkAlive']);
-      _showIcon = PlaylistUtil().isBoolValid(item['showIcon']);
+      _checkAlive = PlaylistUtil().isBoolValid(item['checkAlive'], false);
+      _showLogo = PlaylistUtil().isBoolValid(item['showLogo']);
     });
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -206,7 +206,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
                   Padding(
                       padding: EdgeInsets.only(right: 5, top: 5),
                       child: Icon(
-                        PlaylistUtil().isStrValid(item['showIcon'])
+                        PlaylistUtil().isStrValid(item['showLogo'])
                             ? Icons.tv_outlined
                             : Icons.tv_off_outlined,
                         color: Colors.orange,
@@ -309,10 +309,10 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
                 SizedBox(
                   width: 80,
                   child: Switch(
-                    value: _showIcon, //当前状态
+                    value: _showLogo, //当前状态
                     onChanged: (value) {
                       setState(() {
-                        _showIcon = value;
+                        _showLogo = value;
                       });
                     },
                   ),
