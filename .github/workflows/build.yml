@@ -16,7 +16,6 @@ on:
 env:
   # APP name
   APP_NAME: vvibe
-  FVP_DEPS_LATEST: 1
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -32,7 +31,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           $VCINSTALLDIR = $(& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath)
@@ -57,7 +56,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.27.0
+          flutter-version: 3.27.1
           cache: true
 
       - name: Build
@@ -91,15 +90,15 @@ jobs:
   Linux:
     permissions:
       contents: write
-    runs-on: ubuntu-20.0.4
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - uses: subosito/flutter-action@v2
       with:
         channel: "stable"
-        flutter-version: 3.27.0
+        flutter-version: 3.27.1
         cache: true
     - run: |
        sudo apt-get update -y
@@ -126,5 +125,4 @@ jobs:
       with:
         name: vvibe-${{github.ref_name}}-linux-x64.tar.xz
         path: vvibe-${{github.ref_name}}-linux*.tar.xz
-
 
