@@ -103,7 +103,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       stopPlayer();
     }
     _controller?.dispose();
-    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
       'User-Agent': PlaylistUtil().isStrValid(subConf['ua'])

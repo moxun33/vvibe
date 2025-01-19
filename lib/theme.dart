@@ -23,7 +23,7 @@ Future<ThemeData> genTheme(
  */
 ThemeData genTheme() {
   return ThemeData(
-    scaffoldBackgroundColor: Colors.black12,
+    scaffoldBackgroundColor: Colors.black,
     canvasColor: Colors.black12,
     primaryColor: AppColors.primaryColor,
     splashColor: Colors.transparent,

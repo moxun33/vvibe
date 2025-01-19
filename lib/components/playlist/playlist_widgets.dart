@@ -85,10 +85,11 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   _init() async {
-    Map<String, dynamic> plSettings =
-        await LoacalStorage().getJSON(PLAYER_SETTINGS) as Map<String, dynamic>;
+    final plSettings =
+        await LoacalStorage().getJSON(PLAYER_SETTINGS) ??
+            {} ;
     setState(() {
-      playerSettings = plSettings;
+      playerSettings = plSettings as Map<String, dynamic>;
       playlist = widget.data;
     });
   }
@@ -202,6 +203,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
 
   void _initCacheUrl() async {
     final lastUrl = await LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
+    if (lastUrl == null) return;
     final urlItem = PlayListItem.fromJson(lastUrl);
     setState(() {
       selectedItem = urlItem;
