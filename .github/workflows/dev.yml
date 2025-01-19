@@ -10,8 +10,6 @@ jobs:
   dev-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: tests env 
       - run: | 
           echo ${env:FLUTTER_VERSION}
           echo ${FLUTTER_VERSION}
