@@ -91,7 +91,7 @@ jobs:
   Linux:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.0.4
 
     steps:
     - uses: actions/checkout@v2
@@ -107,9 +107,9 @@ jobs:
     - run: flutter config --enable-linux-desktop
     - run: flutter doctor --verbose
     - run: flutter pub get
-    - run: flutter build linux --release
+    - run: flutter build linux --verbose
     - run: mv build/linux/x64/release/bundle .
-    - run: cmake -E tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz bundle
+    - run:  tar -zcvf vvibe-${{github.ref_name}}-linux-x64.tar.gz bundle
 
     - name: Archive Release
       uses: softprops/action-gh-release@v2
