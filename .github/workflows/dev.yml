@@ -8,7 +8,7 @@ env:
   FLUTTER_VERSION: 3.27.3
 jobs:
   dev-test:
-    runs-on: unbuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - run: echo ${env:FLUTTER_VERSION}
     
