@@ -85,11 +85,11 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   _init() async {
-    final plSettings =
-        await LoacalStorage().getJSON(PLAYER_SETTINGS) ??
-            {} ;
+    final plSettings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     setState(() {
-      playerSettings = plSettings as Map<String, dynamic>;
+      if (plSettings != null){
+        playerSettings = plSettings as Map<String, dynamic>;
+      }
       playlist = widget.data;
     });
   }

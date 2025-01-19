@@ -453,7 +453,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black12,
+      color: Colors.black,
       child: Stack(
         children: <Widget>[
           Row(children: <Widget>[
