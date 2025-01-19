@@ -11,6 +11,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: | 
-          echo ${env:FLUTTER_VERSION}
-          echo ${FLUTTER_VERSION}
+          echo "flutter version: ${FLUTTER_VERSION}"
   
