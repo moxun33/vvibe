@@ -103,11 +103,11 @@ jobs:
         cache: true
     - run: |
        sudo apt-get update -y
-       sudo apt-get install -y cmake clang ninja-build libgtk-3-dev libpulse-dev liblzma-dev  libstdc++-12-dev
+       sudo apt-get install -y unzip xz-utils zip libglu1-mesa cmake clang ninja-build pkg-config libgtk-3-dev libpulse-dev liblzma-dev  libstdc++-12-dev
     - run: flutter config --enable-linux-desktop
     - run: flutter doctor --verbose
     - run: flutter pub get
-    - run: flutter build linux --verbose
+    - run: flutter build linux --release
     - run: mv build/linux/x64/release/bundle .
     - run: cmake -E tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz bundle
 
