@@ -296,7 +296,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   void stopDanmakuSocket() {
     if (barrageWallController.isEnabled) {
       barrageWallController.clear();
-     if(mounted) barrageWallController.disable();
+      //barrageWallController.disable();
     }
     DanmakuService().stop();
   }
@@ -308,7 +308,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS);
     final fontSize =
         settings != null ? settings['dmFSize'].toDouble() ?? 20.0 : 20.0;
-   if(mounted)  barrageWallController.enable();
+
+    if (!barrageWallController.isEnabled) barrageWallController.enable();
     barrageWallController.send([
       Bullet(
           child:
