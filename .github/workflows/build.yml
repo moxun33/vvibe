@@ -15,9 +15,7 @@ env:
   # APP name
   APP_NAME: vvibe
   FVP_DEPS_LATEST: 1
-  FLUTTER_VERSION: 3.27.0
-  FFMPEG_DOWNLOAD_URL: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z
-  FFMPEG_VERSION: latest
+
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -27,7 +25,8 @@ jobs:
       contents: write
     # The type of runner that the job will run on
     runs-on: windows-latest
-
+    env:
+      FFMPEG_DOWNLOAD_URL: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -36,7 +35,7 @@ jobs:
         run: |
           $VCINSTALLDIR = $(& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath)
           Add-Content $env:GITHUB_ENV "LIBCLANG_PATH=${VCINSTALLDIR}\VC\Tools\LLVM\x64\bin`n"
-          Invoke-WebRequest "$FFMPEG_DOWNLOAD_URL" -OutFile ffmpeg-release-full-shared.7z
+          Invoke-WebRequest "${env:FFMPEG_DOWNLOAD_URL}" -OutFile ffmpeg-release-full-shared.7z
           7z x ffmpeg-release-full-shared.7z
           mkdir ffmpeg
           mv ffmpeg-*/* ffmpeg/
@@ -56,7 +55,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: $FLUTER_VERSION
+          flutter-version: 3.27.1
           cache: true
 
       - name: Build
@@ -98,7 +97,7 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: "stable"
-        flutter-version: $FLUTER_VERSION
+        flutter-version: 3.27.1
         cache: true
     - run: |
        sudo apt-get update -y
