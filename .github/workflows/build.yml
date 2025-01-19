@@ -26,32 +26,11 @@ jobs:
       contents: write
     # The type of runner that the job will run on
     runs-on: windows-latest
-    env:
-      FFMPEG_DOWNLOAD_URL: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          $VCINSTALLDIR = $(& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath)
-          Add-Content $env:GITHUB_ENV "LIBCLANG_PATH=${VCINSTALLDIR}\VC\Tools\LLVM\x64\bin`n"
-          Invoke-WebRequest "${env:FFMPEG_DOWNLOAD_URL}" -OutFile ffmpeg-release-full-shared.7z
-          7z x ffmpeg-release-full-shared.7z
-          mkdir ffmpeg
-          mv ffmpeg-*/* ffmpeg/
-          Add-Content $env:GITHUB_ENV "FFMPEG_DIR=${pwd}\ffmpeg`n"
-          Add-Content $env:GITHUB_PATH "${pwd}\ffmpeg\bin`n"
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
-      - name: Copy ffmpeg dll to cargo dir
-        run: |
-          cp ffmpeg/bin/*.dll C:\Users\runneradmin\.cargo\bin
 
       - uses: subosito/flutter-action@v2
         with:
@@ -61,32 +40,28 @@ jobs:
 
       - name: Build
         run: |
+          flutter doctor --verbose
           flutter config --enable-windows-desktop
           flutter pub get
           flutter build windows --verbose
-
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: "zip"
-          filename: vvibe-${{github.ref_name}}-windows-x64.zip
-          directory: build/windows/x64/runner/Release
+          mv build/windows/x64/runner/Release .
+          cmake -E tar cvf vvibe-${{github.ref_name}}-windows-x64.7z --format=7zip Release
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{github.ref_name}}
-          draft: true
+          draft: true+
           prerelease: true
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            build/windows/x64/runner/Release/vvibe-${{github.ref_name}}-windows-x64.zip
+            vvibe-${{github.ref_name}}-windows-x64.7z
 
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3
         with:
-          name: vvibe-${{github.ref_name}}-windows-x64.zip
-          path: build/windows/x64/runner/Release/vvibe-${{github.ref_name}}-windows-x64.zip
+          name: vvibe-${{github.ref_name}}-windows-x64.7z
+          path: vvibe-${{github.ref_name}}-windows-x64.7z
   Linux:
     permissions:
       contents: write
