@@ -1,7 +1,7 @@
 name: dev
 on:
   push:
-    branches: 
+    branches:
      - dffffffjjdj
 env:
   # APP name
@@ -12,6 +12,5 @@ jobs:
   dev-test:
     runs-on: ubuntu-latest
     steps:
-      - run: | 
+      - run: |
           echo "flutter version: ${FLUTTER_VERSION}"
-  
