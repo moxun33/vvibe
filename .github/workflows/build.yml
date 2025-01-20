@@ -37,15 +37,21 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: '3.27.0'
-
-      - name: Build Windows
+          flutter-version: '3.27.2'
+          
+      - name: Install Dependences
         run: |
           flutter doctor --verbose
           flutter config --enable-windows-desktop
           flutter pub get
+          # nightly will crash
+          curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-windows-desktop-vs2022-x64.7z?viasf=1 -o mdk-sdk-windows-desktop-vs2022-x64.7z
+          mv mdk-sdk-windows-desktop-vs2022-x64.7z windows/flutter/ephemeral/.plugin_symlinks/fvp/windows
+          
+      - name: Build Windows
+        run: |
           flutter build windows --verbose --release
-          mv build/windows/x64/runner/Release .
+          cp -r build/windows/x64/runner/Release .
           7z a vvibe-${{github.ref_name}}-windows-x64.zip  Release
 
       - name: Release  Windows Artifact 
@@ -72,7 +78,7 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: "stable"
-        flutter-version: '3.27.0'
+        flutter-version: '3.27.2'
 
     - name: Install Dependences
       run: |
@@ -85,7 +91,7 @@ jobs:
           flutter doctor --verbose
           flutter pub get
           flutter build linux --verbose --release
-          mv build/linux/x64/release/bundle .
+          cp -r build/linux/x64/release/bundle .
           tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz ./bundle
 
     - name: Release Linux Artifact 
