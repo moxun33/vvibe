@@ -69,7 +69,7 @@ jobs:
           name: vvibe-${{github.ref_name}}-windows-x64.zip
           path: vvibe-${{github.ref_name}}-windows-x64.zip
   Linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v4
