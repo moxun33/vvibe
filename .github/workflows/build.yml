@@ -52,7 +52,7 @@ jobs:
         run: |
           flutter build windows --verbose --release
           cp -r build/windows/x64/runner/Release .
-          7z a vvibe-${{github.ref_name}}-windows.zip  Release
+          7z a vvibe-${{github.ref_name}}-windows.zip  Release/*
 
       - name: Release  Windows Artifact 
         uses: softprops/action-gh-release@v2
@@ -92,7 +92,7 @@ jobs:
           flutter pub get
           flutter build linux --verbose --release
           cp -r build/linux/x64/release/bundle .
-          tar Jcvf vvibe-${{github.ref_name}}-linux.tar.xz ./bundle
+          tar Jcvf vvibe-${{github.ref_name}}-linux.tar.xz bundle/*
 
     - name: Release Linux Artifact 
       uses: softprops/action-gh-release@v2
