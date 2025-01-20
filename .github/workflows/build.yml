@@ -9,6 +9,10 @@ on:
       - main
     tags:
       - "v*"
+    paths-ignore:
+      - '.editorconfig'
+      - '.gitignore'
+      - '*.md'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -33,7 +37,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: '3.27.1'
+          flutter-version: '3.27.0'
 
       - name: Build Windows
         run: |
@@ -48,7 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{github.ref_name}}
-          draft: true+
+          draft: true
           prerelease: true
           token: ${{ secrets.GH_TOKEN }}
           files: |
@@ -68,7 +72,7 @@ jobs:
     - uses: subosito/flutter-action@v2
       with:
         channel: "stable"
-        flutter-version: '3.27.1'
+        flutter-version: '3.27.0'
 
     - name: Install Dependences
       run: |
