@@ -76,7 +76,7 @@ jobs:
 
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: 3.27.2
+        flutter-version: 3.10.2
 
     - name: Install Dependences
       run: |
@@ -89,8 +89,8 @@ jobs:
           flutter doctor --verbose
           flutter pub get
           # nightly will crash
-          curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-linux-x64.tar.xz?viasf=1 -o mdk-sdk-linux-x64.tar.xz
-          mv mdk-sdk-linux-x64.tar.xz linux/flutter/ephemeral/.plugin_symlinks/fvp/linux
+          #curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-linux-x64.tar.xz?viasf=1 -o mdk-sdk-linux-x64.tar.xz
+          #mv mdk-sdk-linux-x64.tar.xz linux/flutter/ephemeral/.plugin_symlinks/fvp/linux
           flutter build linux --verbose --release
           cp -r build/linux/x64/release/bundle .
           tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz bundle
