@@ -41,7 +41,7 @@ jobs:
           flutter config --enable-windows-desktop
           flutter pub get
           flutter build windows --verbose --release
-          cp build/windows/x64/runner/Release .
+          mv build/windows/x64/runner/Release .
           7z a vvibe-${{github.ref_name}}-windows-x64.zip  Release
 
       - name: Release  Windows Artifact 
@@ -81,7 +81,7 @@ jobs:
           flutter doctor --verbose
           flutter pub get
           flutter build linux --verbose --release
-          cp build/linux/x64/release/bundle .
+          mv build/linux/x64/release/bundle .
           tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz ./bundle
 
     - name: Release Linux Artifact 
