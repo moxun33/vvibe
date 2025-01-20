@@ -6,7 +6,7 @@ name: build
 on:
   push:
     branches:
-      - main
+      - release
     tags:
       - "v*"
     paths-ignore:
@@ -52,7 +52,7 @@ jobs:
         run: |
           flutter build windows --verbose --release
           cp -r build/windows/x64/runner/Release .
-          7z a vvibe-${{github.ref_name}}-windows-x64.zip  Release
+          7z a vvibe-${{github.ref_name}}-windows.zip  Release
 
       - name: Release  Windows Artifact 
         uses: softprops/action-gh-release@v2
@@ -62,13 +62,13 @@ jobs:
           prerelease: true
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            vvibe-${{github.ref_name}}-windows-x64.zip
+            vvibe-${{github.ref_name}}-windows.zip
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vvibe-${{github.ref_name}}-windows-x64.zip
-          path: vvibe-${{github.ref_name}}-windows-x64.zip
+          name: vvibe-${{github.ref_name}}-windows.zip
+          path: vvibe-${{github.ref_name}}-windows.zip
   Linux:
     runs-on: ubuntu-latest
 
@@ -92,7 +92,7 @@ jobs:
           flutter pub get
           flutter build linux --verbose --release
           cp -r build/linux/x64/release/bundle .
-          tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz ./bundle
+          tar Jcvf vvibe-${{github.ref_name}}-linux.tar.xz ./bundle
 
     - name: Release Linux Artifact 
       uses: softprops/action-gh-release@v2
@@ -102,11 +102,11 @@ jobs:
         prerelease: true
         token: ${{ secrets.GH_TOKEN }}
         files: |
-          vvibe-${{github.ref_name}}-linux-x64.tar.xz
+          vvibe-${{github.ref_name}}-linux.tar.xz
 
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
       with:
-        name: vvibe-${{github.ref_name}}-linux-x64.tar.xz
-        path: vvibe-${{github.ref_name}}-linux-x64.tar.xz
+        name: vvibe-${{github.ref_name}}-linux.tar.xz
+        path: vvibe-${{github.ref_name}}-linux.tar.xz
 
