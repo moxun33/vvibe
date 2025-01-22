@@ -10,14 +10,18 @@ class VWindow {
 
   VWindow._();
   initWindow() async {
-    windowManager.waitUntilReadyToShow().then((_) async {
-      await windowManager.setAsFrameless();
-      await windowManager.setMinimumSize(const Size(1280, 750));
-      await windowManager.setBackgroundColor(Colors.black12);
-      await windowManager.setBrightness(Brightness.dark);
-      // await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
-      await windowManager.center();
+      WindowOptions windowOptions = const WindowOptions(
+      size: Size(1280, 1280 * 9 / 16 + 30),
+      minimumSize: Size(1280, 1280 * 9 / 16 + 30),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+      title: 'vvibe',
+    );
+    windowManager.waitUntilReadyToShow(windowOptions).then((_) async {
       await windowManager.show();
+      await windowManager.focus();
     });
   }
 
