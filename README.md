@@ -1,7 +1,6 @@
 # vvibe
 
-<img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png?token=GHSAT0AAAAAABRX4K3QRU76NHLPZDLZ2JWSYY67OQA">
-
+<img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png
 ![img](https://img.shields.io/badge/language-dart-blue.svg?color=00ACC1)
 ![img](https://img.shields.io/badge/flutter-00B0FF?logo=flutter)
 [![img](https://img.shields.io/github/downloads/moxun33/vvibe/total)](https://github.com/moxun33/vvibe/releases)
@@ -60,9 +59,9 @@
 
 - 直播平台播放源的解析可参考 [real-url](https://github.com/moxun33/real-url)  , 可自行搭建服务器定时解析，推荐使用[青龙](https://github.com/whyour/qinglong)，``虎牙``，``斗鱼``和``哔哩哔哩``的直播源解析的青龙脚本 [ql-scripts](https://github.com/moxun33/ql-scripts)
 
-- 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/nightly/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下
+- 若无法自动下`mdk-sdk`, 手动[下载mdk-sdk](https://sourceforge.net/projects/mdk-sdk/files/mdk-sdk-windows-desktop-vs2022.7z)后解压到 `windows/flutter/ephemeral/.plugin_symlinks/fvp/windows/`目录下; 其他平台操作类似
 - 视频播放器`fvp`插件的`API`持续开发中
-- ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1
+- ~~ffmpeg下载地址 https://github.com/GyanD/codexffmpeg/releases 本项目的ffmpeg版本为4.4.1~~
 
 - 项目还使用或借鉴了未列出的其他项目，同样在此感谢。
 
