@@ -1,6 +1,6 @@
 # vvibe
 
-<img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/main/assets/logo.png">
+<img width="100" alt="image" src="https://raw.githubusercontent.com/moxun33/vvibe/master/assets/logo.png">
 
 
 ![img](https://img.shields.io/badge/language-dart-blue.svg?color=00ACC1)
