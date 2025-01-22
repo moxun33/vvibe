@@ -69,7 +69,31 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       }
     }
   }
-
+  List<String> getVideoDecoders(bool fullFfmpeg){
+    final bp='${fullFfmpeg ? ':copy=1' : ''}';
+    switch (Platform.operatingSystem) {
+      case 'windows':
+        return [
+          "MFT:d3d=11${bp}",
+          "D3D11${bp}",
+          "DXVA${bp}",
+          "hap${bp}",
+          "CUDA${bp}",
+          "FFmpeg${bp}",
+          "dav1d"
+        ];
+      case'linux':
+      return ["hap${bp}", "VAAPI${bp}", "CUDA${bp}", "VDPAU", "FFmpeg", "dav1d"];
+      case'macos':
+      case'ios':
+      return ["VT${bp}", "hap${bp}", "FFmpeg${bp}", "dav1d}"];
+      case'android':
+      case'fuchsia':
+      return ["AMediaCodec${bp}", "FFmpeg${bp}", "dav1d"];
+      default:
+      return ["FFmpeg${bp}", "dav1d"];
+    }
+  }
   playerConfig() {
     final settings = LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
     final fullFfmpeg = settings['fullFfmpeg'] == 'true';
@@ -81,17 +105,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     if (fullFfmpeg) {
       playerProps['video.avfilter'] = 'yadif';
     }
-
+    
     registerWith(options: {
-      'video.decoders': [
-        "MFT:d3d=11${fullFfmpeg ? ':copy=1' : ''}",
-        "D3D11",
-        "DXVA",
-        "hap",
-        "CUDA",
-        "FFmpeg",
-        "dav1d"
-      ],
+      'video.decoders': getVideoDecoders(fullFfmpeg),
       'player': playerProps
     });
   }
