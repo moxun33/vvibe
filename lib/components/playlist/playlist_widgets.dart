@@ -139,37 +139,24 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                           waitDuration: const Duration(seconds: 1),
                         ),
                         subtitle: isExpanded
-                            ? RawKeyboardListener(
-                                focusNode: FocusNode(),
-                                onKey: (RawKeyEvent event) {
-                                  // 子组件监听键盘事件，特别是 Enter 键
-                                  if (event is RawKeyDownEvent) {
-                                    if (event.logicalKey ==
-                                        LogicalKeyboardKey.enter) {
-                                      KeyEventResult
-                                          .handled; // 返回 handled，阻止事件继续冒泡
-                                    }
-                                  }
-                                  KeyEventResult.ignored; // 其他事件不处理
-                                },
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.zero,
-                                      fillColor: Colors.white,
-                                      border: InputBorder.none,
-                                      hintText: '搜索',
-                                      hintStyle:
-                                          TextStyle(color: Colors.white30)),
-                                  style: TextStyle(
-                                      fontSize: 12.0, color: Colors.white),
-                                  onSubmitted: ((value) {
-                                    // onSearch(value);
-                                  }),
-                                  onChanged: ((value) {
-                                    onSearch(value);
-                                  }),
-                                ))
+                            ? TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.zero,
+                                    fillColor: Colors.white,
+                                    border: InputBorder.none,
+                                    hintText: '搜索',
+                                    hintStyle:
+                                        TextStyle(color: Colors.white30)),
+                                style: TextStyle(
+                                    fontSize: 12.0, color: Colors.white),
+                                onSubmitted: ((value) {
+                                  // onSearch(value);
+                                }),
+                                onChanged: ((value) {
+                                  onSearch(value);
+                                }),
+                              )
                             : SizedBox(height: 0, width: 0),
                         textColor: Colors.white,
                       ),
