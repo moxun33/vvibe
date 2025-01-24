@@ -492,15 +492,16 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   Widget build(BuildContext context) {
     return MouseRegion(
         onHover: (event) {
-          setState(() {
-            cursor = '1';
-          });
-          // 延时
-          Future.delayed(Duration(seconds: 5), () {
+          if (cursor == '0') {
             setState(() {
-              cursor = '0';
+              cursor = '1';
             });
-          });
+            Future.delayed(Duration(seconds: 5), () {
+              setState(() {
+                cursor = '0';
+              });
+            });
+          }
         },
         onExit: (_) => {},
         cursor:
