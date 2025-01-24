@@ -234,6 +234,7 @@ class _VplayerControlsState extends State<VplayerControls>
         _setVolume();
       }
     }
+    KeyEventResult.ignored;
   }
 
   _setVolume([bool up = false]) async {
