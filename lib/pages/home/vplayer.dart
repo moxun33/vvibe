@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
@@ -47,6 +48,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   int bufferSpeed = 0; // 缓冲速度 (字节/秒)
   Duration lastBufferUpdateTime = Duration.zero;
   Duration lastBufferedPosition = Duration.zero;
+  String cursor = '1';
   @override
   void initState() {
     super.initState();
@@ -55,6 +57,11 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
     eventBus.on('play-last-video', (e) {
       initLastVideo();
+    });
+    eventBus.on('change-mouse-cursor', (e) {
+      setState(() {
+        cursor = e != null ? e.toString() : '1';
+      });
     });
     initLastVideo();
   }
@@ -152,6 +159,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
                 setState(() {
                   tip = '';
                   playingUrl = item;
+                  cursor = '1';
                 });
                 final itemJson = item.toJson();
                 itemJson['subConf'] = subConf;
@@ -306,6 +314,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       _controller = null;
     });
     windowManager.removeListener(this);
+    setState(() {
+      cursor = '1';
+    });
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕
@@ -479,63 +490,81 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: Stack(
-        children: <Widget>[
-          Row(children: <Widget>[
-            Expanded(
-                flex: 4,
-                child: _controller != null &&
-                        _controller?.value.isInitialized == true
-                    ? AbsorbPointer(
-                        absorbing: _controller == null,
-                        child: BarrageWall(
-                            debug: false, //!Global.isRelease,
-                            safeBottomHeight: getDeviceHeight(context) ~/ 4 * 3,
-                            speed: 10,
-                            massiveMode: false,
-                            speedCorrectionInMilliseconds: 10000,
-                            bullets: [],
-                            controller: barrageWallController,
-                            child:
-                                Stack(alignment: Alignment.center, children: [
-                              AspectRatio(
-                                  aspectRatio: _controller!.value.aspectRatio,
-                                  child: VideoPlayer(_controller!)),
-                              MouseRegion(
-                                  onHover: (_) {
-                                    // print('cachee hover');
-                                  },
-                                  child: VplayerControls(
-                                    _controller!,
-                                    togglePlayList: togglePlayList,
-                                    sendDanmaku: () {},
-                                    toggleMediaInfo: toggleMediaInfo,
-                                    toggleDanmaku: toggleDanmakuVisible,
-                                    toggleEpgDialog: toggleEpgDialog,
-                                    stopPlayer: stopPlayer,
-                                    setTipMsg: _setTipMsg,
-                                    playingUrl: playingUrl,
-                                  ))
-                            ])))
-                    : PlaceCover()),
-            Container(
-                width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
-                child: VideoPlaylist(
-                  visible: playListShowed,
-                  onUrlTap: onPlayUrlChange,
-                )),
-          ]),
-          GestureDetector(
-              onDoubleTap: () => togglePlayList(),
-              child: PlayerContextMenu(
-                  onOpenUrl: onOpenOneUrl,
-                  showPlaylist: togglePlayList,
-                  playListShowed: playListShowed,
-                  child: OsdMsg())),
-        ],
-      ),
-    );
+    return MouseRegion(
+        onHover: (event) {
+          setState(() {
+            cursor = '1';
+          });
+          // 延时
+          Future.delayed(Duration(seconds: 5), () {
+            setState(() {
+              cursor = '0';
+            });
+          });
+        },
+        onExit: (_) => {},
+        cursor:
+            cursor != '0' ? SystemMouseCursors.basic : SystemMouseCursors.none,
+        child: Container(
+          color: Colors.black,
+          child: Stack(
+            children: <Widget>[
+              Row(children: <Widget>[
+                Expanded(
+                    flex: 4,
+                    child: _controller != null &&
+                            _controller?.value.isInitialized == true
+                        ? AbsorbPointer(
+                            absorbing: _controller == null,
+                            child: BarrageWall(
+                                debug: false, //!Global.isRelease,
+                                safeBottomHeight:
+                                    getDeviceHeight(context) ~/ 4 * 3,
+                                speed: 10,
+                                massiveMode: false,
+                                speedCorrectionInMilliseconds: 10000,
+                                bullets: [],
+                                controller: barrageWallController,
+                                child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      AspectRatio(
+                                          aspectRatio:
+                                              _controller!.value.aspectRatio,
+                                          child: VideoPlayer(_controller!)),
+                                      MouseRegion(
+                                          onHover: (_) {
+                                            // print('cachee hover');
+                                          },
+                                          child: VplayerControls(
+                                            _controller!,
+                                            togglePlayList: togglePlayList,
+                                            sendDanmaku: () {},
+                                            toggleMediaInfo: toggleMediaInfo,
+                                            toggleDanmaku: toggleDanmakuVisible,
+                                            toggleEpgDialog: toggleEpgDialog,
+                                            stopPlayer: stopPlayer,
+                                            setTipMsg: _setTipMsg,
+                                            playingUrl: playingUrl,
+                                          ))
+                                    ])))
+                        : PlaceCover()),
+                Container(
+                    width: playListShowed ? PLAYLIST_BAR_WIDTH : 0,
+                    child: VideoPlaylist(
+                      visible: playListShowed,
+                      onUrlTap: onPlayUrlChange,
+                    )),
+              ]),
+              GestureDetector(
+                  onDoubleTap: () => togglePlayList(),
+                  child: PlayerContextMenu(
+                      onOpenUrl: onOpenOneUrl,
+                      showPlaylist: togglePlayList,
+                      playListShowed: playListShowed,
+                      child: OsdMsg())),
+            ],
+          ),
+        ));
   }
 }

@@ -164,6 +164,7 @@ class _VplayerControlsState extends State<VplayerControls>
         _hideControls = false;
         _displayTapped = true;
       });
+      eventBus.emit('change-mouse-cursor', 1);
     }
   }
 
@@ -173,6 +174,7 @@ class _VplayerControlsState extends State<VplayerControls>
         setState(() {
           _hideControls = true;
         });
+        eventBus.emit('change-mouse-cursor', 0);
       }
     });
   }
