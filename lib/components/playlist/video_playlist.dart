@@ -11,6 +11,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/player/settings/play_file_setting_dialog.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_info.dart';
@@ -172,8 +173,18 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     final value = item.title;
 
     switch (value) {
-      case '编辑文件内容':
+      case '编辑文件':
         PlaylistUtil().launchFile(file['name']);
+        break;
+
+      case '播放设置':
+        showDialog(
+            context: context,
+            builder: (context) {
+              return PlayFileSettingDialog(
+                file: file,
+              );
+            });
         break;
 
       default:
@@ -275,7 +286,11 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   updatePlaylistFiles();
                 },
                 value: selectedFileId,
-                hint: Text('选择播放列表', style: TextStyle(color: Colors.white)),
+                hint: Text(playFiles.length > 0 ? '选择播放列表' : '播放列表为空',
+                    style: TextStyle(
+                        color: playFiles.length > 0
+                            ? Colors.white
+                            : Colors.redAccent)),
                 iconStyleData:
                     IconStyleData(icon: const Icon(Icons.keyboard_arrow_down)),
                 onChanged: (String? value) {
@@ -293,7 +308,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                         },
                         menuItems: obj['url'] == null
                             ? [
-                                MenuItem(title: '编辑文件内容'),
+                                MenuItem(title: '编辑文件'),
+                                MenuItem(title: '播放设置'),
                               ]
                             : [],
                         child: MenuItemRow(obj),

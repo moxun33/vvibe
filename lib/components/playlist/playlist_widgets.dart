@@ -229,21 +229,16 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   }
 
   bool get _showLogo {
-    final singleSet = PlaylistUtil().isBoolValid(
-        widget.currentSubConfig['type'] == 'file'
-            ? widget.currentSubConfig['show-logo']
-            : widget.currentSubConfig['showLogo']);
+    final singleSet =
+        PlaylistUtil().isBoolValid(widget.currentSubConfig['showLogo']);
     if (!singleSet && widget.currentSubConfig['type'] != 'file')
       return PlaylistUtil().isBoolValid(widget.playerSetting['showLogo']);
     return singleSet;
   }
 
   bool get _checkAlive {
-    final singleSet = PlaylistUtil().isBoolValid(
-        widget.currentSubConfig['type'] == 'file'
-            ? widget.currentSubConfig['check-alive']
-            : widget.currentSubConfig['checkAlive'],
-        false);
+    final singleSet = PlaylistUtil()
+        .isBoolValid(widget.currentSubConfig['checkAlive'], false);
     if (!singleSet)
       return PlaylistUtil()
           .isBoolValid(widget.playerSetting['checkAlive'], false);

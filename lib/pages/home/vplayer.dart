@@ -346,9 +346,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   //显示、隐藏节目单
   void toggleEpgDialog() {
     if (playingUrl == null) return;
-    final epgUrl = PlaylistUtil().isStrValid(subConf['epg'])
-        ? subConf['epg']
-        : playListInfo?.xTvgUrl;
+    final epgUrl =
+        PlaylistUtil().pickStrVal(subConf['epg'], playListInfo?.tvgUrl);
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -405,7 +405,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   }
 
   bool get showLogo {
-    if (subConf['type'] == 'file') {
+    if (subConf['type'] == 'file' && subConf['showLogo'] == null) {
       return playListInfo?.showLogo != false;
     }
     return PlaylistUtil().isBoolValid(subConf['showLogo']);

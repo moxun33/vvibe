@@ -12,7 +12,7 @@ PlayListInfo playListInfoFromJson(String str) =>
 String playListInfoToJson(PlayListInfo data) => json.encode(data.toJson());
 
 class PlayListInfo {
-  String? xTvgUrl;
+  String? tvgUrl;
   String? catchup;
   String? catchupSource;
   bool? showLogo;
@@ -20,7 +20,7 @@ class PlayListInfo {
   List<PlayListItem> channels;
 
   PlayListInfo({
-    this.xTvgUrl,
+    this.tvgUrl,
     this.catchup,
     this.catchupSource,
     this.showLogo,
@@ -29,12 +29,13 @@ class PlayListInfo {
   });
 
   factory PlayListInfo.fromJson(Map<String, dynamic> json) => PlayListInfo(
-        xTvgUrl: json["x-tvg-url"] ?? json["tvg-url"],
+        tvgUrl: json["x-tvg-url"] ?? json["tvg-url"] ?? json["tvgUrl"],
         catchup: json["catchup"], // "append",
         catchupSource: json[
             "catchup-source"], //"?playseek=\${(b)yyyyMMddHHmmss}-\${(e)yyyyMMddHHmmss}",
-        showLogo: json["x-show-logo"] ?? json["show-logo"],
-        checkAlive: json["x-check-alive"] ?? json["check-alive"],
+        showLogo: json["x-show-logo"] ?? json["show-logo"] ?? json["showLogo"],
+        checkAlive:
+            json["x-check-alive"] ?? json["check-alive"] ?? json["checkAlive"],
 
         channels: json["channels"] == null
             ? []
@@ -42,11 +43,11 @@ class PlayListInfo {
       );
 
   Map<String, dynamic> toJson() => {
-        "tvg-url": xTvgUrl,
+        "tvgUrl": tvgUrl,
         "catchup": catchup,
-        "catchup-source": catchupSource,
-        "show-logo": showLogo,
-        "check-alive": checkAlive,
+        "catchupSource": catchupSource,
+        "showLogo": showLogo,
+        "checkAlive": checkAlive,
         "channels": List<PlayListItem>.from(channels.map((x) => x)),
       };
 }

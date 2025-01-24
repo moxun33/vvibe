@@ -263,7 +263,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         TextFormField(
           controller: _epgController,
           decoration: InputDecoration(
-            labelText: 'EPG地址',
+            labelText: 'EPG地址，支持.xml/.xml.gz',
             labelStyle: TextStyle(color: Colors.grey),
           ),
           onSaved: (value) {

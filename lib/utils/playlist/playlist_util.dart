@@ -69,18 +69,23 @@ class PlaylistUtil {
     try {
       final Directory dir = await getPlayListDir();
       final dirList = await dir.list().toList();
-      final List<String> list = [];
+      final List<Map<String, dynamic>> list = [];
       for (var v in dirList) {
         if (v.path.endsWith(".txt") || v.path.endsWith(".m3u")) {
           final path = v.path.replaceAll('\\', '/');
-          list.add(basename ? path.split('/').last : path);
+          final name = basename ? path.split('/').last : path;
+          final cacheKey = '${name}_PLAY_SETTINGS';
+          final settings = await LoacalStorage().getJSON(cacheKey) ?? {};
+          final Map<String, dynamic> map = {
+            ...settings,
+            'id': name,
+            'name': name,
+            'type': 'file'
+          };
+          list.add(map);
         }
       }
-      return list
-          .map(
-            (e) => {'id': e, 'name': e, 'type': 'file'},
-          )
-          .toList();
+      return list;
     } catch (e) {
       return [];
     }
@@ -143,6 +148,10 @@ class PlaylistUtil {
   bool isStrValid(dynamic v) {
     if (v == null) return false;
     return v.toString().isNotEmpty;
+  }
+
+  String pickStrVal(String v1, String? v2) {
+    return PlaylistUtil().isStrValid(v1) ? v1 : v2 ?? '';
   }
 
 // 解析本地或远程订阅,自动下钻单个直播源集合； 触发：一个直播源且名称为index
@@ -412,13 +421,13 @@ class PlaylistUtil {
 
   Map<String, dynamic> extractM3uMeta(String line) {
     return {
-      "tvg-url": getTextByReg(line, new RegExp(r'(?:x-)?tvg-url="(.*?)"')),
-      'show-logo': isBoolValid(
+      "tvgUrl": getTextByReg(line, new RegExp(r'(?:x-)?tvg-url="(.*?)"')),
+      'showLogo': isBoolValid(
           getTextByReg(line, new RegExp(r'(?:x-)?show-logo="(.*?)"'))),
-      'check-alive': isBoolValid(
+      'checkAlive': isBoolValid(
           getTextByReg(line, new RegExp(r'(?:x-)?check-alive="(.*?)"')), false),
       'catchup': getTextByReg(line, new RegExp(r'catchup="(.*?)"')),
-      'catchup-source':
+      'catchupSource':
           getTextByReg(line, new RegExp(r'catchup-source="(.*?)"')),
     };
   }
