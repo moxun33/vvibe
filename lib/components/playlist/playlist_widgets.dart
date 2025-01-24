@@ -140,13 +140,15 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                         ),
                         subtitle: isExpanded
                             ? RawKeyboardListener(
-                                autofocus: true,
                                 focusNode: FocusNode(),
                                 onKey: (RawKeyEvent event) {
                                   // 子组件监听键盘事件，特别是 Enter 键
                                   if (event is RawKeyDownEvent) {
                                     if (event.logicalKey ==
-                                        LogicalKeyboardKey.enter) {}
+                                        LogicalKeyboardKey.enter) {
+                                      KeyEventResult
+                                          .handled; // 返回 handled，阻止事件继续冒泡
+                                    }
                                   }
                                   KeyEventResult.ignored; // 其他事件不处理
                                 },
@@ -162,6 +164,9 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
                                   style: TextStyle(
                                       fontSize: 12.0, color: Colors.white),
                                   onSubmitted: ((value) {
+                                    // onSearch(value);
+                                  }),
+                                  onChanged: ((value) {
                                     onSearch(value);
                                   }),
                                 ))
