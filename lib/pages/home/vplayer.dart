@@ -175,6 +175,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         tip = '${item.name} 播放失败';
         playingUrl = null;
       });
+      stopPlayer();
     });
     _controller?.play();
   }
@@ -426,7 +427,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   }
 
   bool get showLogo {
-    if (subConf['type'] == 'file' && subConf['showLogo'] == null) {
+    if (subConf['type'] == 'file' || subConf['showLogo'] == null) {
       return playListInfo?.showLogo != false;
     }
     return PlaylistUtil().isBoolValid(subConf['showLogo']);
