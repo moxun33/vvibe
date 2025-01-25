@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/settings/play_file_setting_dialog.dart';
@@ -16,6 +17,7 @@ import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
@@ -36,6 +38,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   String? selectedFileId = null;
   Map<String, dynamic>? selectedFile = null;
   bool loading = true;
+  PlayListItem? currentPlayUrl;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
   @override
@@ -191,6 +194,14 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     }
   }
 
+  _onUrlTap(PlayListItem e) {
+    setState(() {
+      currentPlayUrl = e;
+    });
+    widget.onUrlTap(e,
+        playlistInfo: playlistInfo, subConfig: selectedFile ?? {});
+  }
+
   //state发生变化时会回调该方法,可以是class
   //也可以是InheritedWidget,即其实际所属的组件(上面那个组件)
   @override
@@ -324,11 +335,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
               ? PlGroupPanel(
                   data: playlist,
                   currentSubConfig: currentSubFileConf,
-                  onUrlTap: (e) {
-                    widget.onUrlTap(e,
-                        playlistInfo: playlistInfo,
-                        subConfig: selectedFile ?? {});
-                  },
+                  onUrlTap: _onUrlTap,
                   forceRefreshPlaylist: () {
                     onPlayFileChange(selectedFileId, forceRefresh: true);
                   },

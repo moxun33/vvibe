@@ -10,7 +10,7 @@ class VWindow {
 
   VWindow._();
   initWindow() async {
-      WindowOptions windowOptions = const WindowOptions(
+    WindowOptions windowOptions = const WindowOptions(
       size: Size(1280, 1280 * 9 / 16 + 30),
       minimumSize: Size(1280, 1280 * 9 / 16 + 30),
       center: true,

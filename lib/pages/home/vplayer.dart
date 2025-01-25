@@ -117,7 +117,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
     final Map<String, String> playerProps = {
       'demux.buffer.ranges': '8',
-      'buffer': '2000+1500000'
+      'buffer': '2000+60000'
     };
     if (fullFfmpeg) {
       playerProps['video.avfilter'] = 'yadif';
@@ -169,12 +169,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               updateWindowTitle(item);
               toggleMediaInfo(msgsShowed);
             }))
-        .catchError((_) => {
-              setState(() {
-                tip = '${item.name} 播放失败';
-                playingUrl = null;
-              })
-            });
+        .catchError((_) {
+      eventBus.emit('play-next-url');
+      setState(() {
+        tip = '${item.name} 播放失败';
+        playingUrl = null;
+      });
+    });
     _controller?.play();
   }
 
@@ -293,9 +294,18 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     startPlay(item);
   }
 
-  void _setTipMsg(String msg) {
+  void _setTipMsg(String msg, [bool clear = false]) {
+    if (msg.trim().split('\n').length > 1) {
+      setState(() {
+        msgs = msg.split('\n');
+      });
+      return;
+    }
     setState(() {
-      tip = msg;
+      tip = clear ? '' : msg.trim();
+      if (clear) {
+        msgs = [];
+      }
     });
   }
 
@@ -456,31 +466,37 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   // 信息展示
   Widget OsdMsg() {
-    final _msgs = [tip] + msgs;
-    return Container(
-        padding: const EdgeInsets.all(10),
-        width: getDanmakuSize().width,
-        height: getDanmakuSize().height - 100,
-        color: Colors.transparent,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _msgs.map((txt) {
-              return Text(
-                txt,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    overflow: TextOverflow.ellipsis),
-              );
-            }).toList()));
+    final _msgs = tip.isNotEmpty ? [tip] + msgs : msgs;
+    return Opacity(
+        opacity: _msgs.length > 0 ? 1 : 0,
+        child: Container(
+            padding: const EdgeInsets.all(10),
+            width: getDanmakuSize().width,
+            height: getDanmakuSize().height - 90,
+            color: msgs.isNotEmpty ? Colors.black38 : Colors.transparent,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _msgs.map((txt) {
+                  return Text(
+                    txt,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        overflow: TextOverflow.ellipsis),
+                  );
+                }).toList())));
   }
 
   @override
   void onWindowEnterFullScreen() {
-    super.onWindowEnterFullScreen();
     setState(() {
       playListShowed = false;
     });
+  }
+
+  @override
+  void onWindowLeaveFullScreen() {
+    super.onWindowLeaveFullScreen();
   }
 
   @override

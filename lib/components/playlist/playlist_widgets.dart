@@ -18,6 +18,7 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/components.dart';
 import 'package:vvibe/models/live_danmaku_item.dart';
 import 'package:vvibe/models/playlist_item.dart';
+import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/utils.dart';
 
@@ -67,6 +68,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   void onSearch(String keyword) {
+    if (keyword.trim().isEmpty) return;
     final newList = filterPlaylist(keyword, widget.data);
     if (newList.length < 1) {
       EasyLoading.showInfo('没有搜索结果');
@@ -94,6 +96,8 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
     });
   }
 
+  _onKey(RawKeyEvent event) {}
+
   @override
   void didUpdateWidget(covariant PlGroupPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -112,68 +116,71 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
           playlist,
         ),
         keyList = groups.keys.toList();
-    return SingleChildScrollView(
-        child: ExpansionPanelList(
-            expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            expansionCallback: (i, expanded) =>
-                toggleExpand(i, expanded, keyList[i]),
-            children: keyList.map<ExpansionPanel>((String key) {
-              final urlList = groups[key] ?? [];
-              return ExpansionPanel(
-                  canTapOnHeader: true,
-                  backgroundColor: Colors.white10,
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return Container(
-                      child: ListTile(
-                        dense: false,
-                        hoverColor: Colors.transparent,
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        title: Tooltip(
-                          child: Text(
-                            key,
-                            style: const TextStyle(fontSize: 14),
-                            maxLines: 1,
+    return RawKeyboardListener(
+        focusNode: FocusNode(),
+        onKey: _onKey,
+        child: SingleChildScrollView(
+            child: ExpansionPanelList(
+                expandedHeaderPadding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                expansionCallback: (i, expanded) =>
+                    toggleExpand(i, expanded, keyList[i]),
+                children: keyList.map<ExpansionPanel>((String key) {
+                  final urlList = groups[key] ?? [];
+                  return ExpansionPanel(
+                      canTapOnHeader: true,
+                      backgroundColor: Colors.white10,
+                      headerBuilder: (BuildContext context, bool isExpanded) {
+                        return Container(
+                          child: ListTile(
+                            dense: false,
+                            hoverColor: Colors.transparent,
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            title: Tooltip(
+                              child: Text(
+                                key,
+                                style: const TextStyle(fontSize: 14),
+                                maxLines: 1,
+                              ),
+                              message: key,
+                              waitDuration: const Duration(seconds: 1),
+                            ),
+                            subtitle: isExpanded
+                                ? TextField(
+                                    controller: _searchController,
+                                    decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.zero,
+                                        fillColor: Colors.white,
+                                        border: InputBorder.none,
+                                        hintText: '搜索',
+                                        hintStyle:
+                                            TextStyle(color: Colors.white30)),
+                                    style: TextStyle(
+                                        fontSize: 12.0, color: Colors.white),
+                                    onSubmitted: ((value) {
+                                      // onSearch(value);
+                                    }),
+                                    onChanged: ((value) {
+                                      onSearch(value);
+                                    }),
+                                  )
+                                : SizedBox(height: 0, width: 0),
+                            textColor: Colors.white,
                           ),
-                          message: key,
-                          waitDuration: const Duration(seconds: 1),
-                        ),
-                        subtitle: isExpanded
-                            ? TextField(
-                                controller: _searchController,
-                                decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.zero,
-                                    fillColor: Colors.white,
-                                    border: InputBorder.none,
-                                    hintText: '搜索',
-                                    hintStyle:
-                                        TextStyle(color: Colors.white30)),
-                                style: TextStyle(
-                                    fontSize: 12.0, color: Colors.white),
-                                onSubmitted: ((value) {
-                                  // onSearch(value);
-                                }),
-                                onChanged: ((value) {
-                                  onSearch(value);
-                                }),
-                              )
-                            : SizedBox(height: 0, width: 0),
-                        textColor: Colors.white,
-                      ),
-                      height: isExpanded ? 70 : 20,
-                    );
-                  },
-                  body: expandKey == key
-                      ? PlUrlListView(
-                          playerSetting: playerSettings,
-                          currentSubConfig: widget.currentSubConfig,
-                          data: urlList,
-                          onUrlTap: widget.onUrlTap,
-                          forceRefreshPlaylist: widget.forceRefreshPlaylist)
-                      : SizedBox(height: 0, width: 0),
-                  isExpanded: expandKey == key // expanded[key] ?? false,
-                  );
-            }).toList()));
+                          height: isExpanded ? 70 : 20,
+                        );
+                      },
+                      body: expandKey == key
+                          ? PlUrlListView(
+                              playerSetting: playerSettings,
+                              currentSubConfig: widget.currentSubConfig,
+                              data: urlList,
+                              onUrlTap: widget.onUrlTap,
+                              forceRefreshPlaylist: widget.forceRefreshPlaylist)
+                          : SizedBox(height: 0, width: 0),
+                      isExpanded: expandKey == key // expanded[key] ?? false,
+                      );
+                }).toList())));
   }
 }
 
@@ -202,6 +209,12 @@ class _PlUrlListViewState extends State<PlUrlListView> {
   void initState() {
     super.initState();
     _initCacheUrl();
+    eventBus.on('play-next-url', (e) {
+      _playNextUrl();
+    });
+    eventBus.on('play-prev-url', (e) {
+      _playPrevUrl();
+    });
   }
 
   void _initCacheUrl() async {
@@ -211,6 +224,26 @@ class _PlUrlListViewState extends State<PlUrlListView> {
     setState(() {
       selectedItem = urlItem;
     });
+  }
+
+  List<PlayListItem> get playlist => widget.data;
+  int get currentPlayUrlIndex =>
+      playlist.indexWhere((e) => e.url == selectedItem?.url);
+
+  _playNextUrl() {
+    final index = currentPlayUrlIndex;
+    if (index < playlist.length - 1) {
+      final item = playlist[index + 1];
+      onSelectUrl(item);
+    }
+  }
+
+  _playPrevUrl() {
+    final index = currentPlayUrlIndex;
+    if (index > 0) {
+      final item = playlist[index - 1];
+      onSelectUrl(item);
+    }
   }
 
   void onSelectUrl(PlayListItem e) {

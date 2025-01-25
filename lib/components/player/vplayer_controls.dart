@@ -46,6 +46,7 @@ class _VplayerControlsState extends State<VplayerControls>
   bool isPlaying = true;
   int? textureId;
   bool mediaInfoShowed = false;
+  bool tipShowed = false;
   TextEditingController danmakuCtrl = new TextEditingController();
 
   //late StreamSubscription<FvpPlayState>? playPauseStream;
@@ -54,7 +55,6 @@ class _VplayerControlsState extends State<VplayerControls>
   late FocusNode textFocusNode = new FocusNode();
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
-  bool _isFullScreen = false;
   String message = 'ddss';
   @override
   void initState() {
@@ -89,21 +89,18 @@ class _VplayerControlsState extends State<VplayerControls>
   }
 
   // 切换全屏状态
-  void _toggleFullScreen() async {
-    final nowFull = await windowManager.isFullScreen();
+  void _toggleFullScreen([bool? fulled]) async {
+    final nowFull =
+        fulled != null ? fulled : await windowManager.isFullScreen();
     windowManager.setFullScreen(!nowFull);
     VWindow().showTitleBar(nowFull);
-
-    setState(() {
-      _isFullScreen = !nowFull;
-    });
   }
 
   void reload() {
     player?.play();
   }
 
-  void playOrPuase() async {
+  void playOrPause() async {
     bool toPause = player?.value.isPlaying == true;
     if (toPause) {
       player?.pause();
@@ -212,31 +209,69 @@ class _VplayerControlsState extends State<VplayerControls>
     }
   }
 
+  _showKeyboardHelp() {
+    final msgs = [
+      '快捷键帮助说明：',
+      '   播放/暂停：空格键',
+      '   切换全屏：Enter键',
+      '   退出全屏: Esc键',
+      '   媒体信息：Tab键',
+      '   停止播放： Alt键 + Q键 ',
+      '   增加音量： Up键',
+      '   降低音量： Down键',
+      '   播放下一个：PageDown键',
+      '   播放上一个：PageUp键',
+      '   快捷键帮助：F1键',
+      '   播放列表：F8键',
+      '   EPG信息：F9键',
+    ];
+    widget.setTipMsg(tipShowed ? '' : msgs.join('\n'), tipShowed);
+    setState(() {
+      tipShowed = !tipShowed;
+    });
+  }
+
+  void handleKeyUp(RawKeyEvent event) {
+    final key = event.logicalKey;
+    final Map<LogicalKeyboardKey, Function> keyActions = {
+      LogicalKeyboardKey.space: playOrPause,
+      LogicalKeyboardKey.escape: () => _toggleFullScreen(true),
+      LogicalKeyboardKey.enter: _toggleFullScreen,
+      LogicalKeyboardKey.f1: _showKeyboardHelp,
+      LogicalKeyboardKey.f9: _toggleEpgDialog,
+      LogicalKeyboardKey.f8: widget.togglePlayList,
+      LogicalKeyboardKey.arrowUp: () => _setVolume(true),
+      LogicalKeyboardKey.arrowDown: () => _setVolume(),
+      LogicalKeyboardKey.pageUp: () => {eventBus.emit('play-up-url')},
+      LogicalKeyboardKey.pageDown: () => {eventBus.emit('play-next-url')},
+      LogicalKeyboardKey.tab: () {
+        if (!event.isAltPressed) {
+          _getMetaInfo();
+        }
+      },
+      LogicalKeyboardKey.keyQ: () {
+        if (event.isAltPressed) {
+          stop();
+        }
+      },
+    };
+
+    try {
+      final action = keyActions[key];
+      if (action != null) {
+        action();
+      }
+    } catch (e) {
+      print('Error handling key press: $e');
+    }
+  }
+
   // 处理键盘事件
   void _onKey(RawKeyEvent event) {
     final key = event.logicalKey;
     if (event.runtimeType.toString() == 'RawKeyUpEvent') {
-      if (key == LogicalKeyboardKey.space) {
-        playOrPuase();
-      }
-
-      if (key == LogicalKeyboardKey.escape) {
-        _toggleFullScreen();
-      }
-
-      if (key == LogicalKeyboardKey.enter) {
-        _toggleFullScreen();
-      }
+      handleKeyUp(event);
     }
-    if (event.runtimeType.toString() == 'RawKeyDownEvent') {
-      if (key == LogicalKeyboardKey.arrowUp) {
-        _setVolume(true);
-      }
-      if (key == LogicalKeyboardKey.arrowDown) {
-        _setVolume();
-      }
-    }
-    KeyEventResult.ignored;
   }
 
   _setVolume([bool up = false]) async {
@@ -293,7 +328,7 @@ class _VplayerControlsState extends State<VplayerControls>
                     _cancelAndRestartTimer();
                   },
                   child: AbsorbPointer(
-                      absorbing: false,
+                      absorbing: _hideControls,
                       child: Stack(
                         children: [
                           AnimatedOpacity(
@@ -333,7 +368,7 @@ class _VplayerControlsState extends State<VplayerControls>
                                             ? Icons.pause
                                             : Icons.play_arrow),
                                         onPressed: () {
-                                          playOrPuase();
+                                          playOrPause();
                                         },
                                       ),
 
@@ -438,17 +473,21 @@ class _VplayerControlsState extends State<VplayerControls>
                                           _toggleEpgDialog();
                                         },
                                       ),
-                                      IconButton(
-                                        tooltip:
-                                            '${_isFullScreen ? '退出' : ''}全屏',
-                                        color: Colors.white,
-                                        icon: Icon(_isFullScreen
-                                            ? Icons.fullscreen_exit
-                                            : Icons.fullscreen),
-                                        onPressed: () {
-                                          _toggleFullScreen();
-                                        },
-                                      ),
+                                      FutureBuilder<bool>(
+                                          future: windowManager.isFullScreen(),
+                                          builder: (ctx, snapshot) =>
+                                              IconButton(
+                                                tooltip:
+                                                    '${snapshot.hasData && snapshot.data! ? '退出' : ''}全屏',
+                                                color: Colors.white,
+                                                icon: Icon(snapshot.hasData &&
+                                                        snapshot.data!
+                                                    ? Icons.fullscreen_exit
+                                                    : Icons.fullscreen),
+                                                onPressed: () {
+                                                  _toggleFullScreen();
+                                                },
+                                              )),
                                       IconButton(
                                         tooltip: '播放列表',
                                         color: Colors.white,
