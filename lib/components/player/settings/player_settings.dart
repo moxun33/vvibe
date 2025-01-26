@@ -5,6 +5,8 @@ import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
+import 'widgets/settings_widgets.dart';
+
 class PlayerSettings extends StatefulWidget {
   const PlayerSettings({Key? key}) : super(key: key);
 
@@ -17,7 +19,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
   final TextEditingController _epgUrlTextCtl = TextEditingController();
   final TextEditingController _danmuFSizeTextCtl = TextEditingController();
   bool _checkAlive = true;
-  bool _fullFfmpeg = false;
+  bool _deinterlace = false;
   bool _showLogo = false;
   @override
   void initState() {
@@ -34,26 +36,14 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       _danmuFSizeTextCtl.text = v['dmFSize'].toString();
       setState(() {
         _checkAlive = PlaylistUtil().isBoolValid(v, false);
-        _fullFfmpeg = PlaylistUtil().isBoolValid(v['fullFfmpeg']);
+        _deinterlace = PlaylistUtil().isBoolValid(v['deinterlace'], false);
         _showLogo = PlaylistUtil().isBoolValid(v['showLogo']);
       });
     }
   }
 
-  Widget _buldInputRow(TextEditingController controller,
-      {String? label, InputDecoration? decoration}) {
-    return Row(
-      children: [
-        SizedBox(
-            width: 100,
-            child: Text(label ?? '', style: TextStyle(color: Colors.purple))),
-        SizedBox(
-          width: 450,
-          child: TextField(controller: controller, decoration: decoration),
-        )
-      ],
-    );
-  }
+  get _buildInputRow => SettingsWidgets.buildInputRow;
+  get _buildSwitch => SettingsWidgets.buildSwitch;
 
   void save() async {
     final ua = _uaTextCtl.text,
@@ -68,7 +58,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       'epg': epg.isNotEmpty ? epg : DEF_EPG_URL,
       'dmFSize': dmFSize.isNotEmpty ? int.parse(dmFSize) : DEF_DM_FONT_SIZE,
       'checkAlive': _checkAlive.toString(),
-      'fullFfmpeg': _fullFfmpeg.toString(),
+      'deinterlace': _deinterlace.toString(),
       'showLogo': _showLogo.toString(),
     };
     await LoacalStorage().setJSON(PLAYER_SETTINGS, _map);
@@ -84,22 +74,25 @@ class _PlayerSettingsState extends State<PlayerSettings> {
         children: [
           Row(
             children: [
-              _buldInputRow(_uaTextCtl,
+              _buildInputRow(_uaTextCtl,
                   label: 'User-Agent',
+                  inputWidth: 450.0,
                   decoration: InputDecoration(
                       hintText: '全局请求User-Agent，默认  ${DEF_REQ_UA}')),
               SizedBox(
                 width: 50,
               ),
-              _buldInputRow(_epgUrlTextCtl,
+              _buildInputRow(_epgUrlTextCtl,
                   label: 'EPG地址',
+                  inputWidth: 350.0,
                   decoration:
                       InputDecoration(hintText: 'EPG地址，默认 ${DEF_EPG_URL}')),
             ],
           ),
           Row(children: [
-            _buldInputRow(_danmuFSizeTextCtl,
+            _buildInputRow(_danmuFSizeTextCtl,
                 label: '弹幕大小',
+                inputWidth: 450.0,
                 decoration: InputDecoration(hintText: '弹幕字体大小，默认20')),
           ]),
           SizedBox(
@@ -109,57 +102,27 @@ class _PlayerSettingsState extends State<PlayerSettings> {
             children: [
               Row(
                 children: [
-                  SizedBox(
-                      width: 70,
-                      child:
-                          Text('实时检测', style: TextStyle(color: Colors.purple))),
-                  SizedBox(
-                    width: 50,
-                    child: Switch(
-                      value: _checkAlive, //当前状态
-                      onChanged: (value) {
-                        setState(() {
-                          _checkAlive = value;
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: 60,
-                  ),
-                  SizedBox(
-                      width: 70,
-                      child:
-                          Text('频道图标', style: TextStyle(color: Colors.purple))),
+                  _buildSwitch('实时检测', _checkAlive, (value) {
+                    setState(() {
+                      _checkAlive = value;
+                    });
+                  }),
                   SizedBox(
                     width: 50,
-                    child: Switch(
-                      value: _showLogo, //当前状态
-                      onChanged: (value) {
-                        setState(() {
-                          _showLogo = value;
-                        });
-                      },
-                    ),
                   ),
-                  SizedBox(
-                    width: 60,
-                  ),
-                  SizedBox(
-                      width: 60,
-                      child:
-                          Text('反交错', style: TextStyle(color: Colors.purple))),
+                  _buildSwitch('频道图标', _showLogo, (value) {
+                    setState(() {
+                      _showLogo = value;
+                    });
+                  }),
                   SizedBox(
                     width: 50,
-                    child: Switch(
-                      value: _fullFfmpeg, //当前状态
-                      onChanged: (value) {
-                        setState(() {
-                          _fullFfmpeg = value;
-                        });
-                      },
-                    ),
                   ),
+                  _buildSwitch('反交错', _deinterlace, (value) {
+                    setState(() {
+                      _deinterlace = value;
+                    });
+                  }),
                 ],
               ),
             ],

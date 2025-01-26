@@ -298,7 +298,7 @@ class PlaylistUtil {
     ext['playUrl'] = url;
     final PlayListItem item = PlayListItem.fromJson({
       'url': url,
-      'name': name ?? APP_NAME,
+      'name': name ?? url,
       'group': _info['group'],
       'tvgId': _info['tvgId'],
       'ext': ext ?? {}

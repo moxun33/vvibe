@@ -9,7 +9,6 @@ import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:native_context_menu/native_context_menu.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/settings/play_file_setting_dialog.dart';
@@ -17,7 +16,6 @@ import 'package:vvibe/components/playlist/playlist_widgets.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
-import 'package:vvibe/services/event_bus.dart';
 import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
@@ -55,7 +53,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
 
     urls.addAll(_files);
     setState(() => playFiles = urls as List<Map<String, dynamic>>);
-    final lastSelect = LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
+    final lastSelect = await LoacalStorage().getJSON(LAST_PLAYLIST_FILE_OR_SUB);
     if (lastSelect == null) {
       setState(() {
         loading = false;
@@ -63,7 +61,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       return;
     }
 
-    if (plFileExists(lastSelect)) {
+    if (plFileExists(urls as List<Map<String, dynamic>>, lastSelect)) {
       onPlayFileChange(lastSelect['id'] ?? '');
     }
     //初始化订阅url的列表
@@ -74,8 +72,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
     watchPlaylistDir();
   }
 
-  bool plFileExists(Map<String, dynamic>? pl) {
-    return pl != null && playFiles.where((e) => e['id'] == pl['id']).length > 0;
+  bool plFileExists(List<Map<String, dynamic>> list, Map<String, dynamic>? pl) {
+    return pl != null && list.any((e) => e['id'] == pl['id']);
   }
 
   List<PlayListItem> get playlist {
@@ -189,9 +187,15 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
               );
             });
         break;
-
+      case '强制刷新':
+        forceRefreshPlaylist(file['id']);
+        break;
       default:
     }
+  }
+
+  forceRefreshPlaylist([String? id]) {
+    onPlayFileChange(id ?? selectedFileId, forceRefresh: true);
   }
 
   _onUrlTap(PlayListItem e) {
@@ -321,8 +325,9 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                             ? [
                                 MenuItem(title: '编辑文件'),
                                 MenuItem(title: '播放设置'),
+                                MenuItem(title: '强制刷新'),
                               ]
-                            : [],
+                            : [MenuItem(title: '强制刷新')],
                         child: MenuItemRow(obj),
                       ));
                 }).toList(),
@@ -336,9 +341,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   data: playlist,
                   currentSubConfig: currentSubFileConf,
                   onUrlTap: _onUrlTap,
-                  forceRefreshPlaylist: () {
-                    onPlayFileChange(selectedFileId, forceRefresh: true);
-                  },
+                  forceRefreshPlaylist: forceRefreshPlaylist,
                 )
               : (widget.visible && loading
                   ? Spinning()

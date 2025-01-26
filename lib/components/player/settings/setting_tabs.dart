@@ -12,8 +12,8 @@ class SettingsTabsView extends StatefulWidget {
 class _SettingsTabsViewState extends State<SettingsTabsView>
     with TickerProviderStateMixin {
   final tabs = [
-    {'value': 'subscribe', 'label': '订阅'},
-    {'value': 'player', 'label': '播放器'}
+    {'value': 'subscribe', 'label': '订阅配置'},
+    {'value': 'player', 'label': '播放设置'}
   ];
   late TabController _tabController = TabController(
     length: tabs.length,

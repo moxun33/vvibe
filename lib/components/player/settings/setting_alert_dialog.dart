@@ -15,7 +15,7 @@ class _SettingAlertDialogState extends State<SettingAlertDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text(
-        '设置',
+        '应用设置',
       ),
       titleTextStyle: TextStyle(
           fontWeight: FontWeight.bold, color: Colors.black87, fontSize: 22),
@@ -23,7 +23,7 @@ class _SettingAlertDialogState extends State<SettingAlertDialog> {
         TextButton(child: const Text(''), onPressed: () {}),
       ],
       content: SizedBox(
-        width: getDeviceWidth(context) - 100,
+        width: 1200,
         height: getDeviceHeight(context),
         child: SettingsTabsView(),
       ),

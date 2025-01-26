@@ -44,7 +44,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   bool msgsShowed = false;
   PlayListInfo? playListInfo; // 当前订阅的信息
-  Map<String, dynamic> subConf = {}; //当前远程订阅的独立配置
+  Map<String, dynamic> subConf = {}; //当前远程订阅、文件的独立播放配置
   int bufferSpeed = 0; // 缓冲速度 (字节/秒)
   Duration lastBufferUpdateTime = Duration.zero;
   Duration lastBufferedPosition = Duration.zero;
@@ -111,20 +111,34 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     }
   }
 
-  playerConfig() {
-    final settings = LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
-    final fullFfmpeg = settings['fullFfmpeg'] == 'true';
+  Future<bool> _isDeinterlace() async {
+    if (subConf['deinterlace'] == null) {
+      final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
+      return PlaylistUtil().isBoolValid(settings['deinterlace'], false);
+    }
+    return PlaylistUtil().isBoolValid(subConf['deinterlace'], false);
+  }
 
+  Future<String> _getUA() async {
+    if (PlaylistUtil().isStrValid(subConf['ua'])) {
+      return subConf['ua'];
+    }
+    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
+    return settings['ua'] ?? DEF_REQ_UA;
+  }
+
+  playerConfig() async {
     final Map<String, String> playerProps = {
       'demux.buffer.ranges': '8',
       'buffer': '2000+60000'
     };
-    if (fullFfmpeg) {
+    final _deinterlace = await _isDeinterlace();
+    if (_deinterlace) {
       playerProps['video.avfilter'] = 'yadif';
     }
 
     registerWith(options: {
-      'video.decoders': getVideoDecoders(fullFfmpeg),
+      'video.decoders': getVideoDecoders(_deinterlace),
       'player': playerProps
     });
   }
@@ -136,12 +150,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       stopPlayer();
     }
     _controller?.dispose();
-    final settings = await LoacalStorage().getJSON(PLAYER_SETTINGS) ?? {};
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
-      'User-Agent': PlaylistUtil().isStrValid(subConf['ua'])
-          ? subConf['ua']
-          : settings['ua'] ?? DEF_REQ_UA,
+      'User-Agent': await _getUA(),
     });
     item.catchup = playListInfo?.catchup;
     item.catchupSource = playListInfo?.catchupSource;
@@ -292,6 +303,10 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     // MyLogger.info('打开链接 $url');
     if (url.isEmpty) return;
     final item = await PlaylistUtil().parseSingleUrlAsync(url);
+    setState(() {
+      subConf = {};
+      playListInfo = null;
+    });
     startPlay(item);
   }
 

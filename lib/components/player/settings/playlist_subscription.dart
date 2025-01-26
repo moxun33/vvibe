@@ -5,6 +5,8 @@ import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/utils/utils.dart';
 
+import 'widgets/settings_widgets.dart';
+
 //订阅播放列表
 class PlaylistSubscription extends StatefulWidget {
   const PlaylistSubscription({Key? key}) : super(key: key);
@@ -27,6 +29,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
   late String name, url, ua, epg, blackGroups;
   bool _checkAlive = false;
   bool _showLogo = false;
+  bool _deinterlace = false;
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
       editUrl!['blackGroups'] = blackGroups;
       editUrl!['checkAlive'] = _checkAlive.toString();
       editUrl!['showLogo'] = _showLogo.toString();
+      editUrl!['deinterlace'] = _deinterlace.toString();
 
       _urls.fillRange(index, index, editUrl);
       setState(() {
@@ -77,7 +81,8 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         'epg': epg,
         'blackGroups': blackGroups,
         'checkAlive': _checkAlive.toString(),
-        'showLogo': _showLogo.toString()
+        'showLogo': _showLogo.toString(),
+        'deinterlace': _deinterlace.toString()
       };
       //_urls.add(SubscriptionUrl(id: _uuid.v4(), name: name, url: url));
       _urls.add(_map);
@@ -111,6 +116,7 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
     setState(() {
       _checkAlive = PlaylistUtil().isBoolValid(item['checkAlive'], false);
       _showLogo = PlaylistUtil().isBoolValid(item['showLogo']);
+      _deinterlace = PlaylistUtil().isBoolValid(item['deinterlace'], false);
     });
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -226,6 +232,8 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
         });
   }
 
+  get _buildInputRow => SettingsWidgets.buildInputRow;
+  get _buildSwitch => SettingsWidgets.buildSwitch;
   Widget _buildForm2() {
     return Form(
       key: _formKey,
@@ -284,39 +292,33 @@ class _PlaylistSubscritionState extends State<PlaylistSubscription> {
             padding: EdgeInsets.only(top: 20),
             child: Row(
               children: [
+                _buildSwitch('实时检测', _checkAlive, (value) {
+                  setState(() {
+                    _checkAlive = value;
+                  });
+                }),
                 SizedBox(
-                    width: 60,
-                    child:
-                        Text('实时检测', style: TextStyle(color: Colors.purple))),
-                SizedBox(
-                  width: 80,
-                  child: Switch(
-                    value: _checkAlive, //当前状态
-                    onChanged: (value) {
-                      setState(() {
-                        _checkAlive = value;
-                      });
-                    },
-                  ),
+                  width: 60,
                 ),
+                _buildSwitch('频道图标', _showLogo, (value) {
+                  setState(() {
+                    _showLogo = value;
+                  });
+                }),
                 SizedBox(
-                  width: 20,
+                  width: 50,
                 ),
-                SizedBox(
-                    width: 60,
-                    child:
-                        Text('频道图标', style: TextStyle(color: Colors.purple))),
-                SizedBox(
-                  width: 80,
-                  child: Switch(
-                    value: _showLogo, //当前状态
-                    onChanged: (value) {
-                      setState(() {
-                        _showLogo = value;
-                      });
-                    },
-                  ),
-                ),
+              ],
+            )),
+        Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: Row(
+              children: [
+                _buildSwitch('反交错', _deinterlace, (value) {
+                  setState(() {
+                    _deinterlace = value;
+                  });
+                }),
               ],
             )),
         Padding(

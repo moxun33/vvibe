@@ -17,6 +17,7 @@ class PlayListInfo {
   String? catchupSource;
   bool? showLogo;
   bool? checkAlive;
+  bool? deinterlace;
   List<PlayListItem> channels;
 
   PlayListInfo({
@@ -24,6 +25,7 @@ class PlayListInfo {
     this.catchup,
     this.catchupSource,
     this.showLogo,
+    this.deinterlace,
     this.checkAlive,
     required this.channels,
   });
@@ -34,6 +36,7 @@ class PlayListInfo {
         catchupSource: json[
             "catchup-source"], //"?playseek=\${(b)yyyyMMddHHmmss}-\${(e)yyyyMMddHHmmss}",
         showLogo: json["x-show-logo"] ?? json["show-logo"] ?? json["showLogo"],
+        deinterlace: json["deinterlace"],
         checkAlive:
             json["x-check-alive"] ?? json["check-alive"] ?? json["checkAlive"],
 
@@ -47,6 +50,7 @@ class PlayListInfo {
         "catchup": catchup,
         "catchupSource": catchupSource,
         "showLogo": showLogo,
+        "deinterlace": deinterlace,
         "checkAlive": checkAlive,
         "channels": List<PlayListItem>.from(channels.map((x) => x)),
       };

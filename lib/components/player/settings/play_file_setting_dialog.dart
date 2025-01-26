@@ -4,6 +4,8 @@ import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 
+import './widgets/settings_widgets.dart';
+
 class PlayFileSettingDialog extends StatefulWidget {
   PlayFileSettingDialog({Key? key, required this.file}) : super(key: key);
   Map<String, dynamic> file;
@@ -19,6 +21,7 @@ class _PlayFileSettingDialogState extends State<PlayFileSettingDialog> {
   late String name, url, ua, epg, blackGroups;
   bool _checkAlive = false;
   bool _showLogo = false;
+  bool _deinterlace = false;
 
   @override
   void initState() {
@@ -39,23 +42,9 @@ class _PlayFileSettingDialogState extends State<PlayFileSettingDialog> {
       setState(() {
         _checkAlive = PlaylistUtil().isBoolValid(v['checkAlive'], false);
         _showLogo = PlaylistUtil().isBoolValid(v['showLogo']);
+        _deinterlace = PlaylistUtil().isBoolValid(v['deinterlace'], false);
       });
     }
-  }
-
-  Widget _buldInputRow(TextEditingController controller,
-      {String? label, InputDecoration? decoration}) {
-    return Row(
-      children: [
-        SizedBox(
-            width: 100,
-            child: Text(label ?? '', style: TextStyle(color: Colors.purple))),
-        SizedBox(
-          width: 650,
-          child: TextField(controller: controller, decoration: decoration),
-        )
-      ],
-    );
   }
 
   _submit() {
@@ -65,10 +54,13 @@ class _PlayFileSettingDialogState extends State<PlayFileSettingDialog> {
     values['blackGroups'] = _bgController.text;
     values['checkAlive'] = _checkAlive.toString();
     values['showLogo'] = _showLogo.toString();
+    values['deinterlace'] = _deinterlace.toString();
     LoacalStorage().setJSON(cacheKey, values);
     EasyLoading.showSuccess('保存成功');
   }
 
+  get _buildInputRow => SettingsWidgets.buildInputRow;
+  get _buildSwitch => SettingsWidgets.buildSwitch;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -81,54 +73,42 @@ class _PlayFileSettingDialogState extends State<PlayFileSettingDialog> {
           height: 500,
           child: Column(
             children: [
-              _buldInputRow(_uaTextCtl,
+              _buildInputRow(_uaTextCtl,
                   label: 'User-Agent',
                   decoration: InputDecoration(
                       hintText: '当前文件请求User-Agent，默认  ${DEF_REQ_UA}')),
-              _buldInputRow(_epgUrlTextCtl,
+              _buildInputRow(_epgUrlTextCtl,
                   label: 'EPG地址',
                   decoration: InputDecoration(
                       hintText: '当前文件EPG地址，支持.xml/.xml.gz，默认 ${DEF_EPG_URL}')),
-              _buldInputRow(_bgController,
+              _buildInputRow(_bgController,
                   label: '屏蔽分组',
                   decoration: InputDecoration(hintText: '屏蔽分组, 英文逗号分隔')),
               Padding(
                   padding: EdgeInsets.only(top: 20),
                   child: Row(
                     children: [
+                      _buildSwitch('实时检测', _checkAlive, (value) {
+                        setState(() {
+                          _checkAlive = value;
+                        });
+                      }),
                       SizedBox(
-                          width: 80,
-                          child: Text('实时检测',
-                              style: TextStyle(color: Colors.purple))),
-                      SizedBox(
-                        width: 80,
-                        child: Switch(
-                          value: _checkAlive, //当前状态
-                          onChanged: (value) {
-                            setState(() {
-                              _checkAlive = value;
-                            });
-                          },
-                        ),
+                        width: 50,
                       ),
+                      _buildSwitch('频道图标', _showLogo, (value) {
+                        setState(() {
+                          _showLogo = value;
+                        });
+                      }),
                       SizedBox(
-                        width: 100,
+                        width: 50,
                       ),
-                      SizedBox(
-                          width: 60,
-                          child: Text('频道图标',
-                              style: TextStyle(color: Colors.purple))),
-                      SizedBox(
-                        width: 80,
-                        child: Switch(
-                          value: _showLogo, //当前状态
-                          onChanged: (value) {
-                            setState(() {
-                              _showLogo = value;
-                            });
-                          },
-                        ),
-                      ),
+                      _buildSwitch('反交错', _deinterlace, (value) {
+                        setState(() {
+                          _deinterlace = value;
+                        });
+                      }),
                     ],
                   )),
               Padding(
