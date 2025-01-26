@@ -181,7 +181,6 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               toggleMediaInfo(msgsShowed);
             }))
         .catchError((_) {
-      eventBus.emit('play-next-url');
       setState(() {
         tip = '${item.name} 播放失败';
         playingUrl = null;
@@ -237,10 +236,12 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final _val = _controller?.value;
     if (_val == null) return;
     if (_val.hasError && !_val.isBuffering) {
+      eventBus.emit('play-next-url');
       setState(() {
         tip = '${item.name} 播放失败 ${_val.errorDescription ?? ''}';
         playingUrl = null;
       });
+      stopPlayer();
       return;
     }
     if (_val.isBuffering && !_val.isPlaying) {

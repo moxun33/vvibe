@@ -232,7 +232,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
 
   _playNextUrl() {
     final index = currentPlayUrlIndex;
-    if (index < playlist.length - 1) {
+    if (index >= 0 && index < playlist.length - 1) {
       final item = playlist[index + 1];
       onSelectUrl(item);
     }
@@ -240,7 +240,7 @@ class _PlUrlListViewState extends State<PlUrlListView> {
 
   _playPrevUrl() {
     final index = currentPlayUrlIndex;
-    if (index > 0) {
+    if (index > 0 && index < playlist.length - 1) {
       final item = playlist[index - 1];
       onSelectUrl(item);
     }
