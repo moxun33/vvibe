@@ -242,7 +242,7 @@ class _VplayerControlsState extends State<VplayerControls>
       LogicalKeyboardKey.f8: widget.togglePlayList,
       LogicalKeyboardKey.arrowUp: () => _setVolume(true),
       LogicalKeyboardKey.arrowDown: () => _setVolume(),
-      LogicalKeyboardKey.pageUp: () => {eventBus.emit('play-up-url')},
+      LogicalKeyboardKey.pageUp: () => {eventBus.emit('play-prev-url')},
       LogicalKeyboardKey.pageDown: () => {eventBus.emit('play-next-url')},
       LogicalKeyboardKey.tab: () {
         if (!event.isAltPressed) {
