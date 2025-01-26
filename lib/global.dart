@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart' as fvp;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/login_mode.dart';
@@ -26,6 +27,8 @@ class Global {
 
   /// 是否 release
   static bool get isRelease => IS_RELEASE;
+  // packageInfo
+  static PackageInfo? packageInfo;
 
   /// init
   static Future<ThemeData?> init({bool shouldSetSize = true}) async {
@@ -80,6 +83,9 @@ class Global {
       EpgUtil().downloadEpgDataAync();
       // VVFFmpeg().checkFfmpegDllAync();
     }
+
+    packageInfo = await PackageInfo.fromPlatform();
+
     return genTheme();
   }
 

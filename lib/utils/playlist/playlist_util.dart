@@ -14,6 +14,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
@@ -44,6 +45,25 @@ class PlaylistUtil {
 //本地视频截图
   Future<Directory> getSnapshotDir() async {
     return createDir('snapshots');
+  }
+
+  String get appExecDir {
+    return Directory(Platform.resolvedExecutable)
+        .parent
+        .path
+        .replaceAll('\\', '/');
+  }
+
+  // 在文件资源管理器中打开当前应用根目录
+  openDirectory([String? dir]) {
+    String directoryPath =
+        (dir ?? appExecDir).replaceAll('\\', '/'); // 获取执行文件的所在目录
+    launchUrlString(directoryPath);
+  }
+
+// 打开当前应用根目录下的子目录（相对路径）
+  openAppExecSubDir(String subDir) {
+    openDirectory(Directory(subDir).absolute.path);
   }
 
   //在其他应用打开文件

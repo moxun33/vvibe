@@ -67,3 +67,4 @@ assets/logs/*
 
 # FVM Version Cache
 .fvm/
+updater/

@@ -10,9 +10,12 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:updat/updat_window_manager.dart';
 import 'package:vvibe/common/values/consts.dart';
+import 'package:vvibe/components/updater/updater_widgets.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/pages/home/vplayer.dart';
+import 'package:vvibe/utils/updater.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:vvibe/window/window_widgets.dart';
 
@@ -53,9 +56,21 @@ class MyApp extends StatelessWidget {
       color: Colors.black12,
       title: APP_NAME,
       theme: theme.useSystemChineseFont(Brightness.dark),
-      home: WindowScaffold(
-        child: Vplayer(),
-      ),
+      home: UpdatWindowManager(
+          getLatestVersion: Updater.getLatestVersion,
+          getBinaryUrl: Updater.getBinaryUrl,
+          appName: APP_NAME,
+          getChangelog: Updater.getChangelog,
+          currentVersion: '0.10.8',
+          callback: (status) {
+            print('updat status: $status');
+          },
+          getDownloadFileLocation: Updater.getDownloadFileLocation,
+          updateChipBuilder: UpdaterWidgets.updateChipBuilder,
+          updateDialogBuilder: UpdaterWidgets.updateDialogBuilder,
+          child: WindowScaffold(
+            child: Vplayer(),
+          )),
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
       locale: Locale('zh', 'Hans'),
