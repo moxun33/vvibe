@@ -61,7 +61,7 @@ class PlayListItem {
       tvgLogo: json["tvgLogo"],
       catchup: json["catchup"],
       catchupSource: json["catchup-source"],
-      ext: Map<String, dynamic>.from(json['ext']));
+      ext: Map<String, dynamic>.from(json['ext'] ?? {}));
 
   Map<String, dynamic> toJson() => {
         "name": name,

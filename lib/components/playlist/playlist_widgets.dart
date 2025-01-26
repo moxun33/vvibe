@@ -416,7 +416,7 @@ class _PlUrlTileState extends State<PlUrlTile>
     return Colors.green;
   }
 
-  Widget _getIcon(int? status) {
+  Widget _getIcon(PlayListItem e, int? status) {
     final pingTime = pingRes?.time?.inMilliseconds ?? 0;
     final okIcon = Icon(
       Icons.check,
@@ -427,6 +427,8 @@ class _PlUrlTileState extends State<PlUrlTile>
       case 200:
       case 204:
       case 206:
+      case 302:
+      case 301:
         return Tooltip(child: okIcon, message: '${pingTime}ms');
 
       case 504:
@@ -458,15 +460,14 @@ class _PlUrlTileState extends State<PlUrlTile>
           message: '无法检测 ${pingTime}ms',
         );
       case 405:
+        return okIcon;
       case 422:
         return Tooltip(
-          child: pingRes?.time != null
-              ? okIcon
-              : Icon(
-                  Icons.unpublished_rounded,
-                  size: 8,
-                  color: Colors.yellow[200],
-                ),
+          child: Icon(
+            Icons.unpublished_rounded,
+            size: 8,
+            color: Colors.yellow[200],
+          ),
           message: '拒绝连接 ${pingTime}ms',
         );
       case 500:
@@ -499,7 +500,7 @@ class _PlUrlTileState extends State<PlUrlTile>
         );
       default:
         return loading
-            ? SmallSpinning()
+            ? _getTvLogo(e)
             : Tooltip(
                 child: Icon(
                   Icons.notification_important_outlined,
@@ -509,6 +510,27 @@ class _PlUrlTileState extends State<PlUrlTile>
                 message: '未知 ${pingTime}ms',
               );
     }
+  }
+
+  Widget _getTvLogo(PlayListItem e) {
+    return e.tvgLogo != null && widget.showLogo
+        ? SizedBox(
+            width: 16,
+            child: CachedNetworkImage(
+              fit: BoxFit.contain,
+              imageUrl: widget.url.tvgLogo!,
+              errorWidget: (context, url, error) => Icon(
+                Icons.movie_creation_outlined,
+                size: 14,
+                color: Colors.grey[500],
+              ),
+            ),
+          )
+        : Icon(
+            Icons.movie_creation_outlined,
+            size: 14,
+            color: Colors.grey[500],
+          );
   }
 
   @override
@@ -536,26 +558,7 @@ class _PlUrlTileState extends State<PlUrlTile>
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 1.0,
               children: [
-                widget.checkAlive
-                    ? _getIcon(urlStatus)
-                    : e.tvgLogo != null && widget.showLogo
-                        ? SizedBox(
-                            width: 16,
-                            child: CachedNetworkImage(
-                              fit: BoxFit.contain,
-                              imageUrl: widget.url.tvgLogo!,
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.movie_creation_outlined,
-                                size: 14,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          )
-                        : Icon(
-                            Icons.movie_creation_outlined,
-                            size: 14,
-                            color: Colors.grey[500],
-                          ),
+                widget.checkAlive ? _getIcon(e, urlStatus) : _getTvLogo(e),
                 SizedBox(
                     width: PLAYLIST_BAR_WIDTH - 42,
                     child: Tooltip(

@@ -180,11 +180,12 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               updateWindowTitle(item);
               toggleMediaInfo(msgsShowed);
             }))
-        .catchError((_) {
+        .catchError((e) {
       setState(() {
         tip = '${item.name} 播放失败';
         playingUrl = null;
       });
+      print('play error: ${e.toString()}');
       stopPlayer();
     });
     _controller?.play();
@@ -339,11 +340,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       msgsShowed = false;
       playingUrl = null;
       _controller = null;
-    });
-    windowManager.removeListener(this);
-    setState(() {
       cursor = '1';
     });
+    windowManager.removeListener(this);
   }
 
 //开始连接斗鱼、忽悠、b站的弹幕

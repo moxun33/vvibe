@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:updat/updat.dart';
 import 'package:vvibe/common/colors/colors.dart';
+import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/updater.dart';
 import 'package:window_manager/window_manager.dart';

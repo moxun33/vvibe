@@ -1,11 +1,12 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
+
 import 'package:dart_ping/dart_ping.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
-import 'package:vvibe/common/values/consts.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/utils/logger.dart';
 
 class LimitedConnectionAdapter implements HttpClientAdapter {
@@ -109,14 +110,20 @@ class PlaylistCheckReq {
 
   Future<int> head(String url, CancelToken cancelToken) async {
     try {
-      final resp = await headDio.head(url, cancelToken: cancelToken);
+      headDio.options.followRedirects = false;
+      headDio.httpClientAdapter = LimitedConnectionAdapter(maxConnections: 3);
+      headDio.interceptors.add(DioCacheInterceptor(options: dioCacheOptions));
+      final resp = await headDio.head(
+        url,
+        cancelToken: cancelToken,
+      );
       return resp.statusCode ?? 500;
     } on DioException catch (e) {
       final status = e.response?.statusCode ?? 422;
-      MyLogger.info(e.toString() + url);
+      // print('${e} $url head tv url dio errors');
       return status;
     } catch (e) {
-      MyLogger.info(e.toString());
+      print('${e.toString()} $url head tv url');
       return 500;
     }
   }
