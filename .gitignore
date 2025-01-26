@@ -64,7 +64,7 @@ flutter_rust_bridge_codegen.exe
 assets/epg/*
 assets/ffmpeg/*
 assets/logs/*
+assets/updater/*
 
 # FVM Version Cache
 .fvm/
-updater/
