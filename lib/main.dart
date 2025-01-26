@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
           getBinaryUrl: Updater.getBinaryUrl,
           appName: APP_NAME,
           getChangelog: Updater.getChangelog,
-          currentVersion: '0.10.8',
+          currentVersion: Global.packageInfo?.version ?? '0.10.9',
           callback: (status) {
             print('updat status: $status');
           },
