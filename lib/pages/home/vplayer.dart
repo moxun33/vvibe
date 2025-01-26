@@ -130,7 +130,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   playerConfig() async {
     final Map<String, String> playerProps = {
       'demux.buffer.ranges': '8',
-      'buffer': '2000+60000'
+      'buffer': '5000+60000'
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
