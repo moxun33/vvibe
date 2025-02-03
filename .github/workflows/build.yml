@@ -20,7 +20,7 @@ on:
 env:
   # APP name
   APP_NAME: vvibe
-
+  FVP_DEPS_LATEST: 1
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -37,23 +37,23 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.27.2
-          
+
       - name: Install Dependences
         run: |
           flutter doctor --verbose
           flutter config --enable-windows-desktop
           flutter pub get
           # nightly will crash
-          curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-windows-desktop-vs2022-x64.7z?viasf=1 -o mdk-sdk-windows-desktop-vs2022-x64.7z
-          mv mdk-sdk-windows-desktop-vs2022-x64.7z windows/flutter/ephemeral/.plugin_symlinks/fvp/windows
-          
+          #curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-windows-desktop-vs2022-x64.7z?viasf=1 #-o mdk-sdk-windows-desktop-vs2022-x64.7z
+          #mv mdk-sdk-windows-desktop-vs2022-x64.7z windows/flutter/ephemeral/.plugin_symlinks/fvp/windows
+
       - name: Build Windows
         run: |
           flutter build windows --verbose --release
           cp -r build/windows/x64/runner/Release .
           7z a vvibe-${{github.ref_name}}-windows-x64.zip  Release
 
-      - name: Release  Windows Artifact 
+      - name: Release  Windows Artifact
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{github.ref_name}}
@@ -95,7 +95,7 @@ jobs:
           cp -r build/linux/x64/release/bundle .
           tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz bundle
 
-    - name: Release Linux Artifact 
+    - name: Release Linux Artifact
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{github.ref_name}}
