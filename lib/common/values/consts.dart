@@ -17,6 +17,7 @@ const bool IS_RELEASE = bool.fromEnvironment("dart.vm.product");
 
 //assets目录
 const ASSETS_DIR = IS_RELEASE ? 'data/flutter_assets/assets' : 'assets';
+const DATA_DIR = IS_RELEASE ? 'data' : 'assets';
 
 //自定义窗口标题栏高度
 const CUS_WIN_TITLEBAR_HEIGHT = 30.0;

@@ -8,11 +8,16 @@
  * @qmj
  */
 //import 'package:desktop_multi_window/desktop_multi_window.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:native_context_menu/native_context_menu.dart';
+import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/components/player/settings/open_url_dialog.dart';
 import 'package:vvibe/components/player/settings/setting_alert_dialog.dart';
+import 'package:vvibe/global.dart';
+import 'package:vvibe/services/event_bus.dart';
 
 class PlayerContextMenu extends StatefulWidget {
   PlayerContextMenu(
@@ -40,6 +45,11 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
       ..setFrame(const Offset(0, 0) & Size(1280, 720 + CUS_WIN_TITLEBAR_HEIGHT))
       ..center()
       ..show(); */
+  }
+  checkUpdate() {
+    if (Platform.isWindows) {
+      eventBus.emit('check-for-update');
+    }
   }
 
   void _onItemSelect(BuildContext context, MenuItem item) {
@@ -73,12 +83,26 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
               return SettingAlertDialog();
             });
         break;
+      case '检查更新':
+        checkUpdate();
+        break;
       case '关于应用':
-        /*  showDialog(
+        showDialog(
             context: context,
             builder: (context) {
-              return AboutDialog();
-            }); */
+              return AlertDialog(
+                title: Text('关于${APP_NAME}'),
+                content: Text(
+                    '${APP_NAME} v${Global.packageInfo?.version ?? '0.0.0'}'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('关闭'))
+                ],
+              );
+            });
         break;
 
       default:
@@ -99,6 +123,7 @@ class _PlayerContextMenuState extends State<PlayerContextMenu> {
         /*   MenuItem(title: '扫描直播源'),
         MenuItem(title: '检测直播源'), */
         MenuItem(title: '应用设置'),
+        MenuItem(title: '检查更新'),
         MenuItem(title: '关于应用'),
       ],
       child: widget.child,

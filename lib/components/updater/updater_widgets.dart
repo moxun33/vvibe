@@ -82,7 +82,7 @@ class UpdaterWidgets {
         deleteIcon: Icon(Icons.download_for_offline_outlined),
         onDeleted: () {
           dismissUpdate();
-          PlaylistUtil().openAppExecSubDir(Updater.downloadDir);
+          PlaylistUtil().openAppExecSubDir(UpdaterUtil.downloadDir);
           windowManager.close();
         },
       );

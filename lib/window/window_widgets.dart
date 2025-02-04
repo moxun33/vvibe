@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:vvibe/common/values/values.dart';
+import 'package:vvibe/components/updater/updater.dart';
 import 'package:vvibe/services/event_bus.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -47,6 +48,13 @@ class _WindowButtonsState extends State<WindowButtons> with WindowListener {
 
   close() {
     windowManager.close();
+  }
+
+  @override
+  void onWindowMaximize() {
+    setState(() {
+      maximized = true;
+    });
   }
 
   @override
@@ -188,6 +196,14 @@ class WindowTitleBar extends StatefulWidget {
 }
 
 class _WindowTitleBarState extends State<WindowTitleBar> {
+  _onDoubleTap() async {
+    if (await windowManager.isMaximized()) {
+      windowManager.unmaximize();
+    } else {
+      windowManager.maximize();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return widget.visible
@@ -196,6 +212,7 @@ class _WindowTitleBarState extends State<WindowTitleBar> {
             onPanUpdate: (details) {
               windowManager.startDragging();
             },
+            onDoubleTap: () => _onDoubleTap(),
             onPanEnd: (details) {
               /*  windowManager.setPosition(Offset(
                 windowManager.getPosition().dx + _currentPosition.dx,
@@ -277,7 +294,8 @@ class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Updater(
+        child: Column(
       children: [
         WindowTitleBar(
           visible: showTitlebar,
@@ -286,6 +304,6 @@ class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
         ),
         Expanded(child: widget.child)
       ],
-    );
+    ));
   }
 }

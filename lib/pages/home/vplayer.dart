@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barrage/flutter_barrage.dart';
 import 'package:fvp/fvp.dart';
+import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/common/values/storage.dart';
@@ -64,6 +66,28 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       });
     });
     initLastVideo();
+    _listenLog();
+  }
+
+  _listenLog() {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((record) {
+      if (record.loggerName != 'mdk') return;
+      try {
+        final df = DateFormat("HH:mm:ss.SSS");
+        final msg = record.message;
+        final content =
+            '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${msg}';
+        print('$content  mdk日志《=》2382389329823898932');
+        //if (IS_RELEASE) LogFile.log(content + '\n');
+        if (msg.contains('reader.buffering')) {
+          final num = int.parse(msg.split('-').last.trim());
+          setState(() {
+            tip = num > 0 && num < 100 ? '缓冲中 ${num}%' : '';
+          });
+        }
+      } catch (e) {}
+    });
   }
 
   initLastVideo() {
@@ -129,7 +153,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   playerConfig() async {
     final Map<String, String> playerProps = {
-     // 'demux.buffer.ranges': '8',
+      // 'demux.buffer.ranges': '8',
       'buffer': '5000+60000'
     };
     final _deinterlace = await _isDeinterlace();
@@ -268,7 +292,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         final speed = (newBufferedBytes / (elapsedTime / 1000));
         final _speed = speed.isFinite ? speed.toInt() : 0;
         if (speed > 0 && playingUrl != null) {
-          print('cache $_speed KB/s');
+          // print('cache $_speed KB/s');
           setState(() {
             bufferSpeed = _speed;
           });

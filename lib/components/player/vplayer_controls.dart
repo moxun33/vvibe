@@ -55,6 +55,7 @@ class _VplayerControlsState extends State<VplayerControls>
   late FocusNode textFocusNode = new FocusNode();
   Duration position = Duration.zero;
   Duration duration = Duration.zero;
+  bool mouseEntered = false;
   String message = 'ddss';
   @override
   void initState() {
@@ -151,9 +152,12 @@ class _VplayerControlsState extends State<VplayerControls>
     }
   }
 
-  void _cancelAndRestartTimer() {
+  void _cancelTimer() {
     _hideTimer?.cancel();
+  }
 
+  void _cancelAndRestartTimer() {
+    _cancelTimer();
     if (mounted) {
       _startHideTimer();
 
@@ -215,7 +219,7 @@ class _VplayerControlsState extends State<VplayerControls>
       '   播放/暂停：空格键',
       '   切换全屏：Enter键',
       '   退出全屏: Esc键',
-      '   媒体信息：Tab键',
+      '   媒体信息：Ctrl键 + Tab键',
       '   停止播放： Alt键 + Q键 ',
       '   增加音量： Up键',
       '   降低音量： Down键',
@@ -245,7 +249,7 @@ class _VplayerControlsState extends State<VplayerControls>
       LogicalKeyboardKey.pageUp: () => {eventBus.emit('play-prev-url')},
       LogicalKeyboardKey.pageDown: () => {eventBus.emit('play-next-url')},
       LogicalKeyboardKey.tab: () {
-        if (!event.isAltPressed) {
+        if (!event.isAltPressed && event.isControlPressed) {
           _getMetaInfo();
         }
       },
@@ -302,6 +306,15 @@ class _VplayerControlsState extends State<VplayerControls>
     _setVolume(event.scrollDelta.dy < 0);
   }
 
+  Widget BufferTimes(du) {
+    return SizedBox(
+        width: 130,
+        child: Text(
+          '${_parsePosition()} / ${parseDuration(du)}',
+          style: TextStyle(color: Colors.white),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<VideoPlayerValue>(
@@ -325,7 +338,19 @@ class _VplayerControlsState extends State<VplayerControls>
                 },
                 child: MouseRegion(
                   onHover: (_) {
-                    _cancelAndRestartTimer();
+                    if (!mouseEntered) _cancelAndRestartTimer();
+                  },
+                  onEnter: (event) {
+                    setState(() {
+                      _hideControls = false;
+                      mouseEntered = true;
+                    });
+                  },
+                  onExit: (event) {
+                    setState(() {
+                      mouseEntered = false;
+                    });
+                    _startHideTimer();
                   },
                   child: AbsorbPointer(
                       absorbing: _hideControls,
@@ -504,12 +529,9 @@ class _VplayerControlsState extends State<VplayerControls>
                                 bottom: 5,
                                 child: Row(
                                   children: [
-                                    SizedBox(
-                                        width: 130,
-                                        child: Text(
-                                          '${_parsePosition()} / ${parseDuration(isLive() ? value.buffered.last.end : value.duration)}',
-                                          style: TextStyle(color: Colors.white),
-                                        )),
+                                    BufferTimes(isLive()
+                                        ? value.buffered.last.end
+                                        : value.duration),
                                     Expanded(
                                         child: VideoProgressIndicator(
                                       widget.controller,

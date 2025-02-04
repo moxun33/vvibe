@@ -8,7 +8,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/login_mode.dart';
-import 'package:vvibe/services/ffmpeg.dart';
 import 'package:vvibe/theme.dart';
 import 'package:vvibe/utils/playlist/epg_util.dart';
 import 'package:vvibe/utils/utils.dart';
@@ -37,12 +36,12 @@ class Global {
 
     await windowManager.ensureInitialized();
 // set logger before registerWith()
-    // if (!IS_RELEASE) Logger.root.level = Level.ALL;
-    /*    Logger.root.onRecord.listen((record) {
-      final df = DateFormat("HH:mm:ss.SSS");
+    /*    if (!IS_RELEASE) Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((record) {
+     try{ final df = DateFormat("HH:mm:ss.SSS");
       final content =
           '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${record.message}';
-      print(content);
+      print(content);} catch (e) {}
       //if (IS_RELEASE) LogFile.log(content + '\n');
     }); */
     fvp.registerWith();
