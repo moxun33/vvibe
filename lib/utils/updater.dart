@@ -5,6 +5,7 @@ import 'package:vvibe/common/values/consts.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/global.dart';
 import 'package:vvibe/utils/gzip.dart';
+import 'package:window_manager/window_manager.dart';
 
 class UpdaterUtil {
   static String get platformExt {
@@ -34,6 +35,7 @@ class UpdaterUtil {
     headers: {'Content-Type': 'application/json'},
   ));
 
+  //static const RELEASE_API = 'http://pi.mo:7881/tv/vvibe-updater.json';
   static const RELEASE_API =
       "https://api.github.com/repos/moxun33/vvibe/releases/latest";
 
@@ -120,21 +122,14 @@ class UpdaterUtil {
 // 安装更新
   static installWindowsUpdate() async {
     try {
-      final scriptPath = '${DATA_DIR}\scripts\install-update.bat';
+      print('installWindowsUpdate');
+      final scriptPath = '${APP_DIR}/data/scripts/install-update.bat';
 
-      Process process = await Process.start(scriptPath, [],
-          mode: ProcessStartMode.detached // 以新进程执行
-          );
+      // launchUrlString('${APP_DIR}/updat.exe');
 
-      // 输出执行进程的日志
-      process.stdout.listen((data) {
-        print(String.fromCharCodes(data));
-      });
+      Process.start(scriptPath, [], mode: ProcessStartMode.detached);
 
-      process.stderr.listen((data) {
-        print("Error: ${String.fromCharCodes(data)}");
-      });
-      exit(0);
+      windowManager.close();
     } catch (e) {
       print('Error running PowerShell script: $e');
     }
@@ -156,8 +151,7 @@ class UpdaterUtil {
     final url =
         "https://ghproxy.cc/https://github.com/moxun33/vvibe/releases/download/v$version/vvibe-v$version-${Platform.operatingSystem}-x64.$platformExt";
     print('updater getBinaryUrl: $url');
-    if (!IS_RELEASE)
-      return 'http://pi.mo:7881/tv/vvibe-v0.10.13-windows-x64.zip';
+    // return 'http://pi.mo:7881/tv/vvibe-v0.11.15-windows-x64.zip';
     return url;
   }
 
@@ -173,7 +167,7 @@ class UpdaterUtil {
     return resp.data['body'] ?? '';
   }
 
-  static get downloadDir => '${DATA_DIR}/updater';
+  static get downloadDir => '${APP_DIR}/data/updater';
 
   static initDownloadDir() {
     final dir = downloadDir;

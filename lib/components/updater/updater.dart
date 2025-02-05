@@ -3,9 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:vvibe/common/colors/colors.dart';
 import 'package:vvibe/common/values/enum.dart';
 import 'package:vvibe/services/event_bus.dart';
-import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/updater.dart';
-import 'package:window_manager/window_manager.dart';
 
 class Updater extends StatefulWidget {
   Updater({Key? key, required this.child}) : super(key: key);
@@ -130,7 +128,7 @@ class _UpdaterState extends State<Updater> {
   Function get confirmCb {
     switch (status) {
       case UpdatStatus.available:
-        return startUpdate;
+        return startInstallUpdate;
       case UpdatStatus.readyToInstall:
         return startInstallUpdate;
       default:
