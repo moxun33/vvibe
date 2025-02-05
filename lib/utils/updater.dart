@@ -135,11 +135,27 @@ class UpdaterUtil {
     }
   }
 
+  static installLinuxUpdate() async {
+    try {
+      print('install Linux Update');
+      final scriptPath = '${APP_DIR}/data/scripts/install-update.sh';
+
+      Process.start(scriptPath, [], mode: ProcessStartMode.detached);
+
+      windowManager.close();
+    } catch (e) {
+      print('Error running PowerShell script: $e');
+    }
+  }
+
   static startInstallUpdate() {
     if (!IS_RELEASE) return;
 
     if (Platform.isWindows) {
       installWindowsUpdate();
+    }
+    if (Platform.isLinux) {
+      installLinuxUpdate();
     }
   }
 

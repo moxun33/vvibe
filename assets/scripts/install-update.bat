@@ -26,7 +26,7 @@ if %errorlevel% neq 0 (
 
 :: 输出文件复制成功信息
 echo Files copied successfully.
-pause
+
 :: 启动指定的 exe 文件
 echo Starting %exe_path%...
 start "" "%exe_path%"

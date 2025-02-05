@@ -128,7 +128,7 @@ class _UpdaterState extends State<Updater> {
   Function get confirmCb {
     switch (status) {
       case UpdatStatus.available:
-        return startInstallUpdate;
+        return startUpdate;
       case UpdatStatus.readyToInstall:
         return startInstallUpdate;
       default:
