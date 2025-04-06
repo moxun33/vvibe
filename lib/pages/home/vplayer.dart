@@ -36,7 +36,7 @@ class Vplayer extends StatefulWidget {
 
 class _VplayerState extends State<Vplayer> with WindowListener {
   VideoPlayerController? _controller;
-  bool playListShowed = true;
+  bool playListShowed = false;
 
   final barrageWallController = BarrageWallController();
   PlayListItem? playingUrl;
@@ -153,12 +153,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   playerConfig() async {
     final Map<String, String> playerProps = {
+      "avformat.extension_picky": "0",
       // 'demux.buffer.ranges': '1',
-     // 'buffer': '2000+60000'
+      // 'buffer': '2000+60000'
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
-      playerProps['video.avfilter'] = 'yadif';
+      //  playerProps['video.avfilter'] = 'yadif';
     }
 
     registerWith(options: {
@@ -176,7 +177,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     _controller?.dispose();
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
-      'User-Agent': await _getUA(),
+      // 'User-Agent': await _getUA(),
     });
     item.catchup = playListInfo?.catchup;
     item.catchupSource = playListInfo?.catchupSource;
@@ -519,6 +520,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
                 children: _msgs.map((txt) {
                   return Text(
                     txt,
+                    softWrap: true,
+                    maxLines: 3,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,

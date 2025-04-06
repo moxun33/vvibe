@@ -68,7 +68,7 @@ class _PlGroupPanelState extends State<PlGroupPanel> {
   }
 
   void onSearch(String keyword) {
-    if (keyword.trim().isEmpty) return;
+    // if (keyword.trim().isEmpty) return;
     final newList = filterPlaylist(keyword, widget.data);
     if (newList.length < 1) {
       EasyLoading.showInfo('没有搜索结果');
