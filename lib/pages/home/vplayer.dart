@@ -159,7 +159,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
-      //  playerProps['video.avfilter'] = 'yadif';
+      playerProps['video.avfilter'] = 'yadif';
     }
 
     registerWith(options: {
