@@ -157,8 +157,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   playerConfig() async {
     final Map<String, String> playerProps = {
       "avformat.extension_picky": "0",
-      'demux.buffer.ranges': '1',
-      'buffer': '2000+10000'
+      //'demux.buffer.ranges': '1',
+      //'buffer': '2000+10000'
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
