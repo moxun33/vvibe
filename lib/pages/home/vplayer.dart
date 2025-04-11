@@ -20,6 +20,7 @@ import 'package:vvibe/models/playlist_info.dart';
 import 'package:vvibe/models/playlist_item.dart';
 import 'package:vvibe/services/danmaku/danmaku_service.dart';
 import 'package:vvibe/services/event_bus.dart';
+import 'package:vvibe/utils/common.dart';
 import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
@@ -51,6 +52,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   Duration lastBufferUpdateTime = Duration.zero;
   Duration lastBufferedPosition = Duration.zero;
   String cursor = '1';
+  final _throttle = Throttler(milliseconds: 1000);
+
   @override
   void initState() {
     super.initState();
@@ -154,8 +157,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   playerConfig() async {
     final Map<String, String> playerProps = {
       "avformat.extension_picky": "0",
-      // 'demux.buffer.ranges': '1',
-      // 'buffer': '2000+60000'
+      'demux.buffer.ranges': '1',
+      'buffer': '2000+10000'
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
@@ -279,6 +282,17 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         tip = '';
       });
     }
+
+    _throttle.run(() {
+      _updateBufferSpeed();
+    });
+  }
+
+  void _updateBufferSpeed() {
+    /*  if (playListShowed != true) {
+      updateWindowTitle(playingUrl!, '');
+      return;
+    } */
     final buffered = _controller?.value.buffered;
 
     // 获取最新的缓冲区
@@ -463,6 +477,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   @override
   void dispose() {
+    super.dispose();
+    _throttle.dispose();
     stopPlayer();
   }
 

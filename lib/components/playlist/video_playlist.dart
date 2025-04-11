@@ -32,7 +32,7 @@ class VideoPlaylist extends StatefulWidget {
 class _VideoPlaylistState extends State<VideoPlaylist> {
   // List<PlayListItem> playlist = [];
   PlayListInfo? playlistInfo;
-  List<Map<String, dynamic>> playFiles = []; //本地、订阅列表
+  List<Map<String, dynamic>>? playFiles = []; //本地、订阅列表
   String? selectedFileId = null;
   Map<String, dynamic>? selectedFile = null;
   bool loading = true;
@@ -133,8 +133,8 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   Map<String, dynamic> pickPlFile(String? id) {
     try {
       if (id == null) return {};
-      final file = playFiles.where((e) => e['id'] == id).toList().first;
-      return file;
+      final file = playFiles?.where((e) => e['id'] == id).toList().first;
+      return file ?? {};
     } catch (e) {
       print('$e  pickPlFile errors');
       return {};
@@ -217,7 +217,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   @override
   void didUpdateWidget(covariant VideoPlaylist oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.visible && playFiles.length < 1) {
+    if (widget.visible && playFiles != null && playFiles!.length < 1) {
       _initData();
     }
   }
@@ -301,9 +301,12 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                   updatePlaylistFiles();
                 },
                 value: selectedFileId,
-                hint: Text(playFiles.length > 0 ? '选择播放列表' : '播放列表为空',
+                hint: Text(
+                    playFiles != null && playFiles!.length > 0
+                        ? '选择播放列表'
+                        : '播放列表为空',
                     style: TextStyle(
-                        color: playFiles.length > 0
+                        color: playFiles != null && playFiles!.length > 0
                             ? Colors.white
                             : Colors.redAccent)),
                 iconStyleData:
@@ -313,7 +316,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
                 },
                 menuItemStyleData: MenuItemStyleData(height: 20),
                 style: const TextStyle(color: Colors.white, fontSize: 12),
-                items: playFiles.map<DropdownMenuItem<String>>((obj) {
+                items: playFiles?.map<DropdownMenuItem<String>>((obj) {
                   return DropdownMenuItem<String>(
                       value: obj['id'] ?? jsonEncode(obj),
                       key: ObjectKey(obj),
