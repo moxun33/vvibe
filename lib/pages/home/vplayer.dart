@@ -167,7 +167,6 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
     registerWith(options: {
       'video.decoders': getVideoDecoders(_deinterlace),
-      'lowLatency': 1,
       'player': playerProps
     });
   }
@@ -181,7 +180,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     _controller?.dispose();
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(item.url), httpHeaders: {
-      // 'User-Agent': await _getUA(),
+      'User-Agent': await _getUA(),
     });
     item.catchup = playListInfo?.catchup;
     item.catchupSource = playListInfo?.catchupSource;
