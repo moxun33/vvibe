@@ -45,6 +45,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   bool danmakuManualShow = true;
   String tip = ''; //左上角的单个文字提示，如成功、失败
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
+  List<String> logs = []; //logs
+  String metaInfoStr = ''; // 日志中的媒体信息文本
   bool msgsShowed = false;
   PlayListInfo? playListInfo; // 当前订阅的信息
   Map<String, dynamic> subConf = {}; //当前远程订阅、文件的独立播放配置
@@ -75,21 +77,41 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   _listenLog() {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
-      if (record.loggerName != 'mdk') return;
       try {
         final df = DateFormat("HH:mm:ss.SSS");
         final msg = record.message;
         final content =
             '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${msg}';
-        print('$content  mdk日志《=》2382389329823898932');
+        print('${content}  《=mdk日志');
+        //if (record.loggerName != 'mdk') return;
         //if (IS_RELEASE) LogFile.log(content + '\n');
         if (msg.contains('reader.buffering')) {
           final num = int.parse(msg.split('-').last.trim());
           setState(() {
             tip = num > 0 && num < 100 ? '缓冲中 ${num}%' : '';
           });
+        } else if (msg.contains('buffering progress') &&
+            !msg.contains('100%')) {
+          setState(() {
+            tip = '***缓冲中${msg.split(' ').last}';
+          });
+        } else {
+          setState(() {
+            tip = '';
+          });
         }
-      } catch (e) {}
+        if (msg.contains('Programs') && msg.contains('Metadata')) {
+          setState(() {
+            metaInfoStr = msg;
+          });
+        }
+        setState(() {
+          // 追加到logs
+          logs = [...logs, msg];
+        });
+      } catch (e) {
+        print('$e  《-mdk日志 catch ERROR');
+      }
     });
   }
 
@@ -111,9 +133,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       case 'windows':
         return [
           "MFT:d3d=11${bp}",
+          "hap${bp}",
           "D3D11${bp}",
           "DXVA${bp}",
-          "hap${bp}",
           "CUDA${bp}",
           "FFmpeg${bp}",
           "dav1d"
@@ -157,8 +179,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   playerConfig() async {
     final Map<String, String> playerProps = {
       "avformat.extension_picky": "0",
+      "reader.starts_with_key": "0",
       //'demux.buffer.ranges': '1',
-      //'buffer': '2000+10000'
+      // 'buffer': '2000-60000'
     };
     final _deinterlace = await _isDeinterlace();
     if (_deinterlace) {
@@ -166,6 +189,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     }
 
     registerWith(options: {
+      'global': {
+        'log': 'debug', // off, error, warning, info, debug, all(default)
+      },
       'video.decoders': getVideoDecoders(_deinterlace),
       'player': playerProps
     });
@@ -185,6 +211,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     item.catchup = playListInfo?.catchup;
     item.catchupSource = playListInfo?.catchupSource;
     setState(() {
+      logs = [];
       playingUrl = item;
       tip = '正在打开 ${item.name}';
     });
@@ -249,7 +276,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         '   Bitrate: ${(ac?.bitRate ?? 0) / 1000} kbps',
       ];
       setState(() {
-        msgs = _msgs;
+        msgs = metaInfoStr.isNotEmpty ? metaInfoStr.split('\n') : _msgs;
       });
 
       MyLogger.info(info.toString());
