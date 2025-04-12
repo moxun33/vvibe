@@ -167,6 +167,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
     registerWith(options: {
       'video.decoders': getVideoDecoders(_deinterlace),
+      'lowLatency': 1,
       'player': playerProps
     });
   }
