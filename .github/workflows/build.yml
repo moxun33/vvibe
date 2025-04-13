@@ -44,7 +44,7 @@ jobs:
           flutter config --enable-windows-desktop
           flutter pub get
           # nightly will crash
-          #curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-windows-desktop-vs2022-x64.7z?viasf=1 #-o mdk-sdk-windows-desktop-vs2022-x64.7z
+          #curl https://master.dl.sourceforge.net/project/mdk-sdk/mdk-sdk-windows-desktop-vs2022-x64.7z?viasf=1 -o mdk-sdk-windows-desktop-vs2022-x64.7z
           #mv mdk-sdk-windows-desktop-vs2022-x64.7z windows/flutter/ephemeral/.plugin_symlinks/fvp/windows
 
       - name: Build Windows

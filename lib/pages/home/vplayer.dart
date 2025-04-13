@@ -128,16 +128,17 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     switch (Platform.operatingSystem) {
       case 'windows':
         return [
+          "NVDEC${bp}",
+          "D3D11${bp}",
           "MFT:d3d=11${bp}",
           "hap${bp}",
-          "D3D11${bp}",
           "DXVA${bp}",
           "CUDA${bp}",
-          "FFmpeg${bp}",
-          "dav1d"
+          "FFmpeg${bp}"
         ];
       case 'linux':
         return [
+          "NVDEC${bp}",
           "hap${bp}",
           "VAAPI${bp}",
           "CUDA${bp}",
@@ -261,7 +262,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       final ac = info.audio?[0].codec;
       final _msgs = [
         'Video: ${vc?.codec}/ ${vc?.formatName ?? info.format}',
-        '   Frame Rate: ${vc?.frameRate} fps',
+        '   Frame Rate: ${vc?.frameRate.toInt()} fps',
         '   Resolution: ${vc?.width} x ${vc?.height}',
         '   Format: ${vc?.formatName}',
         '   Bitrate: ${(vc != null && vc.bitRate > 0 ? vc.bitRate : info.bitRate) / 1000} kbps',
