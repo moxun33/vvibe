@@ -46,7 +46,6 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   String tip = ''; //左上角的单个文字提示，如成功、失败
   List<String> msgs = []; //左上角的文字提示列表，如 媒体信息
   List<String> logs = []; //logs
-  String metaInfoStr = ''; // 日志中的媒体信息文本
   bool msgsShowed = false;
   PlayListInfo? playListInfo; // 当前订阅的信息
   Map<String, dynamic> subConf = {}; //当前远程订阅、文件的独立播放配置
@@ -78,12 +77,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
       try {
+        if (record.loggerName != 'mdk') return;
         final df = DateFormat("HH:mm:ss.SSS");
         final msg = record.message;
         final content =
             '${record.loggerName}.${record.level.name}: ${df.format(record.time)}: ${msg}';
-        print('${content}  《=mdk日志');
-        //if (record.loggerName != 'mdk') return;
+        print('${content}  《=mdk日志 ');
+
         //if (IS_RELEASE) LogFile.log(content + '\n');
         if (msg.contains('reader.buffering')) {
           final num = int.parse(msg.split('-').last.trim());
@@ -100,11 +100,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
             tip = '';
           });
         }
-        if (msg.contains('Programs') && msg.contains('Metadata')) {
-          setState(() {
-            metaInfoStr = msg;
-          });
-        }
+
         setState(() {
           // 追加到logs
           logs = [...logs, msg];
@@ -264,11 +260,11 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       final vc = info.video?[0].codec;
       final ac = info.audio?[0].codec;
       final _msgs = [
-        'Video: ${vc?.codec}/ ${info.format}',
+        'Video: ${vc?.codec}/ ${vc?.formatName ?? info.format}',
         '   Frame Rate: ${vc?.frameRate} fps',
         '   Resolution: ${vc?.width} x ${vc?.height}',
         '   Format: ${vc?.formatName}',
-        '   Bitrate: ${(vc?.bitRate ?? 0) / 1000} kbps',
+        '   Bitrate: ${(vc != null && vc.bitRate > 0 ? vc.bitRate : info.bitRate) / 1000} kbps',
         '   ',
         'Audio: ${ac?.codec}  ',
         '   Channels: ${ac?.channels}',
@@ -276,7 +272,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         '   Bitrate: ${(ac?.bitRate ?? 0) / 1000} kbps',
       ];
       setState(() {
-        msgs = metaInfoStr.isNotEmpty ? metaInfoStr.split('\n') : _msgs;
+        msgs = _msgs;
       });
 
       MyLogger.info(info.toString());
@@ -310,41 +306,20 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       });
     }
 
-    _throttle.run(() {
-      _updateBufferSpeed();
-    });
+    _updateBufferSpeed();
   }
 
   void _updateBufferSpeed() {
-    /*  if (playListShowed != true) {
+    _throttle.run(() {
+      /*  if (playListShowed != true) {
       updateWindowTitle(playingUrl!, '');
       return;
     } */
-    final buffered = _controller?.value.buffered;
+      final speed = _controller?.getMediaInfo()?.bitRate ?? 0;
+      final _speed = formatNetworkSpeed(speed, true);
 
-    // 获取最新的缓冲区
-    if (buffered != null && buffered.isNotEmpty) {
-      final newBufferEnd = buffered.last.end;
-      final now = DateTime.now().millisecondsSinceEpoch;
-
-      if (lastBufferUpdateTime != Duration.zero) {
-        final elapsedTime = (now - lastBufferUpdateTime.inMilliseconds);
-        final newBufferedBytes =
-            newBufferEnd.inMilliseconds - lastBufferedPosition.inMilliseconds;
-        final speed = (newBufferedBytes / (elapsedTime / 1000));
-        final _speed = speed.isFinite ? speed.toInt() : 0;
-        if (speed > 0 && playingUrl != null) {
-          // print('cache $_speed KB/s');
-          setState(() {
-            bufferSpeed = _speed;
-          });
-          updateWindowTitle(playingUrl!, '$_speed KB/s');
-        }
-      }
-
-      lastBufferedPosition = newBufferEnd;
-      lastBufferUpdateTime = Duration(milliseconds: now);
-    }
+      updateWindowTitle(playingUrl!, _speed);
+    });
   }
 
   //播放url改变
