@@ -95,11 +95,11 @@ class _VplayerState extends State<Vplayer> with WindowListener {
           setState(() {
             tip = '***缓冲中${msg.split(' ').last}';
           });
-        } else {
+        } /* else {
           setState(() {
             tip = '';
           });
-        }
+        } */
 
         setState(() {
           // 追加到logs
@@ -128,9 +128,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     switch (Platform.operatingSystem) {
       case 'windows':
         return [
-          "NVDEC${bp}",
-          "D3D11${bp}",
           "MFT:d3d=11${bp}",
+          "D3D11${bp}",
+          "NVDEC${bp}",
           "hap${bp}",
           "DXVA${bp}",
           "CUDA${bp}",
@@ -301,7 +301,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       setState(() {
         tip = '${item.name} 缓冲中......';
       });
-    } else {
+    } else if (_val.isPlaying) {
       setState(() {
         tip = '';
       });

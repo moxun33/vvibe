@@ -21,7 +21,7 @@ env:
   # APP name
   APP_NAME: vvibe
   FVP_DEPS_LATEST: 1
-
+  FVP_DEPS_URL: https://github.com/wang-bin/mdk-sdk/releases/latest/download
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 

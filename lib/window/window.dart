@@ -27,7 +27,8 @@ class VWindow {
 
 //设置window title
   void setWindowTitle([String? title, String? icon]) {
-    eventBus.emit('set-window-title', title ?? APP_NAME);
+    eventBus.emit('set-window-title',
+        title != null && title.isNotEmpty ? title : APP_NAME);
     setWindowIcon(icon);
   }
 
