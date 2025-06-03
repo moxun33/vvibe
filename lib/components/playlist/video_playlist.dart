@@ -4,12 +4,16 @@
  * @Last Modified by: Moxx
  * @Last Modified time: 2022-09-10 00:55:23
  */
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:native_context_menu/native_context_menu.dart';
+import 'package:uni_links/uni_links.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/player/settings/play_file_setting_dialog.dart';
 import 'package:vvibe/components/playlist/playlist_widgets.dart';
@@ -20,8 +24,11 @@ import 'package:vvibe/utils/color_util.dart';
 import 'package:vvibe/utils/utils.dart';
 
 class VideoPlaylist extends StatefulWidget {
-  const VideoPlaylist({Key? key, required this.onUrlTap, this.visible = false})
-      : super(key: key);
+  const VideoPlaylist({
+    Key? key,
+    required this.onUrlTap,
+    this.visible = false,
+  }) : super(key: key);
   final void Function(PlayListItem item,
       {Map<String, dynamic>? subConfig, PlayListInfo? playlistInfo}) onUrlTap;
   final bool visible;
@@ -37,6 +44,10 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   Map<String, dynamic>? selectedFile = null;
   bool loading = true;
   PlayListItem? currentPlayUrl;
+  StreamSubscription? _unilinksub;
+  Uri? initialLinkUri;
+  Uri? latestLinkUri;
+  Object? err;
   //初始化状态时使用，我们可以在这里设置state状态
   //也可以请求网络数据后更新组件状态
   @override
@@ -70,7 +81,70 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
       loading = false;
     });
     watchPlaylistDir();
+    handleIncomingLinks();
+    handleInitialUri();
   }
+
+  void handleIncomingLinks() {
+    if (!kIsWeb) {
+      // It will handle app links while the app is already started - be it in
+      // the foreground or in the background.
+      _unilinksub = uriLinkStream.listen((Uri? uri) {
+        if (!mounted) return;
+        print('got uri: $uri');
+        setState(() {
+          latestLinkUri = uri;
+          err = null;
+        });
+      }, onError: (Object err) {
+        print('got err: $err');
+
+        latestLinkUri = null;
+        if (err is FormatException) {
+          setState(() {
+            err = err;
+          });
+        } else {
+          setState(() {
+            err = Null;
+          });
+        }
+      });
+    }
+  }
+
+  /// Handle the initial Uri - the one the app was started with
+  ///
+  /// **ATTENTION**: `getInitialLink`/`getInitialUri` should be handled
+  /// ONLY ONCE in your app's lifetime, since it is not meant to change
+  /// throughout your app's life.
+  ///
+  /// We handle all exceptions, since it is called from initState.
+  Future<void> handleInitialUri() async {
+    // In this example app this is an almost useless guard, but it is here to
+    // show we are not going to call getInitialUri multiple times, even if this
+    // was a weidget that will be disposed of (ex. a navigation route change).
+
+    try {
+      final uri = await getInitialUri();
+
+      print('got initial uri: $uri');
+      if (!mounted) return;
+      setState(() {
+        initialLinkUri = uri;
+      });
+      initPlaylistByUnilink(uri);
+    } on PlatformException {
+      // Platform messages may fail but we ignore the exception
+      print('falied to get initial uri');
+    } on FormatException catch (e) {
+      print('malformed initial uri: $e');
+      err = e;
+    }
+  }
+
+// 根据 unilink初始化播放列表文件
+  void initPlaylistByUnilink(Uri? uri) {}
 
   bool plFileExists(List<Map<String, dynamic>> list, Map<String, dynamic>? pl) {
     return pl != null && list.any((e) => e['id'] == pl['id']);
@@ -241,6 +315,7 @@ class _VideoPlaylistState extends State<VideoPlaylist> {
   @override
   void dispose() {
     super.dispose();
+    _unilinksub?.cancel();
   }
 
   //debug情况下调用，每次热重载都会回调

@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   fvp
   native_context_menu
   screen_retriever_windows
+  uni_links_desktop
   url_launcher_windows
   window_manager
 )

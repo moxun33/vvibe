@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fvp/fvp.dart' as fvp;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:uni_links_desktop/uni_links_desktop.dart';
 import 'package:vvibe/common/values/values.dart';
 import 'package:vvibe/components/spinning.dart';
 import 'package:vvibe/models/login_mode.dart';
@@ -35,6 +36,9 @@ class Global {
     WidgetsFlutterBinding.ensureInitialized();
 
     await windowManager.ensureInitialized();
+    if (Platform.isWindows) {
+      registerProtocol('vvibe');
+    }
 // set logger before registerWith()
     /*    if (!IS_RELEASE) Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {

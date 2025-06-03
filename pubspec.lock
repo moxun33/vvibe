@@ -316,10 +316,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: "895421eafcb14c3f66fed24b20b6421e45711224d0df29ecd7b8bdb37a867f69"
+      sha256: d714aef89b8c4a35901b0b3c3c008d876d835f1604ebc3ce27d75e17b87d8b69
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.31.2"
+    version: "0.32.0"
   glob:
     dependency: transitive
     description:
@@ -821,6 +821,38 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.4.0"
+  uni_links:
+    dependency: "direct main"
+    description:
+      name: uni_links
+      sha256: "051098acfc9e26a9fde03b487bef5d3d228ca8f67693480c6f33fd4fbb8e2b6e"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.5.1"
+  uni_links_desktop:
+    dependency: "direct main"
+    description:
+      name: uni_links_desktop
+      sha256: "081a5ca8d6a41c95a5ba559caadc8d3c7d60d7d23e4f5713c20ff4ac0c6517ad"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.0"
+  uni_links_platform_interface:
+    dependency: transitive
+    description:
+      name: uni_links_platform_interface
+      sha256: "929cf1a71b59e3b7c2d8a2605a9cf7e0b125b13bc858e55083d88c62722d4507"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0"
+  uni_links_web:
+    dependency: transitive
+    description:
+      name: uni_links_web
+      sha256: "7539db908e25f67de2438e33cc1020b30ab94e66720b5677ba6763b25f6394df"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.0"
   url_launcher:
     dependency: "direct main"
     description:
@@ -981,6 +1013,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "5.12.0"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "6f1b564492d0147b330dd794fee8f512cec4977957f310f9951b5f9d83618dae"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.0"
   window_manager:
     dependency: "direct main"
     description:
@@ -1031,4 +1071,4 @@ packages:
     version: "2.2.2"
 sdks:
   dart: ">=3.7.0 <3.11.0"
-  flutter: ">=3.27.0"
+  flutter: ">=3.29.0"

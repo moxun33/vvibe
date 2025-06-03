@@ -25,6 +25,7 @@ import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
+import 'package:vvibe/utils/unilink_sub.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -58,6 +59,10 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  void _init() async {
     windowManager.addListener(this);
 
     // startPlay(PlayListItem(url: 'http://live.metshop.top/douyu/1377142'));
@@ -111,7 +116,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     });
   }
 
-  initLastVideo() {
+  initLastVideo() async {
     final lastPlayUrl = LoacalStorage().getJSON(LAST_PLAY_VIDEO_URL);
     if (lastPlayUrl != null && lastPlayUrl['url'] != null) {
       setState(() {
@@ -121,6 +126,10 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         startPlay(PlayListItem.fromJson(lastPlayUrl));
       }
     }
+  }
+
+  void _initUnilinkFile(Uri? uri) {
+    if (uri == null) return;
   }
 
   List<String> getVideoDecoders(bool fullFfmpeg) {
