@@ -49,8 +49,9 @@ class PlayListItem {
   String? tvgLogo;
   String? catchup;
   String? catchupSource;
+
   Map<String, dynamic>?
-      ext; //平台代理配置{'bakUrls':['备用链接列表'] 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url'}
+      ext; //平台代理等扩展配置{'bakUrls':['备用链接列表'] 'platformHit': false, 'douyu': matchDy, 'huya': matchHy, 'bilibili': matchBl ,'playUrl':'url',manifestType:'mpd',licenseType:'clearKey',licenseKey:'key'}
 
   factory PlayListItem.fromJson(Map<String, dynamic> json) => PlayListItem(
       name: json["name"] ?? '未命名',

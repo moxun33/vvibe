@@ -25,7 +25,6 @@ import 'package:vvibe/utils/local_storage.dart';
 import 'package:vvibe/utils/logger.dart';
 import 'package:vvibe/utils/playlist/playlist_util.dart';
 import 'package:vvibe/utils/screen_device.dart';
-import 'package:vvibe/utils/unilink_sub.dart';
 import 'package:vvibe/window/window.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -95,12 +94,13 @@ class _VplayerState extends State<Vplayer> with WindowListener {
           setState(() {
             tip = num > 0 && num < 100 ? '缓冲中 ${num}%' : '';
           });
-        } else if (msg.contains('buffering progress') &&
+        } /*else if (msg.contains('buffering progress') &&
             !msg.contains('100%')) {
+        } else if (msg.contains('buffering progress')) {
           setState(() {
             tip = '***缓冲中${msg.split(' ').last}';
           });
-        } /* else {
+        }  else {
           setState(() {
             tip = '';
           });
@@ -392,6 +392,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       playingUrl = null;
       _controller = null;
       cursor = '1';
+      tip = '';
     });
     windowManager.removeListener(this);
   }

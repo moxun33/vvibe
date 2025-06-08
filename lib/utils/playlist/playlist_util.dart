@@ -452,6 +452,39 @@ class PlaylistUtil {
     };
   }
 
+  bool isMediaUrl(String url) {
+    return url.startsWith('http') || isRtUrl(url);
+  }
+
+  bool isKodiProp(String line) {
+    return line.startsWith('#KODIPROP:inputstream.adaptive');
+  }
+
+// #KODIPROP:inputstream.adaptive.manifest_type=
+  String getMpdProp(String line, String prop) {
+    if (line.contains('${prop}=')) {
+      return line.split('${prop}=')[1];
+    }
+    return '';
+  }
+
+  String pickKodiPropByLines(List<String> lines, String prop) {
+    final licenseKeyLines =
+        lines.where((e) => isKodiProp(e) && e.contains(prop));
+    if (licenseKeyLines.isNotEmpty) {
+      return getMpdProp(licenseKeyLines.first, prop);
+    }
+    return '';
+  }
+
+  Map<String, dynamic> getKodiProps(List<String> lines) {
+    return {
+      'manifestType': pickKodiPropByLines(lines, 'manifest_type'),
+      'licenseKey': pickKodiPropByLines(lines, 'license_key'),
+      'licenseType': pickKodiPropByLines(lines, 'license_type'),
+    };
+  }
+
   //根据文本行 解析m3u的播放列表文件内容
   Future<PlayListInfo?> parseM3uContents(List<String> lines,
       [bool includeMeta = false]) async {
@@ -462,26 +495,37 @@ class PlaylistUtil {
         return null;
       }
       // 解析第一行的 x-tvg-url等信息
-      final Map<String, dynamic> meta = extractM3uMeta(lines[0]);
-
+      final metaIndex =
+          lines.indexWhere((element) => element.startsWith("#EXTM3U"));
+      final Map<String, dynamic> meta = extractM3uMeta(lines[metaIndex]);
       List<PlayListItem> list = [];
       for (var i = 0; i < lines.length; i++) {
         if (i > 0 && lines[i].startsWith("#EXTINF:")) {
+          final nextExtInfIdx =
+              lines.indexWhere((e) => e.startsWith("#EXTINF:"), i + 1);
           PlayListItem tempItem =
               PlayListItem.fromJson({'ext': Map<String, dynamic>.from({})});
           final info = lines[i],
-              url = lines[i + 1],
               name = info.split(',').last.trim(),
               group = getTextByReg(info, new RegExp(r'group-title="(.*?)"'),
                   defVal: ''),
-              tvgId = getTextByReg(info, new RegExp(r'tvg-id="(.*?)"')),
-              platProxy = isDyHyDlProxyUrl(url);
+              tvgId = getTextByReg(info, new RegExp(r'tvg-id="(.*?)"'));
+          //  print('nextExtInfIdx $nextExtInfIdx  currentExtInfIndex: $i');
+          final innerLines = lines.sublist(
+              i, nextExtInfIdx > 0 ? nextExtInfIdx : lines.length);
+          final urlLines = innerLines.where((e) => isMediaUrl(e));
 
+          String url = urlLines.isNotEmpty ? urlLines.join('#') : '';
+
+          final kodiProps = getKodiProps(innerLines);
+          tempItem.ext?.addAll(kodiProps);
+
+          final platProxy = isDyHyDlProxyUrl(url);
           if (platProxy['platformHit'] == true) {
             PlayListItem _temp = parseSingleUrl(url);
             tempItem.group = _temp.group;
             tempItem.tvgId = _temp.tvgId;
-            tempItem.ext = _temp.ext;
+            tempItem.ext?.addAll(_temp.ext ?? {});
           }
           final item = PlayListItem(
               ext: tempItem.ext ?? Map<String, dynamic>.from({}),
