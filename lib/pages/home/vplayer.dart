@@ -274,7 +274,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         '   Frame Rate: ${vc?.frameRate.toInt()} fps',
         '   Resolution: ${vc?.width} x ${vc?.height}',
         '   Format: ${vc?.formatName}',
-        '   Bitrate: ${(vc != null && vc.bitRate > 0 ? vc.bitRate : info.bitRate) / 1000} kbps',
+        '   Bitrate: ${(vc != null && vc.bitRate > 0 ? vc.bitRate : info.bitRate) / 1000 * 8} kbps',
         '   ',
         'Audio: ${ac?.codec}  ',
         '   Channels: ${ac?.channels}',

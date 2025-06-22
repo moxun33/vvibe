@@ -338,7 +338,7 @@ class _VplayerControlsState extends State<VplayerControls>
                 },
                 child: MouseRegion(
                   onHover: (_) {
-                    if (!mouseEntered) _cancelAndRestartTimer();
+                    _cancelAndRestartTimer();
                   },
                   onEnter: (event) {
                     setState(() {
@@ -380,7 +380,7 @@ class _VplayerControlsState extends State<VplayerControls>
                               Positioned(
                                   left: 10,
                                   right: 0,
-                                  bottom: 18,
+                                  bottom: 12,
                                   child: Row(
                                     children: [
                                       IconButton(
@@ -416,7 +416,12 @@ class _VplayerControlsState extends State<VplayerControls>
                                       ),
                                       AudioTackControl(controller: player),
                                       SubtitleTackControl(controller: player),
-
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 10),
+                                        child: BufferTimes(isLive()
+                                            ? value.buffered.last.end
+                                            : value.duration),
+                                      ),
                                       /*     Focus(
                                   focusNode: textFocusNode,
                                   onFocusChange: onTextFocusChange,
@@ -458,14 +463,14 @@ class _VplayerControlsState extends State<VplayerControls>
                                   )),
                               Positioned(
                                   right: 220,
-                                  bottom: 22,
+                                  bottom: 14,
                                   child: VolumeControl(
                                     widget.controller,
                                     thumbColor: Colors.white70,
                                   )),
                               Positioned(
                                   right: 20,
-                                  bottom: 22,
+                                  bottom: 14,
                                   child: Row(
                                     children: [
                                       IconButton(
@@ -529,9 +534,6 @@ class _VplayerControlsState extends State<VplayerControls>
                                 bottom: 5,
                                 child: Row(
                                   children: [
-                                    BufferTimes(isLive()
-                                        ? value.buffered.last.end
-                                        : value.duration),
                                     Expanded(
                                         child: VideoProgressIndicator(
                                       widget.controller,
