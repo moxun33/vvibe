@@ -186,8 +186,8 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     final Map<String, String> playerProps = {
       "avformat.extension_picky": "0",
       "reader.starts_with_key": "0",
-      'demux.buffer.ranges': '8',
-      'buffer': '2000-60000',
+      //'demux.buffer.ranges': '8',
+      //'buffer': '2000-60000',
       'avio.reconnect': '1',
       'avio.reconnect_delay_max': '10',
     };
