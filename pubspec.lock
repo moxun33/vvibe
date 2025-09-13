@@ -316,10 +316,10 @@ packages:
     dependency: "direct main"
     description:
       name: fvp
-      sha256: cb867b293ee684fbc5de188040f88bae8603d967d825b9407ecb96e191dcadc9
+      sha256: a2850b856e177cb48f3e49940613f2180f3375bcceab2f75e3d7b915009a2840
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.33.1"
+    version: "0.34.0"
   glob:
     dependency: transitive
     description:

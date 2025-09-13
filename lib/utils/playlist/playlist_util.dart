@@ -170,8 +170,8 @@ class PlaylistUtil {
     return v.toString().isNotEmpty;
   }
 
-  String pickStrVal(String v1, String? v2) {
-    return PlaylistUtil().isStrValid(v1) ? v1 : v2 ?? '';
+  String pickStrVal(String? v1, String? v2) {
+    return PlaylistUtil().isStrValid(v1) ? v1! : v2 ?? '';
   }
 
 // 解析本地或远程订阅,自动下钻单个直播源集合； 触发：一个直播源且名称为index
