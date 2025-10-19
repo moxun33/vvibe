@@ -278,7 +278,8 @@ class _WindowScaffoldState extends State<WindowScaffold> with WindowListener {
 
   @override
   void onWindowBlur() {
-    windowManager.blur();
+    // 移除blur()调用，避免点击音量调节等系统控件时窗口变得不可见
+    // 窗口失去焦点是正常行为，不应该改变窗口的可见性
   }
 
   @override

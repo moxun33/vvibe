@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -41,6 +42,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
 
   final barrageWallController = BarrageWallController();
   PlayListItem? playingUrl;
+  PlayListItem? _lastFailedItem; // 上次播放失败的项目
 
   bool danmakuManualShow = true;
   String tip = ''; //左上角的单个文字提示，如成功、失败
@@ -54,6 +56,12 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   Duration lastBufferedPosition = Duration.zero;
   String cursor = '1';
   final _throttle = Throttler(milliseconds: 1000);
+
+  // 网络检查相关
+  Timer? _networkCheckTimer; // 网络检查定时器
+  int _networkCheckCount = 0; // 网络检查次数计数
+  static const int MAX_CHECK_COUNT = 60; // 最大检查次数（10分钟 = 60 * 10秒）
+  static const int CHECK_INTERVAL = 10; // 检查间隔（秒）
 
   @override
   void initState() {
@@ -229,6 +237,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
     _controller
         ?.initialize()
         .then((_) => setState(() {
+              // 取消可能正在进行的网络检查
+              _cancelNetworkCheck();
+
               if (!playback) {
                 setState(() {
                   tip = '';
@@ -243,13 +254,22 @@ class _VplayerState extends State<Vplayer> with WindowListener {
               updateWindowTitle(item);
               toggleMediaInfo(msgsShowed);
             }))
-        .catchError((e) {
+        .catchError((e) async {
       setState(() {
         tip = '${item.name} 播放失败';
         playingUrl = null;
       });
       print('play error: ${e.toString()}');
-      stopPlayer();
+
+      // 检查网络连接
+      bool isNetworkConnected = await _checkNetworkConnection();
+      if (!isNetworkConnected) {
+        // 网络断开，开始定时检查
+        _startNetworkCheck(item);
+      } else {
+        // 网络正常，执行原有的停止逻辑
+        stopPlayer();
+      }
     });
     _controller?.play();
   }
@@ -272,6 +292,7 @@ class _VplayerState extends State<Vplayer> with WindowListener {
       final vc = info.video?[0].codec;
       final ac = info.audio?[0].codec;
       final _msgs = [
+        '${playingUrl?.url ?? ''}',
         'Video: ${vc?.codec}/ ${vc?.formatName ?? info.format}',
         '   Frame Rate: ${vc?.frameRate.toInt()} fps',
         '   Resolution: ${vc?.width} x ${vc?.height}',
@@ -305,7 +326,9 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         tip = '${item.name} 播放失败 ${_val.errorDescription ?? ''}';
         playingUrl = null;
       });
-      stopPlayer();
+
+      // 检查网络连接
+      _checkNetworkAndHandleError(item);
       return;
     }
     if (_val.isBuffering && !_val.isPlaying) {
@@ -378,6 +401,18 @@ class _VplayerState extends State<Vplayer> with WindowListener {
         msgs = [];
       }
     });
+  }
+
+  // 检查网络并处理错误
+  void _checkNetworkAndHandleError(PlayListItem item) async {
+    bool isNetworkConnected = await _checkNetworkConnection();
+    if (!isNetworkConnected) {
+      // 网络断开，开始定时检查
+      _startNetworkCheck(item);
+    } else {
+      // 网络正常，执行原有的停止逻辑
+      stopPlayer();
+    }
   }
 
   void stopPlayer() {
@@ -494,7 +529,72 @@ class _VplayerState extends State<Vplayer> with WindowListener {
   void dispose() {
     super.dispose();
     _throttle.dispose();
+    _cancelNetworkCheck(); // 取消网络检查
     stopPlayer();
+  }
+
+  // 检查网络连接
+  Future<bool> _checkNetworkConnection() async {
+    try {
+      // 使用DNS解析来检查网络连接
+      final result = await InternetAddress.lookup('www.google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  // 开始网络检查
+  void _startNetworkCheck(PlayListItem item) {
+    // 如果已经有检查任务运行，则取消
+    _cancelNetworkCheck();
+
+    // 保存失败的播放项
+    _lastFailedItem = item;
+    _networkCheckCount = 0;
+
+    // 设置定时器，每10秒检查一次网络
+    _networkCheckTimer =
+        Timer.periodic(Duration(seconds: CHECK_INTERVAL), (timer) async {
+      _networkCheckCount++;
+
+      // 检查是否超过最大检查次数（10分钟）
+      if (_networkCheckCount >= MAX_CHECK_COUNT) {
+        setState(() {
+          tip = '网络长时间未恢复，已停止自动重试';
+        });
+        _cancelNetworkCheck();
+        return;
+      }
+
+      // 检查网络连接
+      bool isConnected = await _checkNetworkConnection();
+      if (isConnected) {
+        setState(() {
+          tip = '网络已恢复，正在重新播放...';
+        });
+        _cancelNetworkCheck();
+
+        // 网络恢复后重新播放
+        if (_lastFailedItem != null) {
+          startPlay(_lastFailedItem!);
+        }
+      } else {
+        setState(() {
+          tip =
+              '网络连接断开，${CHECK_INTERVAL}秒后重试（${_networkCheckCount * CHECK_INTERVAL}s/600s）';
+        });
+      }
+    });
+  }
+
+  // 取消网络检查
+  void _cancelNetworkCheck() {
+    if (_networkCheckTimer != null) {
+      _networkCheckTimer!.cancel();
+      _networkCheckTimer = null;
+    }
+    _networkCheckCount = 0;
   }
 
   bool get showLogo {
