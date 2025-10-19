@@ -6,7 +6,7 @@ name: build
 on:
   push:
     branches:
-      - release
+      - master
     tags:
       - "v*"
     paths-ignore:
@@ -51,23 +51,17 @@ jobs:
         run: |
           flutter build windows --verbose --release
           cp -r build/windows/x64/runner/Release .
-          7z a vvibe-${{github.ref_name}}-windows-x64.zip  Release
+          # 读取当前版本号用于文件名
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | sed 's/\+.*//')
+          7z a vvibe-${CURRENT_VERSION}-windows-x64.zip  Release
 
-      - name: Release  Windows Artifact
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{github.ref_name}}
-          draft: true
-          prerelease: true
-          token: ${{ secrets.GH_TOKEN }}
-          files: |
-            vvibe-${{github.ref_name}}-windows-x64.zip
+      # 构建步骤中不再创建draft release，统一由UpdateVersionAndRelease任务处理
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vvibe-${{github.ref_name}}-windows-x64.zip
-          path: vvibe-${{github.ref_name}}-windows-x64.zip
+          name: vvibe-windows-x64
+          path: vvibe-*-windows-x64.zip
   Linux:
     runs-on: ubuntu-20.04
 
@@ -93,21 +87,97 @@ jobs:
           #mv mdk-sdk-linux-x64.tar.xz linux/flutter/ephemeral/.plugin_symlinks/fvp/linux
           flutter build linux --verbose --release
           cp -r build/linux/x64/release/bundle .
-          tar Jcvf vvibe-${{github.ref_name}}-linux-x64.tar.xz bundle
+          # 读取当前版本号用于文件名
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | sed 's/\+.*//')
+          tar Jcvf vvibe-${CURRENT_VERSION}-linux-x64.tar.xz bundle
 
-    - name: Release Linux Artifact
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{github.ref_name}}
-        draft: true
-        prerelease: true
-        token: ${{ secrets.GH_TOKEN }}
-        files: |
-          vvibe-${{github.ref_name}}-linux-x64.tar.xz
+    # 构建步骤中不再创建draft release，统一由UpdateVersionAndRelease任务处理
 
     - name: Upload Linux artifact
       uses: actions/upload-artifact@v4
       with:
-        name: vvibe-${{github.ref_name}}-linux-x64.tar.xz
-        path: vvibe-${{github.ref_name}}-linux-x64.tar.xz
+        name: vvibe-linux-x64
+        path: vvibe-*-linux-x64.tar.xz
+
+  # 更新版本并创建release的任务
+  UpdateVersionAndRelease:
+    needs: [Windows, Linux]
+    runs-on: ubuntu-latest
+    # 只在push到master分支时运行，不在tag触发时运行
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.29.2
+
+      - name: Check commit message format
+        id: check_commit
+        run: |
+          # 检查commit message是否包含年月日格式（如2025.1010）
+          if [[ "${{ github.event.head_commit.message }}" =~ [0-9]{4}\.[0-9]{4} ]]; then
+            echo "format_match=true" >> $GITHUB_OUTPUT
+          else
+            echo "format_match=false" >> $GITHUB_OUTPUT
+            echo "Commit message does not contain date format (YYYY.MMDD), skipping version update." 
+          fi
+      
+      - name: Update pubspec.yml version
+        if: steps.check_commit.outputs.format_match == 'true'
+        run: |
+          # 读取当前版本
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | sed 's/\+.*//')
+          
+          # 解析版本号
+          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+          
+          # 增加patch版本
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          
+          # 更新pubspec.yml
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/g" pubspec.yaml
+          
+          # 提交更改
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add pubspec.yaml
+          git commit -m "Bump version to $NEW_VERSION"
+          git push origin master
+          
+          # 输出新版本用于后续步骤
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      
+      - name: Download Windows artifact
+        if: steps.check_commit.outputs.format_match == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: vvibe-windows-x64
+          path: .
+      
+      - name: Download Linux artifact
+        if: steps.check_commit.outputs.format_match == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: vvibe-linux-x64
+          path: .
+      
+      - name: Create Release
+        if: steps.check_commit.outputs.format_match == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          name: Release v${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GH_TOKEN }}
+          files: |
+            vvibe-*-windows-x64.zip
+            vvibe-*-linux-x64.tar.xz
 
