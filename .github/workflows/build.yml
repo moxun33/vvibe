@@ -36,7 +36,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.29.2
+          flutter-version: 3.35.2
 
       - name: Install Dependences
         run: |
@@ -110,7 +110,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
-          
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.29.2
@@ -123,51 +123,51 @@ jobs:
             echo "format_match=true" >> $GITHUB_OUTPUT
           else
             echo "format_match=false" >> $GITHUB_OUTPUT
-            echo "Commit message does not contain date format (YYYY.MMDD), skipping version update." 
+            echo "Commit message does not contain date format (YYYY.MMDD), skipping version update."
           fi
-      
+
       - name: Update pubspec.yml version
         if: steps.check_commit.outputs.format_match == 'true'
         run: |
           # 读取当前版本
           CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | sed 's/\+.*//')
-          
+
           # 解析版本号
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
           MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
           PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
-          
+
           # 增加patch版本
           NEW_PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
-          
+
           # 更新pubspec.yml
           sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/g" pubspec.yaml
-          
+
           # 提交更改
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
           git add pubspec.yaml
           git commit -m "Bump version to $NEW_VERSION"
           git push origin master
-          
+
           # 输出新版本用于后续步骤
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-      
+
       - name: Download Windows artifact
         if: steps.check_commit.outputs.format_match == 'true'
         uses: actions/download-artifact@v4
         with:
           name: vvibe-windows-x64
           path: .
-      
+
       - name: Download Linux artifact
         if: steps.check_commit.outputs.format_match == 'true'
         uses: actions/download-artifact@v4
         with:
           name: vvibe-linux-x64
           path: .
-      
+
       - name: Create Release
         if: steps.check_commit.outputs.format_match == 'true'
         uses: softprops/action-gh-release@v2

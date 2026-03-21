@@ -68,3 +68,4 @@ assets/updater/*
 
 # FVM Version Cache
 .fvm/
+.trae/
